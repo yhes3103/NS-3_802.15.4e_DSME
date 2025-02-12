@@ -147,7 +147,6 @@ LrWpanPhy::LrWpanPhy()
     // default PHY PIB attributes
     m_phyPIBAttributes.phyTransmitPower = 0;
     m_phyPIBAttributes.phyCCAMode = 1;
-
     SetPhyOption(IEEE_802_15_4_2_4GHZ_OQPSK);
 
     m_random = CreateObject<UniformRandomVariable>();
@@ -998,11 +997,13 @@ LrWpanPhy::PlmeSetAttributeRequest(LrWpanPibAttributeIdentifier id,
 {
     NS_LOG_FUNCTION(this << id << attribute);
     NS_ASSERT(attribute);
-    LrWpanPhyEnumeration status = IEEE_802_15_4_PHY_SUCCESS;
-
-    switch (id)
+    LrWpanPhyEnumeration status = IEEE_802_15_4_PHY_SUCCESS;  // 0x07
+    NS_LOG_INFO(id);
+    switch(id)
     {
-    case phyCurrentPage: {
+    case phyCurrentPage:  // 0x04
+    {
+        NS_LOG_INFO(phyCurrentPage << "進來phyCurrentPage");
         if (!PageSupported(attribute->phyCurrentPage))
         {
             status = IEEE_802_15_4_PHY_INVALID_PARAMETER;
@@ -1175,7 +1176,9 @@ LrWpanPhy::PlmeSetAttributeRequest(LrWpanPibAttributeIdentifier id,
         }
         break;
     }
-    case phyCurrentChannel: {
+    case phyCurrentChannel:  // 0x00
+    {
+        NS_LOG_INFO(phyCurrentChannel << "進來phyCurrentChannel");
         if (!ChannelSupported(attribute->phyCurrentChannel))
         {
             status = IEEE_802_15_4_PHY_INVALID_PARAMETER;
@@ -1269,9 +1272,9 @@ LrWpanPhy::PlmeSetAttributeRequest(LrWpanPibAttributeIdentifier id,
         break;
     }
     }
-
     if (!m_plmeSetAttributeConfirmCallback.IsNull())
     {
+        NS_LOG_INFO("進來!m_plmeSetAttributeConfirmCallback");
         m_plmeSetAttributeConfirmCallback(status, id);
     }
 }
@@ -1322,6 +1325,7 @@ void
 LrWpanPhy::SetPlmeSetAttributeConfirmCallback(PlmeSetAttributeConfirmCallback c)
 {
     NS_LOG_FUNCTION(this);
+    NS_LOG_INFO("開始SetPlmeSetAttributeConfirmCallback");
     m_plmeSetAttributeConfirmCallback = c;
 }
 
@@ -1579,15 +1583,15 @@ LrWpanPhy::GetDataOrSymbolRate(bool isData)
 
     NS_ASSERT(m_phyOption < IEEE_802_15_4_INVALID_PHY_OPTION);
 
-    if (isData)
+    if(isData)
     {
         rate = dataSymbolRates[m_phyOption].bitRate;
     }
     else
     {
+        // dataSymbolRates[8].symbolRate = 62.5
         rate = dataSymbolRates[m_phyOption].symbolRate;
     }
-
     return (rate * 1000.0);
 }
 
@@ -1611,8 +1615,9 @@ LrWpanPhy::GetPpduHeaderTxTime()
 void
 LrWpanPhy::SetPhyOption(LrWpanPhyOption phyOption)
 {
-    NS_LOG_FUNCTION(this);
+    // howard: phyOption = 8
 
+    NS_LOG_FUNCTION(this);
     m_phyOption = IEEE_802_15_4_INVALID_PHY_OPTION;
 
     // TODO: Only O-QPSK 2.4GHz is supported in the LrWpanSpectrumModel
@@ -1666,7 +1671,7 @@ LrWpanPhy::SetPhyOption(LrWpanPhyOption phyOption)
         m_phyPIBAttributes.phyCurrentPage = 2;
         m_phyPIBAttributes.phyCurrentChannel = 1;
         break;
-    case IEEE_802_15_4_2_4GHZ_OQPSK:
+    case IEEE_802_15_4_2_4GHZ_OQPSK:  // 進來這裡
         // IEEE 802.15.4-2009 2.4 GHz O-QPSK (Page 0, Channels 11 to 26)
         m_phyPIBAttributes.phyCurrentPage = 0;
         m_phyPIBAttributes.phyCurrentChannel = 11;

@@ -271,8 +271,12 @@ LrWpanCsmaCa::Start()
 
         m_CW = 2;
 
+        /* howard: m_BE (退避指數) 會決定 backoff time (退避時間) 的長度
+                   公式: backoff time = random(0 * 2^m_BE - 1) * slot time
+                   m_BE 越大代表 backoff time 越長，因此越耗電 */
         if (m_macBattLifeExt)
         {
+            // 把 m_BE 設成 2 (因為 m_macMinBE = 3)
             m_BE = std::min(static_cast<uint8_t>(2), m_macMinBE);
         }
         else

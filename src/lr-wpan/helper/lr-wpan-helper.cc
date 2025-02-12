@@ -269,6 +269,7 @@ void LrWpanHelper::AddGtsInCfp(Ptr<NetDevice> dev
                                 , uint16_t channelOfs
                                 , uint16_t superframeID
                                 , uint8_t slotID) {
+    // 定義在 lr-wpan-helper.h 中的 lr-wpan-mac.h 裡面
     macDSMEACTEntity entity;
 
     entity.m_superframeID = superframeID;
@@ -452,31 +453,28 @@ void LrWpanHelper::AssociateToBeaconPan(NetDeviceContainer c,
     uint8_t idBuf[2];
     Mac16Address address;
 
-    for (NetDeviceContainer::Iterator i = c.Begin(); i != c.End(); i++) {
+    for(NetDeviceContainer::Iterator i = c.Begin(); i != c.End(); i++)
+    {
         Ptr<LrWpanNetDevice> device = DynamicCast<LrWpanNetDevice>(*i);
 
-        if (device) {
+        if(device)
+        {
             idBuf[0] = (id >> 8) & 0xff;
             idBuf[1] = (id >> 0) & 0xff;
             address.CopyFrom(idBuf);
 
             device->GetMac()->SetShortAddress(address);
 
-            if (address == coor) {
-                Ptr<UniformRandomVariable> uniformRandomVariable =
-                    CreateObject<UniformRandomVariable>();
-                ;
-                // Time jitter = Time(MilliSeconds(uniformRandomVariable->GetInteger(0, 10)));
-
-                // Simulator::Schedule(jitter, &LrWpanMac::MlmeStartRequest, device->GetMac(), params);
-
+            if(address == coor)
+            {
+                Ptr<UniformRandomVariable> uniformRandomVariable = CreateObject<UniformRandomVariable>();
                 Simulator::ScheduleNow(&LrWpanMac::MlmeStartRequest, device->GetMac(), params);
-                
-            } else {
+            }
+            else
+            {
                 device->GetMac()->SetPanId(params.m_PanId);
                 device->GetMac()->SetAssociatedCoor(coor);
             }
-
             id++;
         }
     }                            

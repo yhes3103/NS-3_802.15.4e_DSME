@@ -97,20 +97,22 @@ LrWpanNetDevice::LrWpanNetDevice()
     m_mac = CreateObject<LrWpanMac>();
     m_phy = CreateObject<LrWpanPhy>();
     m_csmaca = CreateObject<LrWpanCsmaCa>();
+    NS_LOG_INFO("進來LrWpanNetDevice");
     CompleteConfig();
 }
 
-LrWpanNetDevice::LrWpanNetDevice(bool dsmeOn)
-    : m_configComplete(false) {
-    NS_LOG_FUNCTION(this);
-    m_mac = CreateObject<LrWpanMac>();
-    m_phy = CreateObject<LrWpanPhy>();
-    m_csmaca = CreateObject<LrWpanCsmaCa>();
+/* howard: 不知道為什麼 LrWpanHelper lrWpanHelper(true) 沒辦法把 true 傳到下面這個建構函式裡面
+           所以我就直接注釋掉了，反正 lr-wpan-net-device.h 裡面已經預設 bool dsmeOn = true*/
 
-    m_dsmeOn = dsmeOn;
-
-    CompleteConfig();
-}
+// LrWpanNetDevice::LrWpanNetDevice(bool dsmeOn)
+//     : m_configComplete(false) {
+//     NS_LOG_FUNCTION(this);
+//     m_mac = CreateObject<LrWpanMac>();
+//     m_phy = CreateObject<LrWpanPhy>();
+//     m_csmaca = CreateObject<LrWpanCsmaCa>();
+//     m_dsmeOn = dsmeOn;
+//     CompleteConfig();
+// }
 
 LrWpanNetDevice::~LrWpanNetDevice()
 {
@@ -144,6 +146,7 @@ LrWpanNetDevice::DoInitialize()
 void
 LrWpanNetDevice::CompleteConfig()
 {
+    NS_LOG_INFO("DEVICE");
     NS_LOG_FUNCTION(this);
     if (!m_mac || !m_phy || !m_csmaca || !m_node || m_configComplete)
     {
@@ -161,18 +164,17 @@ LrWpanNetDevice::CompleteConfig()
     m_phy->SetPdDataIndicationCallback(MakeCallback(&LrWpanMac::PdDataIndication, m_mac));
     m_phy->SetPdDataConfirmCallback(MakeCallback(&LrWpanMac::PdDataConfirm, m_mac));
     m_phy->SetPlmeEdConfirmCallback(MakeCallback(&LrWpanMac::PlmeEdConfirm, m_mac));
-    m_phy->SetPlmeGetAttributeConfirmCallback(
-        MakeCallback(&LrWpanMac::PlmeGetAttributeConfirm, m_mac));
-    m_phy->SetPlmeSetTRXStateConfirmCallback(
-        MakeCallback(&LrWpanMac::PlmeSetTRXStateConfirm, m_mac));
-    m_phy->SetPlmeSetAttributeConfirmCallback(
-        MakeCallback(&LrWpanMac::PlmeSetAttributeConfirm, m_mac));
+    m_phy->SetPlmeGetAttributeConfirmCallback(MakeCallback(&LrWpanMac::PlmeGetAttributeConfirm, m_mac));
+    m_phy->SetPlmeSetTRXStateConfirmCallback(MakeCallback(&LrWpanMac::PlmeSetTRXStateConfirm, m_mac));
+    
+    m_phy->SetPlmeSetAttributeConfirmCallback(MakeCallback(&LrWpanMac::PlmeSetAttributeConfirm, m_mac));
 
     m_csmaca->SetLrWpanMacStateCallback(MakeCallback(&LrWpanMac::SetLrWpanMacState, m_mac));
     m_phy->SetPlmeCcaConfirmCallback(MakeCallback(&LrWpanCsmaCa::PlmeCcaConfirm, m_csmaca));
 
     // DSME
-    if (m_dsmeOn) {
+    if(m_dsmeOn)  // 已設定在 lr-wpan-net-device.h 裡面，預設是 true
+    {
         m_mac->SetDsmeModeEnabled();
         m_mac->SetChannelHoppingEnabled();
 

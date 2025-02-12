@@ -697,6 +697,7 @@ LrWpanMac::McpsDataRequest(McpsDataRequestParams params, Ptr<Packet> p)
 }
 
 void LrWpanMac::MlmeStartRequest(MlmeStartRequestParams params) {
+    NS_LOG_INFO("MlmeStartRequest開始");
     NS_LOG_FUNCTION(this);
     NS_ASSERT(m_deviceCapability == DeviceType::FFD);
     //NS_ASSERT(m_becomeCoord || params.m_panCoor);
@@ -768,14 +769,16 @@ void LrWpanMac::MlmeStartRequest(MlmeStartRequestParams params) {
     // Mark primitive as pending and save the start params while the new page and channel is set.
     m_startParams = params;
 
-    if (!params.m_coorRealgn) {
+    if(!params.m_coorRealgn)
+    {
         m_pendPrimitive = MLME_START_REQ;
 
         LrWpanPhyPibAttributes pibAttr;
         pibAttr.phyCurrentPage = m_startParams.m_logChPage;
         m_phy->PlmeSetAttributeRequest(LrWpanPibAttributeIdentifier::phyCurrentPage, &pibAttr);
-
-    } else {
+    }
+    else
+    {
         EndStartRequest();
     }
 }
@@ -1814,6 +1817,7 @@ void LrWpanMac::SendOneEnhancedBeacon() {
     beaconPacket->AddTrailer(macTrailer);
 
     // Set the Beacon packet to be transmitted
+    // 使用 PdDataRequest() 傳到實體層
     m_txPkt = beaconPacket;
 
     if (m_csmaCa->IsSlottedCsmaCa()) {
@@ -3008,7 +3012,7 @@ LrWpanMac::EndStartRequest()
     // The primitive is no longer pending (Channel & Page have been set)
     m_pendPrimitive = MLME_NONE;
 
-    if (m_startParams.m_coorRealgn) // Coordinator Realignment
+    if(m_startParams.m_coorRealgn) // Coordinator Realignment
     {
         // TODO: Send realignment request command frame in CSMA/CA
         // NS_LOG_ERROR(this << " Coordinator realignment request not supported");
@@ -3022,29 +3026,36 @@ LrWpanMac::EndStartRequest()
 
         SendCoordinatorRealignmentCmd(false, true, Mac64Address("ff:ff:ff:ff:ff:ff:ff:ff")
                                       , Mac16Address("ff:ff"));
-
         return;
+    }
+    else
+    {
+        if(m_startParams.m_panCoor)
+        {
+            /* howard: 雖然不影響，但原本讓 m_coord 和 panCoor 都等於 1 應該是錯的
+                       不影響的原因是因為 ScheduleGts() 會有一個 if 來判斷是不是 PAN-C
+                       如果是則直接 return */
+            // m_coord = m_panCoor = true;
 
-    } else {
-        if (m_startParams.m_panCoor) {
-            m_coord = m_panCoor = true;
+            m_panCoor = true;
             m_macPanId = m_startParams.m_PanId;
-
-        } else {
+        }
+        else
+        {
             m_coord = true;
             m_macPanId = m_startParams.m_PanId;
         }
 
         NS_ASSERT(m_startParams.m_PanId != 0xffff);
 
-        if (m_panCoor) 
+        if(m_panCoor)
         {
             m_macBeaconOrder = m_startParams.m_bcnOrd;
-        } else 
+        }
+        else 
         {
-            // Extract BO infos from associated PAN-C
-            m_macBeaconOrder = m_panDescriptorList[m_descIdxOfAssociatedPan].m_superframeSpec
-                                                                            .GetBeaconOrder();
+            // Extract BO infos from associated PAN-C (從 PAN-C 提取 BO)
+            m_macBeaconOrder = m_panDescriptorList[m_descIdxOfAssociatedPan].m_superframeSpec.GetBeaconOrder();
         }
         
         if (m_macBeaconOrder == 15) {
@@ -3072,25 +3083,24 @@ LrWpanMac::EndStartRequest()
             }
 
             m_phy->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_RX_ON);
-
         }
-        else 
+        else
         {
-            if (m_panCoor) 
+            if(m_panCoor) 
             {
                 m_macSuperframeOrder = m_startParams.m_sfrmOrd;
+                
+                // 是否開啟省電模式，這邊預設不開啟
                 m_csmaCa->SetBatteryLifeExtension(m_startParams.m_battLifeExt);
-
-            } 
-            else {
-                // Because the device has associated already, here just to extract the superframe infos (BO, SO, etc.)
-                m_macSuperframeOrder = 
-                        m_panDescriptorList[m_descIdxOfAssociatedPan].m_superframeSpec.GetFrameOrder();
-
-                m_csmaCa->SetBatteryLifeExtension(m_panDescriptorList[m_descIdxOfAssociatedPan]
-                                                 .m_superframeSpec.IsBattLifeExt());
             }
-            
+            else
+            {
+                // Because the device has associated already, here just to extract the superframe infos (BO, SO, etc.)
+                m_macSuperframeOrder = m_panDescriptorList[m_descIdxOfAssociatedPan].m_superframeSpec.GetFrameOrder();
+
+                m_csmaCa->SetBatteryLifeExtension(m_panDescriptorList[m_descIdxOfAssociatedPan].m_superframeSpec.IsBattLifeExt());
+            }
+            // 使用 slotted-CSMA/CA
             m_csmaCa->SetSlottedCsmaCa();
 
             // DSME-TODO
@@ -3100,15 +3110,17 @@ LrWpanMac::EndStartRequest()
             //  the total number of possible slots in the superframe (15).
             // m_fnlCapSlot = 15;
 
-            // Setting final cap timeslot 
+            // Setting final cap timeslot
             m_fnlCapSlot = 8;
 
-            m_beaconInterval =
-                (static_cast<uint32_t>(1 << m_macBeaconOrder)) * aBaseSuperframeDuration;
-            m_superframeDuration =
-                (static_cast<uint32_t>(1 << m_macSuperframeOrder)) * aBaseSuperframeDuration;
+            // BI = 2^BO * aBaseSuperframeDuration
+            m_beaconInterval = (static_cast<uint32_t>(1 << m_macBeaconOrder)) * aBaseSuperframeDuration;
+
+            // SD = 2^SO * aBaseSuperframeDuration
+            m_superframeDuration = (static_cast<uint32_t>(1 << m_macSuperframeOrder)) * aBaseSuperframeDuration;
                 
             // DSME
+            /* howard: 這裡會拿到 62500，因為 2.4 Ghz O-QPSK 每秒可傳 62500 個 symbol */
             uint64_t symbolRate = (uint64_t)m_phy->GetDataOrSymbolRate(false); // symbols per second
             Time bcnTime = Seconds((double)m_beaconInterval / symbolRate);
             Time superfmTime = Seconds((double)m_superframeDuration / symbolRate);
@@ -4471,12 +4483,15 @@ void LrWpanMac::StartGTS(SuperframeType superframeType, uint16_t superframeID, i
         {
             case GROUP_ACK_LEGACY:
 
-
                 if((int)m_macDsmeACT[superframeID][idx].m_slotID == m_legacyGroupAck.GetGACK1SlotID() ||
                 (int)m_macDsmeACT[superframeID][idx].m_slotID == m_legacyGroupAck.GetGACK2SlotID())
                 {
+                    NS_LOG_DEBUG("測試");
+                    // 這行有問題 應該是要給 Coordinator 送 group ack 的，不是給 PAN Coordinator
+                    // if(m_macDsmeACT[superframeID][idx].m_direction == 0 && ) // TX
                     if(m_macDsmeACT[superframeID][idx].m_direction == 0 && m_coord) // TX
                     {
+                        NS_LOG_DEBUG("進來了");
                         // Delay 3ms for the GTS TX-RX time diff
                         // This will avoid for sending GACK packet before the receiver turn on RX.
                         Simulator::Schedule(Time("3ms"), 
@@ -4554,7 +4569,7 @@ void LrWpanMac::EndGTS(SuperframeType superframeType) {
 void LrWpanMac::StartSuperframe() 
 {
     m_startFirstSuperframeEvent.Cancel();
-    if(m_curSuperframeIDx < (m_numOfSuperframes / m_numOfMultisuperframes) - 1 
+    if(m_curSuperframeIDx < (m_numOfSuperframes / m_numOfMultisuperframes) - 1
     && !m_isFirstSuperframe)
     {
         m_curSuperframeIDx++;
@@ -4899,7 +4914,7 @@ void LrWpanMac::ResizeScheduleGTSsEvent(uint8_t bcnOrder,
     // Guess : beacause the multisuperframe will repeat the duty cycle,
     //         here divide the numOfMultisuperframes in order to schedule only one time.
     m_scheduleGTSsEvent.resize(m_numOfSuperframes / m_numOfMultisuperframes);
-    m_scheduleGTSsEvent.resize(m_numOfSuperframes / m_numOfMultisuperframes);
+    // m_scheduleGTSsEvent.resize(m_numOfSuperframes / m_numOfMultisuperframes);
 }
 
 uint8_t LrWpanMac::GenerateSABSubBlock(uint8_t slotID, uint8_t numSlot) {
@@ -5497,7 +5512,6 @@ void LrWpanMac::PdDataIndication(uint32_t psduLength, Ptr<Packet> p, uint8_t lqi
                             syncParams.m_logCh = receivedMacPayload.GetChannelNum(); 
                             syncParams.m_logChPage = receivedMacPayload.GetChannelPage(); 
                             syncParams.m_trackBcn = true; 
-
                             Simulator::ScheduleNow(&LrWpanMac::MlmeSyncRequest,
                                                     this,
                                                     syncParams);  
@@ -6072,7 +6086,9 @@ void LrWpanMac::PdDataIndication(uint32_t psduLength, Ptr<Packet> p, uint8_t lqi
 
                     if (m_macAutoRequest) {
                         if (p->GetSize() > 0) {      // the beacon contains any beacon payload
-                            if (!m_mlmeBeaconNotifyIndicationCallback.IsNull()) {
+                            // 檢查回呼函式有沒有被綁定，有就回傳 false，沒有就回傳 true
+                            if(!m_mlmeBeaconNotifyIndicationCallback.IsNull())
+                            {
                                 // DSME-TODO
                                 // The beacon contains payload, send the beacon notification.
                                 MlmeBeaconNotifyIndicationParams beaconParams;
@@ -7718,7 +7734,6 @@ LrWpanMac::PdDataConfirm(LrWpanPhyEnumeration status)
     symbolRate = m_phy->GetDataOrSymbolRate(false); // symbols per second
 
     m_txPkt->PeekHeader(macHdr);
-
     if (status == IEEE_802_15_4_PHY_SUCCESS) {
         if (!macHdr.IsAcknowledgment()) 
         {
@@ -7859,6 +7874,7 @@ LrWpanMac::PdDataConfirm(LrWpanPhyEnumeration status)
                     */
                     if(m_groupAckPolicy == GROUP_ACK_LEGACY && (m_gtsEvent.IsRunning() || m_incGtsEvent.IsRunning()))
                     {
+                        NS_LOG_DEBUG("hello world !");
                         m_legacyGackGTSIdxBuffer.push_back((uint32_t)m_currentGTSIdx);
                     }  
 
@@ -7915,9 +7931,7 @@ LrWpanMac::PdDataConfirm(LrWpanPhyEnumeration status)
                     m_setMacState =
                         Simulator::ScheduleNow(&LrWpanMac::SetLrWpanMacState, this, MAC_ACK_PENDING);
                 }
-
                 return;
-                
             } 
             else if (macHdr.IsCommand()) 
             {
@@ -8982,6 +8996,7 @@ LrWpanMac::PlmeSetAttributeConfirm(LrWpanPhyEnumeration status, LrWpanPibAttribu
         if (status == LrWpanPhyEnumeration::IEEE_802_15_4_PHY_SUCCESS)
         {
             m_originalChannelInCAP = m_startParams.m_logCh;
+            NS_LOG_INFO("AAA");
             EndStartRequest();
         }
         else
