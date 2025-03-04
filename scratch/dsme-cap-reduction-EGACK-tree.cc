@@ -362,9 +362,9 @@ int main(int argc, char** argv) {
         ClearRoundRobinQueue(&childLrWpanDevIdxQueue); // Reset (clear) queue.
     }
 
-    AsciiTraceHelper ascii;
-    lrWpanHelper.EnableAsciiAll(ascii.CreateFileStream("Gack.tr"));
-    lrWpanHelper.EnablePcapAll(std::string("Gack"), true);
+    // AsciiTraceHelper ascii;
+    // lrWpanHelper.EnableAsciiAll(ascii.CreateFileStream("Gack.tr"));
+    // lrWpanHelper.EnablePcapAll(std::string("Gack"), true);
     Simulator::Stop(Seconds(1.474559997));
     // Simulator::Stop(Seconds(1.35167999));
     // Simulator::Stop(Seconds(1.22879999));

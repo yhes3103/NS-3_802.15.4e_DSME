@@ -63,7 +63,7 @@ int main(int argc, char** argv)
         LogComponentEnableAll(LOG_PREFIX_TIME);  // 時間
         LogComponentEnableAll(LOG_PREFIX_FUNC);  // 進入哪個 function
         LogComponentEnable("LrWpanPhy", LOG_LEVEL_INFO);
-        // LogComponentEnable("LrWpanHelper", LOG_LEVEL_INFO);
+        LogComponentEnable("LrWpanHelper", LOG_LEVEL_INFO);
         LogComponentEnable("LrWpanMac", LOG_LEVEL_INFO);  // lr-wpan 的 LOG_INFO
         LogComponentEnable("LrWpanNetDevice", LOG_LEVEL_INFO);
         // LogComponentEnable("LrWpanCsmaCa", LOG_LEVEL_INFO);
@@ -153,7 +153,7 @@ int main(int argc, char** argv)
     startParams.m_sfrmOrd = SO;  // 設定 SO = 3
     startParams.m_logCh = channelNum;
 
-    BeaconBitmap bitmap(0, 1 << (BO - SO));  // 直接初始化 BeaconBitmap 的建構函式
+    BeaconBitmap bitmap(0, 1 << (BO - SO)); // (uint16_t sdIndex = 0, uint16_t bitmapLen = 8)
     bitmap.SetSDIndex(0);  // PAN-C beacon use SDIDx = 0 (beacon TX at SDIdx 0)
     startParams.m_bcnBitmap = bitmap;
 
@@ -168,6 +168,7 @@ int main(int argc, char** argv)
     // 如果該 vector 的元素數量小於 a，則會將 vector 擴充到 a，然後剩下的元素用 b 填入
     // m_channelOfsBitmap 一開始有 0 個元素，透過 resize 調整成 1 個元素，並且該元素的值為 1 (0b0000000000000001)
     // 代表第一個 Superframe (SDIDx = 0) 中已經有人傳送 Beacon 了
+    // 紀錄目前的 channel offset bitmap 長怎樣，1 代表該 offset 有人使用
     hoppingDescriptor.m_channelOfsBitmap.resize(1, BIT(panChannelOfs));
 
     startParams.m_hoppingDescriptor = hoppingDescriptor;
@@ -177,6 +178,8 @@ int main(int argc, char** argv)
     dsmeSuperframeField.SetChannelDiversityMode(1);
     dsmeSuperframeField.SetCAPReductionFlag(capReduction);
     dsmeSuperframeField.SetGACKFlag(true);
+
+    // 主要就是可以把上面這些資訊直接印出來
     startParams.m_dsmeSuperframeSpec = dsmeSuperframeField;
 
     /**
@@ -243,10 +246,7 @@ int main(int argc, char** argv)
     panDescriptor.m_bcnBitmap = bitmap;
 
     // 把自己設定成 Coordinator (可以發出 Beacon)
-    lrWpanHelper.CoordBoostrap(lrwpanDevices.Get(1)->GetObject<LrWpanNetDevice>()
-                                , panDescriptor
-                                , 1
-                                , params);
+    lrWpanHelper.CoordBoostrap(lrwpanDevices.Get(1)->GetObject<LrWpanNetDevice>(), panDescriptor, 1, params);
     
     // GTSs setting
     // 每個設備都開啟 DSME-GTS 功能
@@ -318,21 +318,22 @@ int main(int argc, char** argv)
     //     setTime += slotTimeInterval;
     // }
 
-    for(int superframeID = 1; superframeID < 4; superframeID++)
+    for(int superframeID = 0; superframeID < 4; superframeID++)
     {
         for(int slotIdx = 0; slotIdx < 7; slotIdx++)
         {
-            if((superframeID == 1) && slotIdx == 5) // Allocate GACK at last slot in the loop
+            // GACK 和 traffic 的 superframeID 要一樣
+            if((superframeID == 2) && slotIdx == 5) // Allocate GACK at last slot in the loop
             {
                 // Setting coordinator
                 lrWpanHelper.AddGtsInCfp(lrwpanDevices.Get(1)->GetObject<LrWpanNetDevice>(), false, 1, // Coord for TX
-                            1, 1, GACK_1_SLOT_IDX); 
+                            1, 2, GACK_1_SLOT_IDX); 
 
                 lrWpanHelper.AddGtsInCfp(lrwpanDevices.Get(2)->GetObject<LrWpanNetDevice>(), true, 1,  // Devices for RX
-                            1, 1, GACK_1_SLOT_IDX); 
+                            1, 2, GACK_1_SLOT_IDX);
             }
-            
-            if((superframeID == 3) && slotIdx == 5)
+
+            if((superframeID == 3) && slotIdx == 5)                                                                                                                                                                                                                                                       
             {
                 lrWpanHelper.AddGtsInCfp(lrwpanDevices.Get(1)->GetObject<LrWpanNetDevice>(), false, 1, // Coord for TX
                             1, 3, GACK_2_SLOT_IDX);
@@ -341,7 +342,7 @@ int main(int argc, char** argv)
                             1, 3, GACK_2_SLOT_IDX);
             }
 
-            if((superframeID == 3) && slotIdx == 0) // We want to allocate slot 0 ~ slot 3
+            if((superframeID == 1) && slotIdx == 0) // We want to allocate slot 0 ~ slot 3
             {
                 lrWpanHelper.AddGtsInCfp(lrwpanDevices.Get(1)->GetObject<LrWpanNetDevice>(), true, 1, // Coord for RX
                                             1, superframeID, slotIdx);       
@@ -352,10 +353,22 @@ int main(int argc, char** argv)
                 // Call traffic API , in this case only needs to send one packet.
                 lrWpanHelper.GenerateTraffic(lrwpanDevices.Get(2), lrwpanDevices.Get(1)->GetAddress(), pktSize, setTime, 100.0, 10000.0); 
             }
+            // if((superframeID == 3) && slotIdx == 0) // We want to allocate slot 0 ~ slot 3
+            // {
+            //     lrWpanHelper.AddGtsInCfp(lrwpanDevices.Get(1)->GetObject<LrWpanNetDevice>(), true, 1, // Coord for RX
+            //                                 1, superframeID, slotIdx);       
+
+            //     lrWpanHelper.AddGtsInCfp(lrwpanDevices.Get(2)->GetObject<LrWpanNetDevice>(), false, 1, // Devices for TX
+            //                                 1, superframeID, slotIdx);
+
+            //     // Call traffic API , in this case only needs to send one packet.
+            //     lrWpanHelper.GenerateTraffic(lrwpanDevices.Get(2), lrwpanDevices.Get(1)->GetAddress(), pktSize, setTime, 100.0, 10000.0); 
+            // }
 
             setTime += slotTimeInterval; // add for the next GTS slot.
         }
     }
+    // Received DATA packet of size
 
     // 這應該是產生 wireshark 封包
     // AsciiTraceHelper ascii;

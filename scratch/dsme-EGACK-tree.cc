@@ -301,7 +301,7 @@ int main(int argc, char** argv) {
         double setTime = slot_0_StartTime;
         double slotTimeInterval = 0.00768; // slot time
         
-        for(int superframeID = 1; superframeID < 4; superframeID++)
+        for(int superframeID = 0; superframeID < 4; superframeID++)
         {
             /**
              * According to the topology to push the RFD lrWpanDeviceIdx into queue.
@@ -353,9 +353,9 @@ int main(int argc, char** argv) {
         ClearRoundRobinQueue(&childLrWpanDevIdxQueue); // Reset (clear) queue.
     }
 
-    AsciiTraceHelper ascii;
-    lrWpanHelper.EnableAsciiAll(ascii.CreateFileStream("Gack.tr"));
-    lrWpanHelper.EnablePcapAll(std::string("Gack"), true);
+    // AsciiTraceHelper ascii;
+    // lrWpanHelper.EnableAsciiAll(ascii.CreateFileStream("Gack.tr"));
+    // lrWpanHelper.EnablePcapAll(std::string("Gack"), true);
     Simulator::Stop(Seconds(1.474559997));
     Simulator::Run();
 

@@ -190,7 +190,6 @@ void
 LrWpanPhy::DoDispose()
 {
     NS_LOG_FUNCTION(this);
-
     // Cancel pending transceiver state change, if one is in progress.
     m_setTRXState.Cancel();
     m_trxState = IEEE_802_15_4_PHY_TRX_OFF;
@@ -361,12 +360,10 @@ LrWpanPhy::StartRx(Ptr<SpectrumSignalParameters> spectrumRxParams)
 
         // Add any incoming packet to the current interference before checking the
         // SINR.
-        NS_LOG_DEBUG(this << " receiving packet with power: "
-                          << 10 * log10(LrWpanSpectrumValueHelper::TotalAvgPower(
+        NS_LOG_DEBUG(this << " receiving packet with power: "<< 10 * log10(LrWpanSpectrumValueHelper::TotalAvgPower(
                                       lrWpanRxParams->psd,
-                                      m_phyPIBAttributes.phyCurrentChannel)) +
-                                 30
-                          << "dBm");
+                                      m_phyPIBAttributes.phyCurrentChannel)) + 30 << "dBm");
+
         m_signal->AddSignal(lrWpanRxParams->psd);
         Ptr<SpectrumValue> interferenceAndNoise = m_signal->GetSignalPsd();
         *interferenceAndNoise -= *lrWpanRxParams->psd;
@@ -537,11 +534,13 @@ LrWpanPhy::EndRx(Ptr<SpectrumSignalParameters> par)
         currentPacket->PeekPacketTag(tag);
         m_phyRxEndTrace(currentPacket, tag.Get());
 
-        if (!m_currentRxPacket.second)
+        if(!m_currentRxPacket.second)
         {
             // The packet was successfully received, push it up the stack.
-            if (!m_pdDataIndicationCallback.IsNull())
+            NS_LOG_INFO("m_pdDataIndicationCallback 是空的");
+            if(!m_pdDataIndicationCallback.IsNull())
             {
+                NS_LOG_INFO("m_pdDataIndicationCallback 有東西");
                 m_pdDataIndicationCallback(currentPacket->GetSize(), currentPacket, tag.Get());
             }
         }
@@ -774,9 +773,12 @@ LrWpanPhy::PlmeSetTRXStateRequest(LrWpanPhyEnumeration state)
 
     NS_LOG_LOGIC("Trying to set m_trxState from " << m_trxState << " to " << state);
     // this method always overrides previous state setting attempts
+    NS_LOG_INFO("m_setTRXState.IsExpired() = " << m_setTRXState.IsExpired());
+    NS_LOG_INFO("state = " << state);
+    NS_LOG_INFO("m_trxStatePending = " << m_trxStatePending);
     if (!m_setTRXState.IsExpired())
     {
-        if (m_trxStatePending == state)
+        if (state == m_trxStatePending)
         {
             // Simply wait for the ongoing state switch.
             return;
@@ -1275,6 +1277,7 @@ LrWpanPhy::PlmeSetAttributeRequest(LrWpanPibAttributeIdentifier id,
     if (!m_plmeSetAttributeConfirmCallback.IsNull())
     {
         NS_LOG_INFO("進來!m_plmeSetAttributeConfirmCallback");
+        // m_mac -> PlmeSetAttributeConfirm(status, id)
         m_plmeSetAttributeConfirmCallback(status, id);
     }
 }
@@ -1283,6 +1286,7 @@ void
 LrWpanPhy::SetPdDataIndicationCallback(PdDataIndicationCallback c)
 {
     NS_LOG_FUNCTION(this);
+    NS_LOG_INFO("進來SetPdDataIndicationCallback");
     m_pdDataIndicationCallback = c;
 }
 

@@ -167,14 +167,16 @@ LrWpanNetDevice::CompleteConfig()
     m_phy->SetPlmeGetAttributeConfirmCallback(MakeCallback(&LrWpanMac::PlmeGetAttributeConfirm, m_mac));
     m_phy->SetPlmeSetTRXStateConfirmCallback(MakeCallback(&LrWpanMac::PlmeSetTRXStateConfirm, m_mac));
     
+    // 把 PlmeSetAttributeConfirm 綁定到 m_mac，相當於 m_mac -> PlmeSetAttributeConfirm
     m_phy->SetPlmeSetAttributeConfirmCallback(MakeCallback(&LrWpanMac::PlmeSetAttributeConfirm, m_mac));
 
     m_csmaca->SetLrWpanMacStateCallback(MakeCallback(&LrWpanMac::SetLrWpanMacState, m_mac));
     m_phy->SetPlmeCcaConfirmCallback(MakeCallback(&LrWpanCsmaCa::PlmeCcaConfirm, m_csmaca));
 
     // DSME
-    if(m_dsmeOn)  // 已設定在 lr-wpan-net-device.h 裡面，預設是 true
+    if(m_dsmeOn)  // m_dsmeOn = true (定義在 lr-wpan-net-device.h)
     {
+        // 開啟 DSME Mode & Channel Hopping
         m_mac->SetDsmeModeEnabled();
         m_mac->SetChannelHoppingEnabled();
 

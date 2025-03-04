@@ -234,34 +234,34 @@ void LrWpanHelper::ConfigureSlotframeAllToPan(NetDeviceContainer devs, int empty
 
 }
 
-void LrWpanHelper::AddGtsInCfp(NetDeviceContainer nodes, uint8_t numSlot, uint16_t superframeID, uint8_t slotID) {
-    macDSMEACTEntity entity;
-}
+// void LrWpanHelper::AddGtsInCfp(NetDeviceContainer nodes, uint8_t numSlot, uint16_t superframeID, uint8_t slotID) {
+//     macDSMEACTEntity entity;
+// }
 
-void LrWpanHelper::AddGtsInCfp(Ptr<NetDevice> dev
-                                , bool rx
-                                , uint8_t numSlot
-                                , uint16_t superframeID
-                                , uint8_t slotID) {
-    macDSMEACTEntity entity;
+// void LrWpanHelper::AddGtsInCfp(Ptr<NetDevice> dev
+//                                 , bool rx
+//                                 , uint8_t numSlot
+//                                 , uint16_t superframeID
+//                                 , uint8_t slotID) {
+//     macDSMEACTEntity entity;
 
-    entity.m_superframeID = superframeID;
-    entity.m_slotID = slotID;
-    entity.m_numSlot = numSlot;
-    entity.m_direction = rx;
-    entity.m_type = 0x00;
-    entity.m_prioritizedChAccess = 1;
+//     entity.m_superframeID = superframeID;
+//     entity.m_slotID = slotID;
+//     entity.m_numSlot = numSlot;
+//     entity.m_direction = rx;
+//     entity.m_type = 0x00;
+//     entity.m_prioritizedChAccess = 1;
 
-    // if (entity.m_direction) {
-    //     entity.m_srcAddr = receivedMacHdr.GetShortSrcAddr();
-    // } else {
-    //     entity.m_dstAddr = receivedMacHdr.GetShortSrcAddr();
-    // }
+//     // if (entity.m_direction) {
+//     //     entity.m_srcAddr = receivedMacHdr.GetShortSrcAddr();
+//     // } else {
+//     //     entity.m_dstAddr = receivedMacHdr.GetShortSrcAddr();
+//     // }
 
-    entity.m_cnt = 0;
+//     entity.m_cnt = 0;
 
-    dev->GetObject<LrWpanNetDevice>()->GetMac()->AddDsmeACTEntity(superframeID, entity);
-}
+//     dev->GetObject<LrWpanNetDevice>()->GetMac()->AddDsmeACTEntity(superframeID, entity);
+// }
 
 void LrWpanHelper::AddGtsInCfp(Ptr<NetDevice> dev
                                 , bool rx
@@ -269,7 +269,6 @@ void LrWpanHelper::AddGtsInCfp(Ptr<NetDevice> dev
                                 , uint16_t channelOfs
                                 , uint16_t superframeID
                                 , uint8_t slotID) {
-    // 定義在 lr-wpan-helper.h 中的 lr-wpan-mac.h 裡面
     macDSMEACTEntity entity;
 
     entity.m_superframeID = superframeID;
@@ -287,37 +286,36 @@ void LrWpanHelper::AddGtsInCfp(Ptr<NetDevice> dev
     }
 
     entity.m_cnt = 0;
-
+    NS_LOG_INFO("設定GTS");
     dev->GetObject<LrWpanNetDevice>()->GetMac()->AddDsmeACTEntity(superframeID, entity);
 }
 
-void LrWpanHelper::AddGtsInCfp(Ptr<NetDevice> dev
-                                , Ptr<NetDevice> dev2
-                                , bool rx
-                                , uint8_t numSlot
-                                , uint16_t channelOfs
-                                , uint16_t superframeID
-                                , uint8_t slotID) {
-    macDSMEACTEntity entity;
+// void LrWpanHelper::AddGtsInCfp(Ptr<NetDevice> dev
+//                                 , Ptr<NetDevice> dev2
+//                                 , bool rx
+//                                 , uint8_t numSlot
+//                                 , uint16_t channelOfs
+//                                 , uint16_t superframeID
+//                                 , uint8_t slotID) {
+//     macDSMEACTEntity entity;
 
-    entity.m_superframeID = superframeID;
-    entity.m_slotID = slotID;
-    entity.m_numSlot = numSlot;
-    entity.m_channelID = channelOfs;
-    entity.m_direction = rx;
-    entity.m_type = 0x00;
-    entity.m_prioritizedChAccess = 1;
+//     entity.m_superframeID = superframeID;
+//     entity.m_slotID = slotID;
+//     entity.m_numSlot = numSlot;
+//     entity.m_channelID = channelOfs;
+//     entity.m_direction = rx;
+//     entity.m_type = 0x00;
+//     entity.m_prioritizedChAccess = 1;
 
-    if (rx) {
-        entity.m_srcAddr = dev2->GetObject<LrWpanNetDevice>()->GetMac()->GetShortAddress();
-    } else {
-        entity.m_dstAddr = dev2->GetObject<LrWpanNetDevice>()->GetMac()->GetShortAddress();
-    }
+//     if (rx) {
+//         entity.m_srcAddr = dev2->GetObject<LrWpanNetDevice>()->GetMac()->GetShortAddress();
+//     } else {
+//         entity.m_dstAddr = dev2->GetObject<LrWpanNetDevice>()->GetMac()->GetShortAddress();
+//     }
 
-    entity.m_cnt = 0;
-
-    dev->GetObject<LrWpanNetDevice>()->GetMac()->AddDsmeACTEntity(superframeID, entity);                                
-} 
+//     entity.m_cnt = 0;
+//     dev->GetObject<LrWpanNetDevice>()->GetMac()->AddDsmeACTEntity(superframeID, entity);                                
+// } 
 
 void LrWpanHelper::GenerateTraffic(Ptr<NetDevice> dev, Address dst, int packet_size, double start, double duration, double interval) {
     double end = start + duration;
@@ -482,7 +480,7 @@ void LrWpanHelper::AssociateToBeaconPan(NetDeviceContainer c,
 
 void LrWpanHelper::CoordBoostrap(Ptr<NetDevice> dev, PanDescriptor descriptor, uint16_t sdIndex, MlmeStartRequestParams params) {
     Ptr<LrWpanNetDevice> device = DynamicCast<LrWpanNetDevice>(dev);
-
+    NS_LOG_INFO("進來CoordBoostrap");
     device->GetMac()->AddPanDescriptor(descriptor);
     device->GetMac()->SetDescIndexOfAssociatedPan(0);
     device->GetMac()->SetTimeSlotToSendBcn(sdIndex);

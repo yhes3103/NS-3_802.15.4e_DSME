@@ -78,7 +78,7 @@ SuperframeField::SetSuperframeOrder(uint8_t frmOrder)
 void
 SuperframeField::SetFinalCapSlot(uint8_t capSlot)
 {
-    if (capSlot > 15)
+    if(capSlot > 15)
     {
         NS_ABORT_MSG("The final slot cannot be greater than the slots in a CAP (15)");
     }
@@ -494,11 +494,12 @@ operator<<(std::ostream& os, const PendingAddrFields& pendingAddrFields)
  ***********************************************************/
 // DSME-TODO
 // Maybe Set according to IEEE 802.15.4e-2012 Section I.4.2 Table I.1?
-DsmeSuperFrameField::DsmeSuperFrameField() {
+DsmeSuperFrameField::DsmeSuperFrameField()
+{
     SetMultiSuperframeOrder(14);
     SetChannelDiversityMode(0);
     SetGACKFlag(0);
-    SetCAPReductionFlag(1);
+    SetCAPReductionFlag(0);
     SetDeferredBeaconFalg(0);
 }
 
@@ -532,7 +533,6 @@ void DsmeSuperFrameField::SetDeferredBeaconFalg(bool deferredBcnFlag) {
 
 uint8_t DsmeSuperFrameField::GetDsmeSuperframe() const {
     uint8_t superframe;
-
     superframe = m_sspecMultiSuperframeOrder & (0x0F);
     superframe |= (m_sspecChannelDiversityMode << 4) & (0x01 << 4);
     superframe |= (m_sspecGACKFlag << 5) & (0x01 << 5);
