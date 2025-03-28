@@ -290,44 +290,43 @@ void LrWpanHelper::AddGtsInCfp(Ptr<NetDevice> dev
     dev->GetObject<LrWpanNetDevice>()->GetMac()->AddDsmeACTEntity(superframeID, entity);
 }
 
-// void LrWpanHelper::AddGtsInCfp(Ptr<NetDevice> dev
-//                                 , Ptr<NetDevice> dev2
-//                                 , bool rx
-//                                 , uint8_t numSlot
-//                                 , uint16_t channelOfs
-//                                 , uint16_t superframeID
-//                                 , uint8_t slotID) {
-//     macDSMEACTEntity entity;
+void LrWpanHelper::AddGtsInCfp(Ptr<NetDevice> dev
+                                , Ptr<NetDevice> dev2
+                                , bool rx
+                                , uint8_t numSlot
+                                , uint16_t channelOfs
+                                , uint16_t superframeID
+                                , uint8_t slotID) {
+    macDSMEACTEntity entity;
 
-//     entity.m_superframeID = superframeID;
-//     entity.m_slotID = slotID;
-//     entity.m_numSlot = numSlot;
-//     entity.m_channelID = channelOfs;
-//     entity.m_direction = rx;
-//     entity.m_type = 0x00;
-//     entity.m_prioritizedChAccess = 1;
+    entity.m_superframeID = superframeID;
+    entity.m_slotID = slotID;
+    entity.m_numSlot = numSlot;
+    entity.m_channelID = channelOfs;
+    entity.m_direction = rx;
+    entity.m_type = 0x00;
+    entity.m_prioritizedChAccess = 1;
 
-//     if (rx) {
-//         entity.m_srcAddr = dev2->GetObject<LrWpanNetDevice>()->GetMac()->GetShortAddress();
-//     } else {
-//         entity.m_dstAddr = dev2->GetObject<LrWpanNetDevice>()->GetMac()->GetShortAddress();
-//     }
+    if (rx) {
+        entity.m_srcAddr = dev2->GetObject<LrWpanNetDevice>()->GetMac()->GetShortAddress();
+    } else {
+        entity.m_dstAddr = dev2->GetObject<LrWpanNetDevice>()->GetMac()->GetShortAddress();
+    }
 
-//     entity.m_cnt = 0;
-//     dev->GetObject<LrWpanNetDevice>()->GetMac()->AddDsmeACTEntity(superframeID, entity);                                
-// } 
+    entity.m_cnt = 0;
+    dev->GetObject<LrWpanNetDevice>()->GetMac()->AddDsmeACTEntity(superframeID, entity);                                
+} 
 
-void LrWpanHelper::GenerateTraffic(Ptr<NetDevice> dev, Address dst, int packet_size, double start, double duration, double interval) {
-    double end = start + duration;
-
-    Simulator::Schedule(Seconds(start), &LrWpanHelper::SendPacket, this, dev, dst, packet_size, interval, end);
+void LrWpanHelper::GenerateTraffic(Ptr<NetDevice> dev, Address dst, int packet_size, double coord_Rx_GTS_Start, double device_Tx_GTS_Start, double duration, double interval)
+{
+    double coord_Rx_GTS_End = coord_Rx_GTS_Start + duration;
+    Simulator::Schedule(Seconds(device_Tx_GTS_Start), &LrWpanHelper::SendPacket, this, dev, dst, packet_size, interval, coord_Rx_GTS_End);
 }
 
-void LrWpanHelper::SendPacket(Ptr<NetDevice> dev, Address dst, int packet_size, double interval, double end) {
+void LrWpanHelper::SendPacket(Ptr<NetDevice> dev, Address dst, int packet_size, double interval, double coord_Rx_GTS_End) {
 
-    // NS_LOG_DEBUG("Sending Packet");
-
-    if (Simulator::Now().GetSeconds() <= end) {
+    if(Simulator::Now().GetSeconds() < coord_Rx_GTS_End)
+    {
         Ptr<Packet> pkt = Create<Packet> (packet_size);
         // dev->Send(pkt, dst, 0x86DD);
 
@@ -335,14 +334,29 @@ void LrWpanHelper::SendPacket(Ptr<NetDevice> dev, Address dst, int packet_size, 
         device->SendInGts(pkt, dst, 0x86DD);
     }
 
-    if (Simulator::Now().GetSeconds() <= (end + interval)) {
-        Simulator::Schedule(Seconds(interval), &LrWpanHelper::SendPacket, this, dev, dst, packet_size, interval, end);
+    // if(Simulator::Now().GetSeconds() <= (end + interval))
+    // {
+    //     Simulator::Schedule(Seconds(interval), &LrWpanHelper::SendPacket, this, dev, dst, packet_size, interval, end);
+    // }
+
+    // howard: 這樣寫應該是對的
+    //         邏輯上 Coord 的 GTS 會比 device 的 GTS 還早一些時間分配，因此 Coord 的 GTS 也會比 device 的 GTS 早結束
+    //         所以 device 真正傳資料的時間為 device TX GTS 開始 ~ Coord RX GTS 結束
+    //         原本的邏輯會導致 Coord RX GTS 結束了，可是 device 的 TX GTS 還繼續傳
+    
+    //         而每次傳輸的間隔應該要先計算這個封包預估會傳多久，然後利用這個時間來當作傳輸頻率 interval
+    //         原本是直接每 0.0001s 就傳一次，但這樣感覺有點奇怪，當 Coord TX GTS 結束的時候，那些還在傳輸的封包不就遺失了?
+
+    if(Simulator::Now().GetSeconds() < coord_Rx_GTS_End)
+    {
+        // NS_LOG_DEBUG("Sending Packet2");
+        Simulator::Schedule(Seconds(interval), &LrWpanHelper::SendPacket, this, dev, dst, packet_size, interval, coord_Rx_GTS_End);
     }
 }
 
 void LrWpanHelper::SendGACKPacket(Ptr<NetDevice> dev, Address dst, int packet_size, double interval, double end) {
     // TODO
-    NS_LOG_DEBUG("Sending Packet");
+    // NS_LOG_DEBUG("Sending Packet");
 
     if (Simulator::Now().GetSeconds() <= end) {
         Ptr<Packet> pkt = Create<Packet> (packet_size);

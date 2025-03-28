@@ -191,8 +191,8 @@ class LrWpanHelper : public PcapHelperForDevice, public AsciiTraceHelperForDevic
                     , uint16_t superframeID
                     , uint8_t slotID);
 
-    void GenerateTraffic(Ptr<NetDevice> dev, Address dst, int packet_size, double start, double duration, double interval);
-    void SendPacket(Ptr<NetDevice> dev, Address dst, int packet_size, double interval,double end);
+    void GenerateTraffic(Ptr<NetDevice> dev, Address dst, int packet_size, double coord_Rx_GTS_Start, double device_Tx_GTS_Start, double duration, double interval);
+    void SendPacket(Ptr<NetDevice> dev, Address dst, int packet_size, double interval, double coord_Rx_GTS_End);
     void SendGACKPacket(Ptr<NetDevice> dev, Address dst, int packet_size, double interval,double end);
 
   private:

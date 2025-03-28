@@ -314,29 +314,28 @@ LrWpanPhy::StartRx(Ptr<SpectrumSignalParameters> spectrumRxParams)
         m_edPower.lastUpdate = now;
     }
 
-    Ptr<LrWpanSpectrumSignalParameters> lrWpanRxParams =
-        DynamicCast<LrWpanSpectrumSignalParameters>(spectrumRxParams);
+    Ptr<LrWpanSpectrumSignalParameters> lrWpanRxParams = DynamicCast<LrWpanSpectrumSignalParameters>(spectrumRxParams);
 
-    if (!lrWpanRxParams)
-    {
-        CheckInterference();
-        m_signal->AddSignal(spectrumRxParams->psd);
+    // howard: 不知道在幹嘛
+    // if (!lrWpanRxParams)
+    // {
+    //     CheckInterference();
+    //     m_signal->AddSignal(spectrumRxParams->psd);
 
-        // Update peak power if CCA is in progress.
-        if (!m_ccaRequest.IsExpired())
-        {
-            double power =
-                LrWpanSpectrumValueHelper::TotalAvgPower(m_signal->GetSignalPsd(),
-                                                         m_phyPIBAttributes.phyCurrentChannel);
-            if (m_ccaPeakPower < power)
-            {
-                m_ccaPeakPower = power;
-            }
-        }
-
-        Simulator::Schedule(spectrumRxParams->duration, &LrWpanPhy::EndRx, this, spectrumRxParams);
-        return;
-    }
+    //     // Update peak power if CCA is in progress.
+    //     if (!m_ccaRequest.IsExpired())
+    //     {
+    //         double power =
+    //             LrWpanSpectrumValueHelper::TotalAvgPower(m_signal->GetSignalPsd(),
+    //                                                      m_phyPIBAttributes.phyCurrentChannel);
+    //         if (m_ccaPeakPower < power)
+    //         {
+    //             m_ccaPeakPower = power;
+    //         }
+    //     }
+    //     Simulator::Schedule(spectrumRxParams->duration, &LrWpanPhy::EndRx, this, spectrumRxParams);
+    //     return;
+    // }
 
     Ptr<Packet> p = (lrWpanRxParams->packetBurst->GetPackets()).front();
     NS_ASSERT(p);
@@ -360,9 +359,9 @@ LrWpanPhy::StartRx(Ptr<SpectrumSignalParameters> spectrumRxParams)
 
         // Add any incoming packet to the current interference before checking the
         // SINR.
-        NS_LOG_DEBUG(this << " receiving packet with power: "<< 10 * log10(LrWpanSpectrumValueHelper::TotalAvgPower(
-                                      lrWpanRxParams->psd,
-                                      m_phyPIBAttributes.phyCurrentChannel)) + 30 << "dBm");
+        // NS_LOG_DEBUG(this << " receiving packet with power: "<< 10 * log10(LrWpanSpectrumValueHelper::TotalAvgPower(
+        //                               lrWpanRxParams->psd,
+        //                               m_phyPIBAttributes.phyCurrentChannel)) + 30 << "dBm");
 
         m_signal->AddSignal(lrWpanRxParams->psd);
         Ptr<SpectrumValue> interferenceAndNoise = m_signal->GetSignalPsd();
@@ -377,23 +376,25 @@ LrWpanPhy::StartRx(Ptr<SpectrumSignalParameters> spectrumRxParams)
         // Std. 802.15.4-2006, appendix E, Figure E.2
         // At SNR < -5 the BER is less than 10e-1.
         // It's useless to even *try* to decode the packet.
-        if (10 * log10(sinr) > -5)
+        if(10 * log10(sinr) > -5)
         {
             ChangeTrxState(IEEE_802_15_4_PHY_BUSY_RX);
             m_currentRxPacket = std::make_pair(lrWpanRxParams, false);
             m_phyRxBeginTrace(p);
-
+            // howard:
             m_rxLastUpdate = Simulator::Now();
         }
         else
         {
+            // NS_LOG_INFO("進來丟資料1");
             m_phyRxDropTrace(p);
         }
     }
     else if (m_trxState == IEEE_802_15_4_PHY_BUSY_RX)
     {
         // Drop the new packet.
-        NS_LOG_DEBUG(this << " packet collision");
+        // NS_LOG_DEBUG(this << " packet collision");
+        // NS_LOG_INFO("進來丟資料2");
         m_phyRxDropTrace(p);
 
         // Check if we correctly received the old packet up to now.
@@ -407,7 +408,8 @@ LrWpanPhy::StartRx(Ptr<SpectrumSignalParameters> spectrumRxParams)
     else
     {
         // Simply drop the packet.
-        NS_LOG_DEBUG(this << " transceiver not in RX state");
+        // NS_LOG_DEBUG(this << " transceiver not in RX state");
+        // NS_LOG_INFO("進來丟資料3");
         m_phyRxDropTrace(p);
 
         // Add the signal power to the interference, anyway.
@@ -428,7 +430,6 @@ LrWpanPhy::StartRx(Ptr<SpectrumSignalParameters> spectrumRxParams)
 
     // Always call EndRx to update the interference.
     // We keep track of this event, and if necessary cancel this event when a TX of a packet.
-
     Simulator::Schedule(spectrumRxParams->duration, &LrWpanPhy::EndRx, this, spectrumRxParams);
 }
 
@@ -537,16 +538,16 @@ LrWpanPhy::EndRx(Ptr<SpectrumSignalParameters> par)
         if(!m_currentRxPacket.second)
         {
             // The packet was successfully received, push it up the stack.
-            NS_LOG_INFO("m_pdDataIndicationCallback 是空的");
             if(!m_pdDataIndicationCallback.IsNull())
             {
-                NS_LOG_INFO("m_pdDataIndicationCallback 有東西");
+                NS_LOG_INFO("把 PHY Layer 的封包送往 MAC Layer");
                 m_pdDataIndicationCallback(currentPacket->GetSize(), currentPacket, tag.Get());
             }
         }
         else
         {
             // The packet was destroyed, drop it.
+            // NS_LOG_INFO("進來丟資料4");
             m_phyRxDropTrace(currentPacket);
         }
         Ptr<LrWpanSpectrumSignalParameters> none = nullptr;
@@ -618,13 +619,19 @@ LrWpanPhy::PdDataRequest(const uint32_t psduLength, Ptr<Packet> p)
             m_currentTxPacket.second = false;
 
             Ptr<LrWpanSpectrumSignalParameters> txParams = Create<LrWpanSpectrumSignalParameters>();
+
             txParams->duration = CalculateTxTime(p);
+            // howard: Debug 用
+            // NS_LOG_DEBUG(txParams->duration.As(Time::S));
+
             txParams->txPhy = GetObject<SpectrumPhy>();
             txParams->psd = m_txPsd;
             txParams->txAntenna = m_antenna;
             Ptr<PacketBurst> pb = CreateObject<PacketBurst>();
             pb->AddPacket(p);
             txParams->packetBurst = pb;
+
+            // howard: 傳資料到 channel，但不清楚 StartTx 定義在哪邊
             m_channel->StartTx(txParams);
             m_pdDataRequest = Simulator::Schedule(txParams->duration, &LrWpanPhy::EndTx, this);
             ChangeTrxState(IEEE_802_15_4_PHY_BUSY_TX);
@@ -771,11 +778,7 @@ LrWpanPhy::PlmeSetTRXStateRequest(LrWpanPhyEnumeration state)
     NS_ABORT_IF((state != IEEE_802_15_4_PHY_RX_ON) && (state != IEEE_802_15_4_PHY_TRX_OFF) &&
                 (state != IEEE_802_15_4_PHY_FORCE_TRX_OFF) && (state != IEEE_802_15_4_PHY_TX_ON));
 
-    NS_LOG_LOGIC("Trying to set m_trxState from " << m_trxState << " to " << state);
     // this method always overrides previous state setting attempts
-    NS_LOG_INFO("m_setTRXState.IsExpired() = " << m_setTRXState.IsExpired());
-    NS_LOG_INFO("state = " << state);
-    NS_LOG_INFO("m_trxStatePending = " << m_trxStatePending);
     if (!m_setTRXState.IsExpired())
     {
         if (state == m_trxStatePending)
@@ -838,7 +841,7 @@ LrWpanPhy::PlmeSetTRXStateRequest(LrWpanPhyEnumeration state)
         }
     }
 
-    if (state == IEEE_802_15_4_PHY_TX_ON)
+    if(state == IEEE_802_15_4_PHY_TX_ON)
     {
         CancelEd(state);
 
@@ -884,6 +887,7 @@ LrWpanPhy::PlmeSetTRXStateRequest(LrWpanPhyEnumeration state)
         }
         else if (m_trxState == IEEE_802_15_4_PHY_TRX_OFF)
         {
+            // howard: update MAC state 讓它跟 PHY 一樣?
             ChangeTrxState(IEEE_802_15_4_PHY_TX_ON);
             if (!m_plmeSetTRXStateConfirmCallback.IsNull())
             {
@@ -1000,12 +1004,10 @@ LrWpanPhy::PlmeSetAttributeRequest(LrWpanPibAttributeIdentifier id,
     NS_LOG_FUNCTION(this << id << attribute);
     NS_ASSERT(attribute);
     LrWpanPhyEnumeration status = IEEE_802_15_4_PHY_SUCCESS;  // 0x07
-    NS_LOG_INFO(id);
     switch(id)
     {
     case phyCurrentPage:  // 0x04
     {
-        NS_LOG_INFO(phyCurrentPage << "進來phyCurrentPage");
         if (!PageSupported(attribute->phyCurrentPage))
         {
             status = IEEE_802_15_4_PHY_INVALID_PARAMETER;
@@ -1180,7 +1182,6 @@ LrWpanPhy::PlmeSetAttributeRequest(LrWpanPibAttributeIdentifier id,
     }
     case phyCurrentChannel:  // 0x00
     {
-        NS_LOG_INFO(phyCurrentChannel << "進來phyCurrentChannel");
         if (!ChannelSupported(attribute->phyCurrentChannel))
         {
             status = IEEE_802_15_4_PHY_INVALID_PARAMETER;
@@ -1276,7 +1277,6 @@ LrWpanPhy::PlmeSetAttributeRequest(LrWpanPibAttributeIdentifier id,
     }
     if (!m_plmeSetAttributeConfirmCallback.IsNull())
     {
-        NS_LOG_INFO("進來!m_plmeSetAttributeConfirmCallback");
         // m_mac -> PlmeSetAttributeConfirm(status, id)
         m_plmeSetAttributeConfirmCallback(status, id);
     }
@@ -1286,7 +1286,6 @@ void
 LrWpanPhy::SetPdDataIndicationCallback(PdDataIndicationCallback c)
 {
     NS_LOG_FUNCTION(this);
-    NS_LOG_INFO("進來SetPdDataIndicationCallback");
     m_pdDataIndicationCallback = c;
 }
 
@@ -1329,7 +1328,6 @@ void
 LrWpanPhy::SetPlmeSetAttributeConfirmCallback(PlmeSetAttributeConfirmCallback c)
 {
     NS_LOG_FUNCTION(this);
-    NS_LOG_INFO("開始SetPlmeSetAttributeConfirmCallback");
     m_plmeSetAttributeConfirmCallback = c;
 }
 
@@ -1507,7 +1505,9 @@ LrWpanPhy::EndTx()
 
     if (m_currentTxPacket.second == false)
     {
-        NS_LOG_DEBUG("Packet successfully transmitted");
+        // howard: 這是一個 fake message，真正的 data 早在 StartRx() 就收到了
+        // 這邊只是假裝要傳這麼久 (根據封包大小所計算的傳送時間)
+        NS_LOG_DEBUG("PHY Layer 成功接收到封包");
         m_phyTxEndTrace(m_currentTxPacket.first);
         if (!m_pdDataConfirmCallback.IsNull())
         {
@@ -1561,6 +1561,8 @@ LrWpanPhy::CalculateTxTime(Ptr<const Packet> packet)
     bool isData = true;
     Time txTime = GetPpduHeaderTxTime();
 
+    // howard: txTime += Seconds(packet->GetSize() * 2.0 / 62500);
+    // 這也可以
     txTime += Seconds(packet->GetSize() * 8.0 / GetDataOrSymbolRate(isData));
 
     return txTime;
@@ -1609,6 +1611,8 @@ LrWpanPhy::GetPpduHeaderTxTime()
 
     NS_ASSERT(m_phyOption < IEEE_802_15_4_INVALID_PHY_OPTION);
 
+    // howard: 共佔 6 bytes
+    // 1 bytes = 2 symbol，因此需要花 (6 * 2.0 / 62500) = 0.00192s
     totalPpduHdrSymbols = ppduHeaderSymbolNumbers[m_phyOption].shrPreamble +
                           ppduHeaderSymbolNumbers[m_phyOption].shrSfd +
                           ppduHeaderSymbolNumbers[m_phyOption].phr;

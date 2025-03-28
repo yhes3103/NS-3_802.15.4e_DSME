@@ -451,8 +451,7 @@ LrWpanNetDevice::Send(Ptr<Packet> packet, const Address& dest, uint16_t protocol
     m_mcpsDataRequestParams.m_dstPanId = m_mac->GetPanId();
     m_mcpsDataRequestParams.m_srcAddrMode = SHORT_ADDR;
 
-    // Using ACK requests for broadcast destinations is ok here. They are disabled
-    // by the MAC.
+    // Using ACK requests for broadcast destinations is ok here. They are disabled by the MAC.
     if (m_useAcks) {
         m_mcpsDataRequestParams.m_txOptions = TX_OPTION_ACK;
     }
