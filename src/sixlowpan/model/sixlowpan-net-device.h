@@ -75,6 +75,11 @@ class SixLowPanNetDevice : public NetDevice
     /**
      * Enumeration of the dropping reasons in SixLoWPAN.
      */
+
+    // howard: 新增
+    void SetHC1CompMethod(bool HC1);
+    void SetMeshUnder(bool MeshUnder);
+
     enum DropReason
     {
         DROP_FRAGMENT_TIMEOUT = 1,           //!< Fragment timeout exceeded
@@ -257,6 +262,11 @@ class SixLowPanNetDevice : public NetDevice
     void DoDispose() override;
 
   private:
+    
+    // howard: 新增
+    bool six_useHC1;
+    bool six_meshUnder;
+    
     /**
      * \brief Receives all the packets from a NetDevice for further processing.
      * \param [in] device The NetDevice the packet ws received from.

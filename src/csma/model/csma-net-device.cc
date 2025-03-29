@@ -699,7 +699,6 @@ CsmaNetDevice::Receive(Ptr<Packet> packet, Ptr<CsmaNetDevice> senderDevice)
 {
     NS_LOG_FUNCTION(packet << senderDevice);
     NS_LOG_LOGIC("UID is " << packet->GetUid());
-
     //
     // We never forward up packets that we sent.  Real devices don't do this since
     // their receivers are disabled during send, so we don't.
@@ -830,6 +829,9 @@ CsmaNetDevice::Receive(Ptr<Packet> packet, Ptr<CsmaNetDevice> senderDevice)
     //
     if (packetType != PACKET_OTHERHOST)
     {
+        // howard:
+        NS_LOG_INFO ("ForwardUp to IP, packet->GetSize() = " << packet->GetSize () << " bytes");
+        
         m_snifferTrace(originalPacket);
         m_macRxTrace(originalPacket);
         m_rxCallback(this, packet, protocol, header.GetSource());
@@ -956,6 +958,8 @@ bool
 CsmaNetDevice::Send(Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber)
 {
     NS_LOG_FUNCTION(packet << dest << protocolNumber);
+    // howard: 
+    NS_LOG_INFO ("ForwardUp to PHY, packet->GetSize() = " << packet->GetSize () << " bytes");
     return SendFrom(packet, m_address, dest, protocolNumber);
 }
 

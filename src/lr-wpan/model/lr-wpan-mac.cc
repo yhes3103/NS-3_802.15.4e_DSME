@@ -1,10 +1,8 @@
 #include "lr-wpan-mac.h"
-
 #include "lr-wpan-csmaca.h"
 #include "lr-wpan-mac-header.h"
 #include "lr-wpan-mac-pl-headers.h"
 #include "lr-wpan-mac-trailer.h"
-
 #include <ns3/double.h>
 #include <ns3/log.h>
 #include <ns3/node.h>
@@ -149,10 +147,8 @@ LrWpanMac::LrWpanMac() {
     m_macRxOnWhenIdle = true;
     m_macPanId = 0xffff;
     m_macCoordShortAddress = Mac16Address("ff:ff");
-    m_macCoordExtendedAddress = Mac64Address("ff:ff:ff:ff:ff:ff:ff:ed");
     m_deviceCapability = DeviceType::FFD;
     m_associationStatus = ASSOCIATED;
-    m_selfExt = Mac64Address::Allocate();
 
     m_macPromiscuousMode = false;
 
@@ -221,13 +217,10 @@ LrWpanMac::LrWpanMac() {
 
     m_macMultisuperframeOrder = 15;
 
-    // m_macDSMESAB;
-    // m_macDsmeACT;
     m_macSDindex = -1;
-    // m_macBcnBitmap;
     m_macChannelOfs = 0;
     m_macDeferredBcnUsed = false;
-    // m_macSyncParentExtAddr;
+
     m_macSyncParentShortAddr = Mac16Address("ff:ff");
 
     m_macBcnSlotLen = 60;
@@ -235,8 +228,6 @@ LrWpanMac::LrWpanMac() {
     m_macDSMEGTSExpirationTime = 7;
 
     m_macPANCoordinatorBSN = 0;
-
-    // m_macNeighborInformationTable;
 
     m_simpleAddress = Mac8Address(0xff);
 
@@ -375,13 +366,6 @@ LrWpanMac::SetShortAddress(Mac16Address address)
     m_shortAddress = address;
 }
 
-void
-LrWpanMac::SetExtendedAddress(Mac64Address address)
-{
-    NS_LOG_FUNCTION(this << address);
-    m_selfExt = address;
-}
-
 Mac8Address LrWpanMac::GetSimpleAddress() const {
     NS_LOG_FUNCTION(this);
     return m_simpleAddress;
@@ -397,7 +381,6 @@ LrWpanMac::GetShortAddress() const
 Mac64Address
 LrWpanMac::GetExtendedAddress() const
 {
-    NS_LOG_FUNCTION(this);
     return m_selfExt;
 }
 
@@ -414,106 +397,16 @@ LrWpanMac::McpsDataRequest(McpsDataRequestParams params, Ptr<Packet> p)
     McpsDataConfirmParams confirmParams;
     confirmParams.m_msduHandle = params.m_msduHandle;
 
-    // TODO: We need a drop trace for the case that the packet is too large or the request
-    // parameters are maleformed.
-    //       The current tx drop trace is not suitable, because packets dropped using this trace
-    //       carry the mac header and footer, while packets being dropped here do not have them.
+    // howard: 正常這裡要檢查 Packet 有沒有符合 Spec 的大小
 
     LrWpanMacHeader macHdr(LrWpanMacHeader::LRWPAN_MAC_DATA, m_macDsn.GetValue());
     m_macDsn++;
 
-    if (p->GetSize() > LrWpanPhy::aMaxPhyPacketSize - aMinMPDUOverhead)
-    {
-        // Note, this is just testing maximum theoretical frame size per the spec
-        // The frame could still be too large once headers are put on
-        // in which case the phy will reject it instead
-        NS_LOG_ERROR(this << " packet too big: " << p->GetSize());
-        confirmParams.m_status = IEEE_802_15_4_FRAME_TOO_LONG;
-        if (!m_mcpsDataConfirmCallback.IsNull())
-        {
-            m_mcpsDataConfirmCallback(confirmParams);
-        }
-        return;
-    }
+    macHdr.SetSrcAddrMode(params.m_srcAddrMode);
+    macHdr.SetSrcAddrFields(GetPanId(), GetShortAddress());
 
-    if ((params.m_srcAddrMode == NO_PANID_ADDR) && (params.m_dstAddrMode == NO_PANID_ADDR))
-    {
-        NS_LOG_ERROR(this << " Can not send packet with no Address field");
-        confirmParams.m_status = IEEE_802_15_4_INVALID_ADDRESS;
-        if (!m_mcpsDataConfirmCallback.IsNull())
-        {
-            m_mcpsDataConfirmCallback(confirmParams);
-        }
-        return;
-    }
-    switch (params.m_srcAddrMode)
-    {
-    case NO_PANID_ADDR:
-        macHdr.SetSrcAddrMode(params.m_srcAddrMode);
-        macHdr.SetNoPanIdComp();
-        break;
-    // DSME-TODO
-    // case ADDR_MODE_RESERVED:
-    //     NS_ABORT_MSG("Can not set source address type to ADDR_MODE_RESERVED. Aborting.");
-    //     break;
-    case SIMPLE_ADDR:
-        macHdr.SetSrcAddrMode(params.m_srcAddrMode);
-        macHdr.SetSrcAddrFields(GetPanId(), GetSimpleAddress());
-        break;
-
-    case SHORT_ADDR:
-        macHdr.SetSrcAddrMode(params.m_srcAddrMode);
-        macHdr.SetSrcAddrFields(GetPanId(), GetShortAddress());
-        break;
-    case EXT_ADDR:
-        macHdr.SetSrcAddrMode(params.m_srcAddrMode);
-        macHdr.SetSrcAddrFields(GetPanId(), GetExtendedAddress());
-        break;
-    default:
-        NS_LOG_ERROR(this << " Can not send packet with incorrect Source Address mode = "
-                          << params.m_srcAddrMode);
-        confirmParams.m_status = IEEE_802_15_4_INVALID_ADDRESS;
-        if (!m_mcpsDataConfirmCallback.IsNull())
-        {
-            m_mcpsDataConfirmCallback(confirmParams);
-        }
-        return;
-    }
-
-    switch (params.m_dstAddrMode)
-    {
-    case NO_PANID_ADDR:
-        macHdr.SetDstAddrMode(params.m_dstAddrMode);
-        macHdr.SetNoPanIdComp();
-        break;
-    // DSME-TODO
-    // case ADDR_MODE_RESERVED:
-    //     NS_ABORT_MSG("Can not set destination address type to ADDR_MODE_RESERVED. Aborting.");
-    //     break;
-
-    // case SIMPLE_ADDR:
-    //     macHdr.SetDstAddrMode(params.m_dstAddrMode);
-    //     macHdr.SetDstAddrFields(params.m_dstPanId, params.m_dst); 
-    //     break;    
-
-    case SHORT_ADDR:
-        macHdr.SetDstAddrMode(params.m_dstAddrMode);
-        macHdr.SetDstAddrFields(params.m_dstPanId, params.m_dstAddr);
-        break;
-    case EXT_ADDR:
-        macHdr.SetDstAddrMode(params.m_dstAddrMode);
-        macHdr.SetDstAddrFields(params.m_dstPanId, params.m_dstExtAddr);
-        break;
-    default:
-        NS_LOG_ERROR(this << " Can not send packet with incorrect Destination Address mode = "
-                          << params.m_dstAddrMode);
-        confirmParams.m_status = IEEE_802_15_4_INVALID_ADDRESS;
-        if (!m_mcpsDataConfirmCallback.IsNull())
-        {
-            m_mcpsDataConfirmCallback(confirmParams);
-        }
-        return;
-    }
+    macHdr.SetDstAddrMode(params.m_dstAddrMode);
+    macHdr.SetDstAddrFields(params.m_dstPanId, params.m_dstAddr);
 
     // IEEE 802.15.4-2006 (7.5.6.1)
     // Src & Dst PANs are identical, PAN compression is ON
@@ -584,7 +477,7 @@ LrWpanMac::McpsDataRequest(McpsDataRequestParams params, Ptr<Packet> p)
 
         if((m_incGtsEvent.IsRunning() || m_gtsEvent.IsRunning()) && m_lrWpanMacState == MAC_GTS)
         {
-            NS_LOG_INFO("開始傳資料");
+            NS_LOG_INFO("進來 CFP 傳資料");
             m_txPkt = p;
             ChangeMacState(MAC_GTS_SENDING);
             m_phy->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_TX_ON);
@@ -629,88 +522,15 @@ LrWpanMac::McpsDataRequest(McpsDataRequestParams params, Ptr<Packet> p)
 }
 
 void LrWpanMac::MlmeStartRequest(MlmeStartRequestParams params) {
-    NS_LOG_INFO("MlmeStartRequest開始");
     NS_LOG_FUNCTION(this);
     NS_ASSERT(m_deviceCapability == DeviceType::FFD);
-    //NS_ASSERT(m_becomeCoord || params.m_panCoor);
-
-    MlmeStartConfirmParams confirmParams;
-
-    if (GetShortAddress() == Mac16Address("ff:ff")) {
-        NS_LOG_ERROR(this << " Invalid MAC short address");
-        confirmParams.m_status = MLMESTART_NO_SHORT_ADDRESS;
-
-        if (!m_mlmeStartConfirmCallback.IsNull()) {
-            m_mlmeStartConfirmCallback(confirmParams);
-        }
-
-        return;
-    }
-
-    if (params.m_panCoor && 
-        ((params.m_bcnOrd > 15) || (params.m_sfrmOrd > params.m_bcnOrd))) {
-        confirmParams.m_status = MLMESTART_INVALID_PARAMETER;
-
-        if (!m_mlmeStartConfirmCallback.IsNull()) {
-            m_mlmeStartConfirmCallback(confirmParams);
-        }
-
-        NS_LOG_ERROR(this << "Incorrect superframe order or beacon order.");
-        return;
-
-    } 
-
-    if (params.m_bcnBitmap.GetSDIndex() > 0 && !m_beaconTrackingOn) {
-        confirmParams.m_status = MLMESTART_TRACKING_OFF;
-
-        if (!m_mlmeStartConfirmCallback.IsNull()) {
-            m_mlmeStartConfirmCallback(confirmParams);
-        }
-
-        NS_LOG_ERROR(this << "MAC sublayer is not currently tracking the beacon of its coordinator");
-
-        return;
-    }
-
-    // macMultiSuperframeOrder setting...
-    if (params.m_panCoor && m_macDSMEenabled && (params.m_bcnOrd != 15)) {
-        // 0 ≤ SO ≤ MO ≤ BO ≤ 14
-        if (params.m_bcnOrd < params.m_dsmeSuperframeSpec.GetMultiSuperframeOrder()) {
-            confirmParams.m_status = MLMESTART_INVALID_PARAMETER;
-            if (!m_mlmeStartConfirmCallback.IsNull()) {
-                m_mlmeStartConfirmCallback(confirmParams);
-            }
-
-            NS_LOG_ERROR(this << "Incorrect pararmeter: Multisuperframe order cannot be larger than beacon order.");
-
-            return;
-        }
-
-        if (params.m_dsmeSuperframeSpec.GetMultiSuperframeOrder() < params.m_sfrmOrd) {
-            if (!m_mlmeStartConfirmCallback.IsNull()) {
-                m_mlmeStartConfirmCallback(confirmParams);
-            }
-
-            NS_LOG_ERROR(this << " Incorrect pararmeter: Superframe order cannot be larger than multisuperframe order");
-
-            return;
-        }
-    }
 
     // Mark primitive as pending and save the start params while the new page and channel is set.
     m_startParams = params;
-
-    if(!params.m_coorRealgn)
-    {
-        m_pendPrimitive = MLME_START_REQ;
-        LrWpanPhyPibAttributes pibAttr;
-        pibAttr.phyCurrentPage = m_startParams.m_logChPage;
-        m_phy->PlmeSetAttributeRequest(LrWpanPibAttributeIdentifier::phyCurrentPage, &pibAttr);
-    }
-    else
-    {
-        EndStartRequest();
-    }
+    m_pendPrimitive = MLME_START_REQ;
+    LrWpanPhyPibAttributes pibAttr;
+    pibAttr.phyCurrentPage = m_startParams.m_logChPage;
+    m_phy->PlmeSetAttributeRequest(LrWpanPibAttributeIdentifier::phyCurrentPage, &pibAttr);
 }
 
 void LrWpanMac::MlmeSyncRequest(MlmeSyncRequestParams params) {
@@ -752,17 +572,6 @@ void LrWpanMac::MlmeSyncRequest(MlmeSyncRequestParams params) {
 // See IEEE 802.15.4e-2012 Section 5.2.2.1 
 void LrWpanMac::SendOneEnhancedBeacon() {
     NS_LOG_FUNCTION(this);
-    
-    // for dsme-sixlowpan-7-branches-3-levels-hilow-tree-topology.cc
-    // if (m_incGtsEvent.IsRunning()) {
-    //     m_incGtsEvent.Cancel();
-    //     EndGTS(SuperframeType::INCOMING);
-    // }
-
-    // if (m_gtsEvent.IsRunning()) {
-    //     m_gtsEvent.Cancel();
-    //     EndGTS(SuperframeType::OUTGOING);
-    // }
 
     NS_ASSERT(m_lrWpanMacState == MAC_IDLE);
     NS_ASSERT(GetShortAddress() != Mac16Address("ff:ff"));
@@ -801,13 +610,8 @@ void LrWpanMac::SendOneEnhancedBeacon() {
     macHdr.SetDstAddrFields(GetPanId(), Mac16Address("ff:ff")); // broadcast packet
 
     // see IEEE 802.15.4-2011 Section 5.1.2.4
-    if (GetShortAddress() == Mac16Address("ff:fe")) {
-        macHdr.SetSrcAddrMode(LrWpanMacHeader::EXTADDR);
-        macHdr.SetSrcAddrFields(GetPanId(), GetExtendedAddress());
-    } else {
-        macHdr.SetSrcAddrMode(LrWpanMacHeader::SHORTADDR);
-        macHdr.SetSrcAddrFields(GetPanId(), GetShortAddress());
-    }
+    macHdr.SetSrcAddrMode(LrWpanMacHeader::SHORTADDR);
+    macHdr.SetSrcAddrFields(GetPanId(), GetShortAddress());
 
     // If a broadcast data or command frame is pending
     //, the Frame Pending field shall be set to one
@@ -968,7 +772,7 @@ LrWpanMac::EndStartRequest()
         {
             m_macSuperframeOrder = m_startParams.m_sfrmOrd;
             
-            // 是否開啟省電模式，這邊預設不開啟
+            // howard: 是否開啟省電模式，這邊預設不開啟
             m_csmaCa->SetBatteryLifeExtension(m_startParams.m_battLifeExt);
         }
         else
@@ -1175,7 +979,6 @@ LrWpanMac::EndStartRequest()
                 ScheduleGts(false);
             }
         }
-
         NS_LOG_DEBUG("**********************************************************************************************");       
     }
 }
@@ -1387,7 +1190,6 @@ void LrWpanMac::ScheduleGts(bool indication)
                         superframe_Duration = (it->second[i].m_superframeID) * m_superframeDuration;
                         superframe_time = Seconds((double)superframe_Duration / symbolRate);
 
-                        // howard: 感覺這裡有寫錯，應該要多一個條件判斷這裡是不是 SuperframeID = 0，如果是就不會進來這邊
                         if(isCAPReductionOn()) // TODO : 第二個multisuperframe開始的CAP不會有CAP，他會變成全部都CFP，要改為判斷這裡是不是superframeID = 0
                         {
                             first_Timeslot = each_Timeslot_Duration * 1;  // first timeslot is used for beacon tx
@@ -1478,14 +1280,12 @@ void LrWpanMac::PurgeDsmeACT()
     // deallocate or expire
     if(m_macDsmeACT.size())
     {
-        NS_LOG_INFO("進來 m_macDsmeACT.size() = " << m_macDsmeACT.size());
         for(auto it = m_macDsmeACT.begin(); it != m_macDsmeACT.end(); ++it)
         {
             for(unsigned int i = 0; i < it->second.size(); ++i)
             {
                 if(it->second[i].m_deallocated)  // Check ACT element has been deallocated or not.
                 { 
-                    NS_LOG_INFO("進來 it->second[i].m_deallocated = " << it->second[i].m_deallocated);
                     it->second.erase(it->second.begin() + i);
                 }
             }
@@ -1515,51 +1315,8 @@ void LrWpanMac::StartGTS(SuperframeType superframeType, uint16_t superframeID, i
         // m_macDsmeACT[superframeID][idx].m_cnt++;
     }
 
-    // GTS expiration
-    if (m_macDsmeACT[superframeID][idx].m_cnt > m_macDSMEGTSExpirationTime) 
-    {
-        NS_LOG_DEBUG("GTS expiration");
-        m_macDsmeACT[superframeID][idx].m_expired = true;
-
-        if (!m_mlmeDsmeGtsIndicationCallback.IsNull()) {
-            MlmeDsmeGtsIndicationParams gtsIndicationParams;
-
-            if (m_macDsmeACT[superframeID][idx].m_dstAddr != Mac16Address("00:00")) {
-                gtsIndicationParams.m_devAddr = m_macDsmeACT[superframeID][idx].m_dstAddr;
-            } else {
-                gtsIndicationParams.m_devAddr = m_macDsmeACT[superframeID][idx].m_srcAddr;
-            }
-
-            gtsIndicationParams.m_manageType = ManagementType::GTS_EXPIRATION;
-            gtsIndicationParams.m_direction = !m_macDsmeACT[superframeID][idx].m_direction;
-            gtsIndicationParams.m_prioritizedChAccess = m_macDsmeACT[superframeID][idx].m_prioritizedChAccess;
-
-            gtsIndicationParams.m_dsmeSABSpec.setCAPReduction(isCAPReductionOn());
-            gtsIndicationParams.m_dsmeSABSpec.setSABSubBlkLen(1);
-            gtsIndicationParams.m_dsmeSABSpec.setSABSubBlkIdx(m_macDsmeACT[superframeID][idx].m_superframeID);
-
-            if (isCAPReductionOn()) {
-                uint16_t subBlk = GenerateSABSubBlockCapOn(m_macDsmeACT[superframeID][idx].m_slotID
-                                                         , m_macDsmeACT[superframeID][idx].m_numSlot);
-
-                gtsIndicationParams.m_dsmeSABSpec.setSABSubBlk(subBlk);
-
-            } else {
-                uint8_t subBlk = GenerateSABSubBlock(m_macDsmeACT[superframeID][idx].m_slotID
-                                                    , m_macDsmeACT[superframeID][idx].m_numSlot);
-
-                gtsIndicationParams.m_dsmeSABSpec.setSABSubBlk(subBlk);
-            }
-
-            m_mlmeDsmeGtsIndicationCallback(gtsIndicationParams);
-        }
-
-        return;
-    }
-
     if (m_macDsmeACT[superframeID][idx].m_allocated) 
     {
-
         Time startGtsTime;        
         uint64_t symbolRate = (uint64_t)m_phy->GetDataOrSymbolRate(false);  // symbols per second
 
@@ -1720,57 +1477,6 @@ void LrWpanMac::StartGTS(SuperframeType superframeType, uint16_t superframeID, i
     }
 
     SetLrWpanMacStateToGTS(superframeID, idx);
-
-    if (m_gtsContinuePktSendingFromCap && !m_txQueue.empty()) {
-        Ptr<TxQueueElement> txQElement = m_txQueue.front();
-        m_txPkt = txQElement->txQPkt;
-    }
-
-    if (m_txPkt && m_gtsContinuePktSendingFromCap) 
-    {
-        LrWpanMacHeader peekedMacHdr;
-        m_txPkt->PeekHeader(peekedMacHdr);
-
-        if (peekedMacHdr.IsData()) {
-            peekedMacHdr.Print(std::cout);
-
-            if (m_macDsmeACT[superframeID][idx].m_dstAddr != Mac16Address("00:00")) {
-                if (m_macDsmeACT[superframeID][idx].m_dstAddr == peekedMacHdr.GetShortDstAddr()) {
-                    std::cout << "direction: " << (uint16_t) m_macDsmeACT[superframeID][idx].m_direction 
-                              << std::endl;
-                    std::cout << "GetShortAddress: " << GetShortAddress() << std::endl;
-                    std::cout << "m_dstAddr: " << m_macDsmeACT[superframeID][idx].m_dstAddr << std::endl;
-                    
-                    ChangeMacState(MAC_GTS_SENDING);
-                    m_phy->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_TX_ON);
-                }
-
-            } else {
-                if (m_macDsmeACT[superframeID][idx].m_srcAddr == peekedMacHdr.GetShortDstAddr()) {
-                    std::cout << "direction: " << (uint16_t) m_macDsmeACT[superframeID][idx].m_direction 
-                              << std::endl;
-                    std::cout << "GetShortAddress: " << GetShortAddress() << std::endl;
-                    std::cout << "m_srcAddr: " << m_macDsmeACT[superframeID][idx].m_srcAddr << std::endl;
-
-                    // ChangeMacState(MAC_GTS_SENDING);
-                    // m_phy->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_TX_ON);
-                }
-            }
-
-            if (superframeType == OUTGOING) {
-                if (m_macDsmeACT[superframeID][idx].m_dstAddr == peekedMacHdr.GetShortSrcAddr()) {
-                    ChangeMacState(MAC_GTS_SENDING);
-                    m_phy->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_TX_ON);
-                }
-
-            } else {
-                if (m_macDsmeACT[superframeID][idx].m_srcAddr == peekedMacHdr.GetShortSrcAddr()) {
-                    ChangeMacState(MAC_GTS_SENDING);
-                    m_phy->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_TX_ON);
-                }
-            }
-        }
-    }
 
     // DSME-TODO
     if (m_txPktGts) {
@@ -1975,14 +1681,6 @@ void LrWpanMac::StartRemainingPeriod(SuperframeType superframeType)
                                               
         m_beaconEvent = Simulator::Schedule(endRemainingTime, &LrWpanMac::SendOneEnhancedBeacon, this);
         Simulator::Schedule(endRemainingTime, &LrWpanMac::PurgeDsmeACT, this);
-
-        // DSME-TODO
-        // For dsme-net-device setting use only, so comment it
-        // Simulator::Schedule(endRemainingTime, &LrWpanMac::ScheduleGtsSyncToCoord, this, m_choosedSDIndexToSendBcn);
-        
-        // if (!m_forDsmeNetDeviceIntegrateWithHigerLayer) {
-        //     Simulator::Schedule(endRemainingTime, &LrWpanMac::ScheduleGts, this, false);
-        // }
     }
 }
 
@@ -2078,10 +1776,6 @@ LrWpanMac::GetPendingAddrFields()
         if (peekedMacHdr.GetDstAddrMode() == SHORT_ADDR) {
             numOfShortAddr++;
             pndAddrFields.AddAddress(peekedMacHdr.GetShortDstAddr());
-
-        } else if (peekedMacHdr.GetDstAddrMode() == EXT_ADDR) {
-            numOfExtAddr++;
-            pndAddrFields.AddAddress(peekedMacHdr.GetExtDstAddr());
         }
     }
 
@@ -2320,6 +2014,7 @@ void LrWpanMac::SetMlmeDsmeGtsConfirmCallback(MlmeDsmeGtsConfirmCallback c) {
 
 void LrWpanMac::PdDataIndication(uint32_t psduLength, Ptr<Packet> p, uint8_t lqi) {
 
+    // howard: 把封包傳到 MAC Layer
     // This indication occur when phy layer received a packet and transfer the packet to MAC the layer.
 
     NS_ASSERT(m_lrWpanMacState == MAC_IDLE || m_lrWpanMacState == MAC_ACK_PENDING ||
@@ -2351,33 +2046,14 @@ void LrWpanMac::PdDataIndication(uint32_t psduLength, Ptr<Packet> p, uint8_t lqi
         McpsDataIndicationParams params;
         params.m_dsn = receivedMacHdr.GetSeqNum();
         params.m_mpduLinkQuality = lqi;
+
         params.m_srcPanId = receivedMacHdr.GetSrcPanId();
         params.m_srcAddrMode = receivedMacHdr.GetSrcAddrMode();
-
-        switch (params.m_srcAddrMode) {
-            case SHORT_ADDR:
-                params.m_srcAddr = receivedMacHdr.GetShortSrcAddr();
-                break;
-            case EXT_ADDR:
-                params.m_srcExtAddr = receivedMacHdr.GetExtSrcAddr();
-                break;
-            default:
-                break;
-        }
+        params.m_srcAddr = receivedMacHdr.GetShortSrcAddr();
 
         params.m_dstPanId = receivedMacHdr.GetDstPanId();
         params.m_dstAddrMode = receivedMacHdr.GetDstAddrMode();
-
-        switch (params.m_dstAddrMode) {
-            case SHORT_ADDR:
-                params.m_dstAddr = receivedMacHdr.GetShortDstAddr();
-                break;
-            case EXT_ADDR:
-                params.m_dstExtAddr = receivedMacHdr.GetExtDstAddr();
-                break;
-            default:
-                break;
-        }
+        params.m_dstAddr = receivedMacHdr.GetShortDstAddr();
 
         // NS_LOG_DEBUG("receivedMacHdr.GetSrcPanId()" << receivedMacHdr.GetSrcPanId());
         // NS_LOG_DEBUG("receivedMacHdr.GetDstPanId()" << receivedMacHdr.GetDstPanId());
@@ -2453,10 +2129,6 @@ void LrWpanMac::PdDataIndication(uint32_t psduLength, Ptr<Packet> p, uint8_t lqi
             }
         }
 
-        if (acceptFrame && (receivedMacHdr.GetDstAddrMode() == EXT_ADDR)) {
-            acceptFrame = (receivedMacHdr.GetExtDstAddr() == m_selfExt);
-        }
-
         if (acceptFrame) {
             m_macRxTrace(originalPkt);
             // \todo: What should we do if we receive a frame while waiting for an ACK?
@@ -2472,29 +2144,6 @@ void LrWpanMac::PdDataIndication(uint32_t psduLength, Ptr<Packet> p, uint8_t lqi
                  || receivedMacHdr.GetFrameVer() == LrWpanMacHeader::IEEE_802_15_4_2006) 
                 ) 
             {
-                // If this is a data or mac command frame, which is not a broadcast or
-                // multicast, with ack req set, generate and send an ack frame. If there is a
-                // CSMA medium access in progress we cancel the medium access for sending the
-                // ACK frame. A new transmission attempt will be started after the ACK was send.
-                if (m_lrWpanMacState == MAC_ACK_PENDING)
-                {
-                    m_ackWaitTimeout.Cancel();
-                    // howard: 用不到
-                    // NS_LOG_INFO("進來 PrepareRetransmission 2");
-                    // PrepareRetransmission();
-                }
-                else if (m_lrWpanMacState == MAC_CSMA)
-                {   
-                    // DSME-TODO
-                    // \todo: If we receive a packet while doing CSMA/CA, should  we drop the
-                    // packet because of channel busy,
-                    //        or should we restart CSMA/CA for the packet after sending the ACK?
-                    // Currently we simply restart CSMA/CA after sending the ACK.
-                    NS_LOG_DEBUG("Received a packet with ACK required while in CSMA. Cancel "
-                                 "current CSMA-CA");
-                    m_csmaCa->Cancel();
-                }
-
                 // Cancel any pending MAC state change, ACKs have higher priority.
                 m_setMacState.Cancel();
                 ChangeMacState(MAC_IDLE);
@@ -2552,14 +2201,7 @@ void LrWpanMac::PdDataIndication(uint32_t psduLength, Ptr<Packet> p, uint8_t lqi
                 }
                 else // Normal flow
                 {
-                    m_setMacState = Simulator::ScheduleNow(&LrWpanMac::SendAck,
-                                                    this,
-                                                    receivedMacHdr.GetSeqNum());
-                    // if (!receivedMacHdr.IsData()) {
-                    //     m_setMacState = Simulator::ScheduleNow(&LrWpanMac::SendAck,
-                    //                                             this,
-                    //                                             receivedMacHdr.GetSeqNum());
-                    // }
+                    m_setMacState = Simulator::ScheduleNow(&LrWpanMac::SendAck, this, receivedMacHdr.GetSeqNum());
                 }                                               
             }
 
@@ -2567,18 +2209,10 @@ void LrWpanMac::PdDataIndication(uint32_t psduLength, Ptr<Packet> p, uint8_t lqi
             {
                 NS_LOG_DEBUG("Packet from " << params.m_srcAddr);
             } 
-            else if (receivedMacHdr.GetSrcAddrMode() == EXT_ADDR) 
-            {
-                NS_LOG_DEBUG("Packet from " << params.m_srcExtAddr);
-            }
 
             if (receivedMacHdr.GetDstAddrMode() == SHORT_ADDR) 
             {
                 NS_LOG_DEBUG("Packet to " << params.m_dstAddr);
-            } 
-            else if (receivedMacHdr.GetDstAddrMode() == EXT_ADDR) 
-            {
-                NS_LOG_DEBUG("Packet to " << params.m_dstExtAddr);
             }
 
             if(receivedMacHdr.IsBeacon())
@@ -2730,9 +2364,6 @@ void LrWpanMac::PdDataIndication(uint32_t psduLength, Ptr<Packet> p, uint8_t lqi
                 if (receivedMacHdr.GetSrcAddrMode() == SHORT_ADDR) {
                     panDescriptor.m_coorAddrMode = SHORT_ADDR;
                     panDescriptor.m_coorShortAddr = receivedMacHdr.GetShortSrcAddr();
-                } else {
-                    panDescriptor.m_coorAddrMode = EXT_ADDR;
-                    panDescriptor.m_coorExtAddr = receivedMacHdr.GetExtSrcAddr();
                 }
 
                 panDescriptor.m_coorPanId = receivedMacHdr.GetSrcPanId();
@@ -2775,7 +2406,6 @@ void LrWpanMac::PdDataIndication(uint32_t psduLength, Ptr<Packet> p, uint8_t lqi
                     m_incomingBeaconOrder = incomingSuperframe.GetBeaconOrder();
                     m_incomingSuperframeOrder = incomingSuperframe.GetFrameOrder();
                     m_incomingFnlCapSlot = incomingSuperframe.GetFinalCapSlot();
-                    // NS_LOG_INFO("m_incomingFnlCapSlot = " << std::to_string(m_incomingFnlCapSlot));
 
                     m_incomingBeaconInterval =(static_cast<uint32_t>(1 << m_incomingBeaconOrder)) * aBaseSuperframeDuration;
                     m_incomingSuperframeDuration = aBaseSuperframeDuration * (static_cast<uint32_t>(1 << m_incomingSuperframeOrder));
@@ -2844,9 +2474,10 @@ void LrWpanMac::PdDataIndication(uint32_t psduLength, Ptr<Packet> p, uint8_t lqi
                     // For dsme-net-device setting use only 
                     // ScheduleGtsSyncToCoord(m_incSDindex);
 
-                    if (!m_forDsmeNetDeviceIntegrateWithHigerLayer) {
-                        if (receivedMacHdr.GetExtSrcAddr() == GetCoordExtAddress()
-                            || receivedMacHdr.GetShortSrcAddr() == GetCoordShortAddress()) {
+                    if(!m_forDsmeNetDeviceIntegrateWithHigerLayer)
+                    {
+                        if(receivedMacHdr.GetShortSrcAddr() == GetCoordShortAddress())
+                        {
                             ScheduleGts(true);
                         }
                     }
@@ -2909,15 +2540,6 @@ void LrWpanMac::PdDataIndication(uint32_t psduLength, Ptr<Packet> p, uint8_t lqi
                             Simulator::ScheduleNow(&LrWpanMac::SetLrWpanMacState, this, MAC_IDLE);                         
                     }                
 
-                    // Begin CAP on the current device using info from the Incoming superframe
-                    // NS_LOG_DEBUG("Incoming superframe Active Portion (Beacon + CAP + CFP): "
-                    //              << m_incomingSuperframeDuration << " symbols");
-                    // m_incCapEvent = Simulator::ScheduleNow(&LrWpanMac::StartCAP,
-                    //                                        this,
-                    //                                        SuperframeType::INCOMING);
-                    // m_setMacState =
-                    //     Simulator::ScheduleNow(&LrWpanMac::SetLrWpanMacState, this, MAC_IDLE);
-
                 } else if (!m_scanEvent.IsRunning() && m_macPanId == 0xFFFF) {
                     NS_LOG_DEBUG(this << " Device not associated, cannot process beacon");
                     return;
@@ -2948,43 +2570,7 @@ void LrWpanMac::PdDataIndication(uint32_t psduLength, Ptr<Packet> p, uint8_t lqi
                         }
                     }
 
-                    if (m_scanEvent.IsRunning()) {
-                        // Channel scanning is taking place, save only unique PAN descriptors
-                        bool descriptorExists = false;
-
-                        for (const auto& descriptor : m_panDescriptorList)
-                        {
-                            if (descriptor.m_coorAddrMode == SHORT_ADDR)
-                            {
-                                // Found a coordinator in PAN descriptor list with the same
-                                // registered short address
-                                descriptorExists =
-                                    (descriptor.m_coorShortAddr ==
-                                         panDescriptor.m_coorShortAddr &&
-                                     descriptor.m_coorPanId == panDescriptor.m_coorPanId);
-                            }
-                            else
-                            {
-                                // Found a coordinator in PAN descriptor list with the same
-                                // registered extended address
-                                descriptorExists =
-                                    (descriptor.m_coorExtAddr == panDescriptor.m_coorExtAddr &&
-                                     descriptor.m_coorPanId == panDescriptor.m_coorPanId);
-                            }
-
-                            if (descriptorExists)
-                            {
-                                break;
-                            }
-                        }
-
-                        if (!descriptorExists) {
-                            m_panDescriptorList.push_back(panDescriptor);
-                        }
-
-                        return;
-
-                    } else if (m_trackingEvent.IsRunning()) {  // currently synchronizing with a coordinator
+                    if (m_trackingEvent.IsRunning()) {  // currently synchronizing with a coordinator
                         // check if MLME-SYNC.request was previously issued and running
                         // Sync. is necessary to handle pending messages (indirect
                         // transmissions)
@@ -3017,228 +2603,7 @@ void LrWpanMac::PdDataIndication(uint32_t psduLength, Ptr<Packet> p, uint8_t lqi
                             pndAddrFields = receivedMacPayload.GetPndAddrFields();
                         }
                     } 
-
-                } else {
-                    // m_macAutoRequest is FALSE
-                    // Data command request are not send, only the beacon notification.
-                    // see IEEE 802.15.4-2011 Section 6.2.4.1
-                    if (!m_mlmeBeaconNotifyIndicationCallback.IsNull()) {
-                        MlmeBeaconNotifyIndicationParams beaconParams;
-
-                        if (m_macDSMEenabled && receivedMacHdr.GetFrameVer() == LrWpanMacHeader::IEEE_802_15_4) {
-                            beaconParams.m_ebsn = receivedMacHdr.GetSeqNum();
-                            beaconParams.m_beaconType = 0x01;
-                            
-                        } else {
-                            beaconParams.m_bsn = receivedMacHdr.GetSeqNum();
-                            beaconParams.m_beaconType = 0x00;
-                        }
-                        
-                        beaconParams.m_panDescriptor = panDescriptor;
-                        m_mlmeBeaconNotifyIndicationCallback(beaconParams, originalPkt);
-                    }
                 }
-
-            } else if (receivedMacHdr.IsCommand()) {
-                // Handle the reception of frame commands that do not require ACK (i.e. Beacon
-                // Request Command)
-                HeaderIETermination termination;
-                PayloadIETermination termination2;
-                EBFilterIE filterIE;
-                bool respTheEBR = true;
-
-                if (receivedMacHdr.IsIEListPresent()) {
-                    p->RemoveHeader(termination);
-                    p->RemoveHeader(filterIE);
-                    p->RemoveHeader(termination2);
-
-                    if (filterIE.IsPermitJoiningOn() && !m_macAssociationPermit) {
-                        respTheEBR = false;
-                    }
-                }
-
-                CommandPayloadHeader receivedMacPayload;
-                p->PeekHeader(receivedMacPayload);
-
-                if (receivedMacPayload.GetCommandFrameType() == CommandPayloadHeader::BEACON_REQ) {
-                    // TODO: check that node is any coordinator not just pan coordinator
-                    if (m_csmaCa->IsUnSlottedCsmaCa() && m_coord) { // non-beacon enabled PAN
-                        if (receivedMacHdr.GetFrameVer() == LrWpanMacHeader::IEEE_802_15_4 && m_macDSMEenabled) {
-                            NS_LOG_DEBUG("Enhanced Beacon Request Command Received;");
-
-                            if (respTheEBR) {
-                                NS_LOG_DEBUG("Response with Enhanced Beacon.");
-                                SendOneEnhancedBeacon();
-                            }
-
-                        }
-                    }
-                    else
-                    {
-                        m_macRxDropTrace(originalPkt);
-                    }
-
-                } else if (receivedMacPayload.GetCommandFrameType() == CommandPayloadHeader::DSME_BEACON_ALLOC_NOTIF) {
-                    NS_LOG_DEBUG("Received Dsme beacon allocation notification with SD index: " 
-                                << receivedMacPayload.GetAllocationBcnSDIndex());
-
-                    /** 
-                     * Need to check if there is a beacon bitmap collision occured. 
-                     * If collision occured, need to send DSME beacon-collision notification command.
-                     * If collision free, need to update the beacon bitmap.
-                     */ 
-                    
-                    // Check the incoming beacon allocation is collision with the current beacon bitmap or not
-                    std::vector<uint16_t> currentBitmap = m_macSDBitmap.GetSDBitmap();
-
-                    int allocArrIdx = receivedMacPayload.GetAllocationBcnSDIndex() / 16;
-                    int allocBitmapPosition = receivedMacPayload.GetAllocationBcnSDIndex() % 16;
-
-                    if(currentBitmap.size() < 1)
-                    {
-                        // NS_LOG_DEBUG("currentBitmap length = " << currentBitmap.size());
-                        return;
-                    }
-
-                    if((currentBitmap[allocArrIdx] & (1 << (allocBitmapPosition))) > 0) // if the expected slot has already allocated
-                    {
-                        NS_LOG_INFO("Check beacon scheduling ... Result = [ " << "Device : " << params.m_srcAddr << " " 
-                                 << "Beacon bitmap allocation collision" << " ]" << "\n"
-                                 << " Current Dsme beacon bitmap : " << m_macSDBitmap << "\n"
-                                 << " Expected allocation SDidx = " << receivedMacPayload.GetAllocationBcnSDIndex() << "\n"
-                                 << " Wait for next beacon cycle to allocate vacant beacon slot" <<"\n");   
-
-                        SetBcnSchedulingAllocStatus(ALLOC_COLLISION);                        
-                        
-                        // Send DSME beacon-collision notification command to the device who cause the collision
-                        // howard: 用不到
-                        // SendDsmeBeaconCollisionNotifyCommand(params.m_srcAddr, receivedMacPayload.GetAllocationBcnSDIndex());
-
-                    }
-                    else  // Collision free, Update beacon bitmap
-                    {
-                        /**
-                         * Here update beacon bitmap for the coordinator which received Beacon allocation command 
-                         * and check beacon slot allocation successfully.
-                        */
-                        NS_LOG_INFO("Check beacon scheduling ... Result = [ " << "Device : " << params.m_srcAddr << " " 
-                                 << "Beacon bitmap allocate Timeslot "<< receivedMacPayload.GetAllocationBcnSDIndex() << " successfully" << " ]" << "\n");
-                        m_macSDBitmap.SetSDBitmap(receivedMacPayload.GetAllocationBcnSDIndex());
-
-                        NS_LOG_DEBUG("Current mac SD Bitmap is updated as: " << m_macSDBitmap);
-                    }
-
-                }  else if (receivedMacPayload.GetCommandFrameType() == CommandPayloadHeader::DSME_BEACON_COLLISION_NOTIF) {
-
-                    NS_LOG_DEBUG("Received Dsme beacon allocation collision " 
-                              << " Send from " << receivedMacHdr.GetShortSrcAddr() << " cannoot allocate SD index: " 
-                              << receivedMacPayload.GetCollisionBcnSDIndex() << " , due to allocation collision"
-                              << " Need to wait for the next beacon");
-
-                    // TODO : Pedding to next beacon for allocation
-                    SetBcnSchedulingAllocStatus(ALLOC_COLLISION);
-                    SetBcnCollision();
-                    m_needBcnSchedulingAgain = true;
-
-                } else if (receivedMacPayload.GetCommandFrameType() == CommandPayloadHeader::COOR_REALIGN) {
-                    // DSME-TODO:
-                    // the device shall ensure that its own beacons do not overlap 
-                    // with the beacons transmitted by the coordinator.
-                    if (GetCoordShortAddress() == receivedMacPayload.GetCoordinatorShortAddress()
-                        && receivedMacHdr.GetShortDstAddr().IsBroadcast()) {
-                        if (!m_mlmeSyncLossIndicationCallback.IsNull()) {
-                            MlmeSyncLossIndicationParams syncLossParams;
-                            syncLossParams.m_panId = receivedMacPayload.GetPanId();
-                            syncLossParams.m_logCh = receivedMacPayload.GetChannelNum();
-
-                            if (false) {
-                                syncLossParams.m_lossReason = MLMESYNCLOSS_SUPERFRAME_OVERLAP;
-                            } else {
-                                syncLossParams.m_lossReason = MLMESYNCLOSS_REALIGMENT;
-                            }
-
-                            m_mlmeSyncLossIndicationCallback(syncLossParams);
-
-                            m_beaconTrackingOn = false;
-
-                            // DSME-TODO
-                            m_trackingEvent.Cancel();
-                            m_beaconEvent.Cancel();
-                            m_capEvent.Cancel();
-                            m_cfpEvent.Cancel();
-                            m_incCapEvent.Cancel();
-                            m_incCfpEvent.Cancel();
-                            
-                            m_macPanId = receivedMacPayload.GetPanId();
-                        }
-                    }
-
-                } else if (receivedMacPayload.GetCommandFrameType() == CommandPayloadHeader::ORPHAN_NOTIF) {
-                    NS_LOG_DEBUG("Orphan Notification Received; forwarding up");    
-
-                    if (!m_mlmeOrphanIndicationCallback.IsNull()) {
-                        MlmeOrphanIndicationPararms OrphanParams;
-                        OrphanParams.m_orphanAddress = receivedMacHdr.GetExtSrcAddr();
-                        m_mlmeOrphanIndicationCallback(OrphanParams);
-                    }
-
-                } else if (receivedMacPayload.GetCommandFrameType() == CommandPayloadHeader::DSME_INFO_REQ) {
-                    if (!m_mlmeDsmeInfoIndicationCallback.IsNull()) {
-                        MlmeDsmeInfoIndicationParams indicationParams;
-                        indicationParams.m_devAddr = receivedMacHdr.GetExtSrcAddr();
-                        indicationParams.m_info = static_cast<InfoType>(receivedMacPayload.GetDsmeInfoType());
-
-                        m_mlmeDsmeInfoIndicationCallback(indicationParams);
-                    }
-
-                    // the device shall determine whether it has an allocated DSME-GTS 
-                    // to the requesting device.
-
-                    // If it has an allocated DSME-GTS, the
-                    // MLME of the Destination device shall send a DSME Information 
-                    // reply command frame in the DSME-GTS.
-
-                    // howard: 用不到
-                    // uint16_t superframeID = 0;
-                    // uint8_t slotID = 0;
-
-                    if (receivedMacPayload.GetDsmeInfoType() == MLMEDSMEINFO_TIMESTAMP) {
-                        // if (SearchDsmeACTForAllocatedGTS(receivedMacHdr.GetShortSrcAddr(), superframeID, slotID)) {
-                        //     // howard: 用不到
-                        //     // SendDsmeInfoResponseCommand(m_rxPkt->Copy(), superframeID, slotID);
-                        // }
-
-                    } else {
-                        // howard: 用不到
-                        // SendDsmeInfoResponseCommand(m_rxPkt->Copy(), superframeID, slotID);
-                    }
-
-                } else if (receivedMacPayload.GetCommandFrameType() == CommandPayloadHeader::DSME_INFO_REPLY) {
-
-                    if (!m_mlmeDsmeInfoConfirmCallback.IsNull()) {
-                        MlmeDsmeInfoConfirmParams confirmParams;
-                        confirmParams.m_info = static_cast<InfoType>(receivedMacPayload.GetDsmeInfoType());
-
-                        if (confirmParams.m_info == MLMEDSMEINFO_TIMESTAMP) {
-                            confirmParams.m_timestamp = receivedMacPayload.GetDsmeInfoTimestamp();
-                            confirmParams.m_superframeID = receivedMacPayload.GetDsmeInfoSuperframeID();
-                            confirmParams.m_slotID = receivedMacPayload.GetDsmeInfoSlotID();
-
-                        } else if (confirmParams.m_info == MLMEDSMEINFO_DSME_SAB_SPECIFICATION) {
-                            confirmParams.m_dsmeSABSpec = receivedMacPayload.GetDsmeGtsSABSpec();
-
-                        } else {
-                            confirmParams.m_panDescriptor = receivedMacPayload.GetDsmeInfoPANDescriptor();
-                        }
-
-                        confirmParams.m_status = MLMEDSMEINFO_SUCCESS;
-
-                        m_mlmeDsmeInfoConfirmCallback(confirmParams);
-                    }
-                    
-                    m_gtsRetrieve = false;
-                }
-
             } 
             else if (receivedMacHdr.IsData() && !m_mcpsDataIndicationCallback.IsNull()) 
             {
@@ -3524,38 +2889,6 @@ LrWpanMac::IfsWaitTimeout(Time ifsTime)
 }
 
 void
-LrWpanMac::PrintPendTxQ(std::ostream& os) const
-{
-    LrWpanMacHeader peekedMacHdr;
-
-    os << "Pending Transaction List [" << GetShortAddress() << " | " << GetExtendedAddress()
-       << "] | CurrentTime: " << Simulator::Now().As(Time::S) << "\n"
-       << "       Destination        | Sequence Number |   Frame type    | Expire time\n";
-
-    for (uint32_t i = 0; i < m_indTxQueue.size(); i++)
-    {
-        m_indTxQueue[i]->txQPkt->PeekHeader(peekedMacHdr);
-        os << m_indTxQueue[i]->dstExtAddress << "           "
-           << static_cast<uint32_t>(m_indTxQueue[i]->seqNum) << "          ";
-
-        if (peekedMacHdr.IsCommand())
-        {
-            os << "Cmd Frame    ";
-        }
-        else if (peekedMacHdr.IsData())
-        {
-            os << "Data Frame   ";
-        }
-        else
-        {
-            os << "Unk Frame    ";
-        }
-
-        os << m_indTxQueue[i]->expireTime.As(Time::S) << "\n";
-    }
-}
-
-void
 LrWpanMac::RemovePendTxQElement(Ptr<Packet> p)
 {
     LrWpanMacHeader peekedMacHdr;
@@ -3563,17 +2896,7 @@ LrWpanMac::RemovePendTxQElement(Ptr<Packet> p)
 
     for (auto it = m_indTxQueue.begin(); it != m_indTxQueue.end(); it++)
     {
-        if (peekedMacHdr.GetDstAddrMode() == EXT_ADDR)
-        {
-            if (((*it)->dstExtAddress == peekedMacHdr.GetExtDstAddr()) &&
-                ((*it)->seqNum == peekedMacHdr.GetSeqNum()))
-            {
-                m_macIndTxDequeueTrace(p);
-                m_indTxQueue.erase(it);
-                break;
-            }
-        }
-        else if (peekedMacHdr.GetDstAddrMode() == SHORT_ADDR)
+        if (peekedMacHdr.GetDstAddrMode() == SHORT_ADDR)
         {
             if (((*it)->dstShortAddress == peekedMacHdr.GetShortDstAddr()) &&
                 ((*it)->seqNum == peekedMacHdr.GetSeqNum()))
@@ -3584,7 +2907,6 @@ LrWpanMac::RemovePendTxQElement(Ptr<Packet> p)
             }
         }
     }
-
     p = nullptr;
 }
 
@@ -3680,62 +3002,14 @@ LrWpanMac::PdDataConfirm(LrWpanPhyEnumeration status)
 
             } 
             else if (macHdr.IsAckReq())  // We have sent a regular data packet, check if we have to it for an ACK.
-            {                             
+            {                            
                 // we sent a regular data frame or command frame (e.g. AssocReq command) that
                 // require ACK wait for the ack or the next retransmission timeout start retransmission timer.
 
                 Time waitTime = Seconds(static_cast<double>(GetMacAckWaitDuration()) / symbolRate);
 
                 // DSME
-                if (macHdr.IsCommand()) {
-                    Ptr<Packet> txOriginalPkt = m_txPkt->Copy();
-                    LrWpanMacHeader txMacHdr;
-                    txOriginalPkt->RemoveHeader(txMacHdr);
-                    CommandPayloadHeader txMacPayload;
-                    txOriginalPkt->RemoveHeader(txMacPayload);
-
-                    if (txMacPayload.GetCommandFrameType() == CommandPayloadHeader::DISASSOCIATION_NOTIF) {
-                        if (m_disassociateParams.m_disassociateReason == CommandPayloadHeader::DISASSC_DEV_LEAVE_PAN ||
-                            m_disassociateParams.m_disassociateReason == CommandPayloadHeader::DISASSC_COORD_WISH_DEV_LEAVE_PAN) 
-                        {
-                            // howard: 用不到
-                            // RemoveReferencesToPAN();
-                        }
-
-                    } else if (txMacPayload.GetCommandFrameType() == CommandPayloadHeader::DSME_GTS_REQ) {
-                        NS_ASSERT(m_dsmeGtsAckWaitTimeout.IsExpired());
-                        m_dsmeGtsAckWaitTimeout = Simulator::Schedule(waitTime
-                                                                      , &LrWpanMac::DsmeGtsAckWaitTimeout
-                                                                      , this);
-
-                    } else if (txMacPayload.GetCommandFrameType() == CommandPayloadHeader::COOR_REALIGN) {
-                        // DSME-TODO
-                        // the MLME updates the PIB attributes BeaconOrder
-                        // , SuperframeOrder, PANId, ChannelPage, and ChannelNumber parameters.z
-
-                    } else if (txMacPayload.GetCommandFrameType() == CommandPayloadHeader::DSME_INFO_REQ) {
-                        NS_ASSERT(m_dsmeInfoAckWaitTimeout.IsExpired());
-                        m_dsmeInfoAckWaitTimeout = Simulator::Schedule(waitTime
-                                                                       , &LrWpanMac::DsmeInfoAckWaitTimeout
-                                                                       , this);
-                    }
-                
-                // For dsme-net-device-throughput... testing usage
-                }
-                else if (m_forDsmeNetDeviceIntegrateWithHigerLayer && macHdr.IsData() 
-                     && (m_gtsEvent.IsRunning() || m_incGtsEvent.IsRunning())) 
-                {
-                    NS_LOG_DEBUG("Successfully sent a data packet during a GTS period.");
-
-                    if (!m_mcpsDataConfirmCallback.IsNull()) {
-                        McpsDataConfirmParams confirmParams;
-                        confirmParams.m_msduHandle = m_mcpsDataRequestParams.m_msduHandle;
-                        confirmParams.m_status = IEEE_802_15_4_SUCCESS;
-                        m_mcpsDataConfirmCallback(confirmParams);
-                    }
-
-                } 
-                else if (macHdr.IsData()) 
+                if (macHdr.IsData()) 
                 {
                     NS_LOG_DEBUG("Send the data packet successfully !");
                     // std::cout << Simulator::Now().GetNanoSeconds() << ", " << GetShortAddress() << " successfully sent the data packet" << std::endl;
@@ -3784,59 +3058,7 @@ LrWpanMac::PdDataConfirm(LrWpanPhyEnumeration status)
                     ifsWaitTime = Seconds(static_cast<double>(m_macSIFSPeriod) / symbolRate);
                     m_ifsEvent =  Simulator::Schedule(ifsWaitTime, &LrWpanMac::IfsWaitTimeout, this, ifsWaitTime);
                 }
-                else
-                {
-                    // Time waitTime = Seconds(static_cast<double>(GetMacAckWaitDuration()) / symbolRate);
-                    NS_ASSERT(m_ackWaitTimeout.IsExpired());
-                    // howard: 用不到
-                    // m_ackWaitTimeout = Simulator::Schedule(waitTime, &LrWpanMac::AckWaitTimeout, this);
-                    m_setMacState =
-                        Simulator::ScheduleNow(&LrWpanMac::SetLrWpanMacState, this, MAC_ACK_PENDING);
-                }
                 return;
-            } 
-            else if (macHdr.IsCommand()) 
-            {
-                // We handle commands that do not require ACK (e.g. BeaconReq command)
-                // other command are handle by the previous if statement.
-                // Broadcasted coordinator realignment command would meet this.
-                Ptr<Packet> txOriginalPkt = m_txPkt->Copy();
-                LrWpanMacHeader txMacHdr;
-                txOriginalPkt->RemoveHeader(txMacHdr);
-                CommandPayloadHeader txMacPayload;
-                txOriginalPkt->RemoveHeader(txMacPayload);
-
-                if (txMacPayload.GetCommandFrameType() == CommandPayloadHeader::COOR_REALIGN) {
-                    // DSME-TODO
-                    // the new superframe configuration and channel parameters 
-                    // shall be put into operation
-                    m_macPanId = m_startParams.m_PanId;
-
-                    m_pendPrimitive = MLME_START_REALGN;
-
-                    LrWpanPhyPibAttributes pibAttr;
-                    pibAttr.phyCurrentPage = m_startParams.m_logChPage;
-                    m_phy->PlmeSetAttributeRequest(LrWpanPibAttributeIdentifier::phyCurrentPage, &pibAttr);
-
-                    if (!m_panCoor) {
-                        m_sendBcn = true;
-                    }
-
-                    if (!m_mlmeStartConfirmCallback.IsNull()) {
-                        MlmeStartConfirmParams mlmeConfirmParams;
-                        mlmeConfirmParams.m_status = MLMESTART_SUCCESS;
-                        m_mlmeStartConfirmCallback(mlmeConfirmParams);
-                    }
-                }
-                
-                RemoveFirstTxQElement();
-            
-            } 
-            else if (macHdr.IsData() && (m_gtsEvent.IsRunning() || m_incGtsEvent.IsRunning())) 
-            {
-                // Do nothing because Acknowledgment is not required
-                NS_LOG_DEBUG("Successfully sent a data packet during a GTS period.");
-
             } 
             else 
             {
@@ -3854,7 +3076,6 @@ LrWpanMac::PdDataConfirm(LrWpanPhyEnumeration status)
                 ifsWaitTime = Seconds(static_cast<double>(GetIfsSize()) / symbolRate);
                 RemoveFirstTxQElement();
             }
-
         }
         else if(macHdr.IsAcknowledgment() && macHdr.IsIEListPresent() && m_groupAckPolicy == GROUP_ACK_LEGACY)
         {
@@ -3868,722 +3089,23 @@ LrWpanMac::PdDataConfirm(LrWpanPhyEnumeration status)
             ResetEnhancedGroupAckBitmap();
             m_txPkt = nullptr;
         }
-        else 
-        {
-            // The packet sent was a successful ACK
-
-            // Check the received frame before the transmission of the ACK,
-            // and send the appropriate Indication or Confirmation
-            Ptr<Packet> recvOriginalPkt = m_rxPkt->Copy();
-            LrWpanMacHeader receivedMacHdr;
-            recvOriginalPkt->RemoveHeader(receivedMacHdr);
-
-            if (receivedMacHdr.IsCommand())
-            {
-                CommandPayloadHeader receivedMacPayload;
-                recvOriginalPkt->RemoveHeader(receivedMacPayload);
-                
-                if (receivedMacPayload.GetCommandFrameType() ==
-                    CommandPayloadHeader::ASSOCIATION_REQ)
-                {
-                    if (!m_mlmeAssociateIndicationCallback.IsNull())
-                    {
-                        MlmeAssociateIndicationParams associateParams;
-                        associateParams.capabilityInfo = receivedMacPayload.GetCapabilityField();
-                        associateParams.m_extDevAddr = receivedMacHdr.GetExtSrcAddr();
-                        m_mlmeAssociateIndicationCallback(associateParams);
-                    }
-
-                    // Clear the packet buffer for the packet request received.
-                    m_rxPkt = nullptr;
-
-                } else if (receivedMacPayload.GetCommandFrameType() ==
-                    CommandPayloadHeader::DSME_ASSOCIATION_REQ) {
-                    // DSME
-                    if (!m_mlmeAssociateIndicationCallback.IsNull()) {
-                        MlmeAssociateIndicationParams associateParams;
-                        associateParams.capabilityInfo = receivedMacPayload.GetCapabilityField();
-                        associateParams.m_extDevAddr = receivedMacHdr.GetExtSrcAddr();
-                        associateParams.m_channelOfs = receivedMacPayload.GetChannelOfs();
-                        associateParams.m_hoppingSeqID = receivedMacPayload.GetHoppingSeqID();
-
-                        m_mlmeAssociateIndicationCallback(associateParams);
-                    }
-
-                } else if (receivedMacPayload.GetCommandFrameType() == 
-                            CommandPayloadHeader::ASSOCIATION_RESP 
-                         || receivedMacPayload.GetCommandFrameType() ==
-                         CommandPayloadHeader::DSME_ASSOCIATION_RESP) {
-                    // DSME
-                    MlmeAssociateConfirmParams confirmParams;
-
-                    switch (receivedMacPayload.GetAssociationStatus()) {
-                        case CommandPayloadHeader::SUCCESSFUL:
-                            confirmParams.m_status =
-                                LrWpanMlmeAssociateConfirmStatus::MLMEASSOC_SUCCESS;
-                            confirmParams.m_assocShortAddr =
-                                GetShortAddress(); // the original short address used in the association
-                                                // request
-                            SetShortAddress(
-                                receivedMacPayload
-                                    .GetShortAddr()); // the assigned short address by the coordinator
-
-                            m_macPanId = receivedMacHdr.GetSrcPanId();
-                            m_macChannelOfs = receivedMacPayload.GetChannelOfs();
-
-                            // DSME: Dsme association response command
-                            // DSME-TODO
-                            if (m_macDSMEenabled && m_macHoppingEnabled) {
-                                if (receivedMacPayload.GetHoppingSeqLen() > 0) {
-                                    SetHoppingSeq(receivedMacPayload.GetHoppingSequnce());
-                                }
-
-                                SetHoppingSeqLen(receivedMacPayload.GetHoppingSeqLen());
-                            }
-                            
-                            /** 
-                             * Set association sequence for self-designed Enhanced Beacon Scheduling (EBS)
-                             * Note : 
-                             * EBS set the SDIdx as the value of association sequence in order to achive allocation collision free.
-                             **/ 
-                            if(receivedMacPayload.GetEBSAllocationSeq() != 0) // 0 represent EBS disabled
-                            {
-                                SetTimeSlotToSendBcn(receivedMacPayload.GetEBSAllocationSeq());
-                            }                            
-
-                            break;
-
-                        case CommandPayloadHeader::FULL_CAPACITY:
-                            confirmParams.m_status =
-                                LrWpanMlmeAssociateConfirmStatus::MLMEASSOC_FULL_CAPACITY;
-                            m_macPanId = 0xffff;
-                            m_macCoordShortAddress = Mac16Address("FF:FF");
-                            m_macCoordExtendedAddress = Mac64Address("ff:ff:ff:ff:ff:ff:ff:ed");
-                            m_incCapEvent.Cancel();
-                            m_incCfpEvent.Cancel();
-                            m_csmaCa->SetUnSlottedCsmaCa();
-                            m_incomingBeaconOrder = 15;
-                            m_incomingSuperframeOrder = 15;
-                            break;
-
-                        case CommandPayloadHeader::ACCESS_DENIED:
-                            confirmParams.m_status =
-                                // LrWpanMlmeAssociateConfirmStatus::MLMEASSOC_ACCESS_DENIED;
-                                LrWpanMlmeAssociateConfirmStatus::MLMEASSOC_CHANNEL_ACCESS_FAILURE;
-                            m_macPanId = 0xffff;
-                            m_macCoordShortAddress = Mac16Address("FF:FF");
-                            m_macCoordExtendedAddress = Mac64Address("ff:ff:ff:ff:ff:ff:ff:ed");
-                            m_incCapEvent.Cancel();
-                            m_incCfpEvent.Cancel();
-                            m_csmaCa->SetUnSlottedCsmaCa();
-                            m_incomingBeaconOrder = 15;
-                            m_incomingSuperframeOrder = 15;
-                            break;
-                        
-                        case CommandPayloadHeader::HOPPING_SEQ_OFS_DUPLICATION:
-                            confirmParams.m_status =
-                                LrWpanMlmeAssociateConfirmStatus::MLMEASSOC_INVALID_PARAMETER;
-                            m_macPanId = 0xffff;
-                            m_macCoordShortAddress = Mac16Address("FF:FF");
-                            m_macCoordExtendedAddress = Mac64Address("ff:ff:ff:ff:ff:ff:ff:ed");
-                            m_incCapEvent.Cancel();
-                            m_incCfpEvent.Cancel();
-                            m_csmaCa->SetUnSlottedCsmaCa();
-                            m_incomingBeaconOrder = 15;
-                            m_incomingSuperframeOrder = 15;     
-                            break;
-                                
-                        case CommandPayloadHeader::FASTA_SUCCESSFUL:
-                            confirmParams.m_status =
-                                LrWpanMlmeAssociateConfirmStatus::MLMEASSOC_SUCCESS;
-                            confirmParams.m_assocShortAddr =
-                                GetShortAddress(); // the original short address used in the association
-                                                // request
-                            SetShortAddress(
-                                receivedMacPayload
-                                    .GetShortAddr()); // the assigned short address by the coordinator
-
-                            m_macPanId = receivedMacHdr.GetSrcPanId();
-                            m_macChannelOfs = receivedMacPayload.GetChannelOfs();
-
-                            if (m_macDSMEenabled && m_macHoppingEnabled) {
-                                if (receivedMacPayload.GetHoppingSeqLen() > 0) {
-                                    SetHoppingSeq(receivedMacPayload.GetHoppingSequnce());
-                                }
-
-                                SetHoppingSeqLen(receivedMacPayload.GetHoppingSeqLen());
-                            }
-
-                            break;
-
-                        case CommandPayloadHeader::RESERVED:
-                            NS_LOG_ERROR("CommandPayloadHeader::RESERVED encounterd, which is not legit");
-                            break;
-                    }
-
-                    if (!m_mlmeAssociateConfirmCallback.IsNull())
-                    {
-                        m_mlmeAssociateConfirmCallback(confirmParams);
-                    }
-
-                } else if (receivedMacPayload.GetCommandFrameType() == CommandPayloadHeader::DISASSOCIATION_NOTIF) {
-                    NS_LOG_DEBUG("Received DISASSOCIATION_NOTIF\n");
-                    if (!m_mlmeDisassociateIndicationCallback.IsNull()) {
-                        MlmeDisassociateIndicationParams disassociateParams;
-                        disassociateParams.m_extDevAddr = receivedMacHdr.GetExtSrcAddr();
-                        disassociateParams.m_disassociateReason = receivedMacPayload.GetDisassociationReason();
-                        m_mlmeDisassociateIndicationCallback(disassociateParams);
-                    }
-                    
-                } else if (receivedMacPayload.GetCommandFrameType() == CommandPayloadHeader::DATA_REQ) {
-                    // We enqueue the the Assoc Response command frame in the Tx queue
-                    // and the packet is transmitted as soon as the PHY is free and the IFS have
-                    // taken place.
-                    // SendAssocResponseCommand(m_rxPkt->Copy());
-
-                    /**
-                     * 應該先檢查 pending transcation list 有沒有相對應的 address 
-                     * 而不是直接認定是要回傳 association response command frame.
-                     */
-                    // DSME-TODO
-                    Ptr<IndTxQueueElement> indTxQElement = Create<IndTxQueueElement>();
-                    bool elementFound = true;
-                    // std::cout << receivedMacHdr.GetExtSrcAddr() << std::endl;
-                    // PrintPendTxQ(std::cout);
-                    // if (receivedMacHdr.GetSrcAddrMode() == LrWpanMacHeader::EXTADDR) {
-                    //     elementFound = SearchIndQueueElement(receivedMacHdr.GetExtSrcAddr(), indTxQElement);
-                    // } else {
-                    //     elementFound = SearchIndQueueElement(receivedMacHdr.GetShortSrcAddr(), indTxQElement);
-                    // }
-
-                    // PrintPendTxQ(std::cout); // debug
-
-                    if (elementFound) {
-                        LrWpanMacTrailer peekedTrailer;
-                        LrWpanMacHeader peekedMacHdr;
-                        CommandPayloadHeader peekedPayloadHdr;
-
-                        indTxQElement->txQPkt->RemoveTrailer(peekedTrailer);
-                        indTxQElement->txQPkt->RemoveHeader(peekedMacHdr);
-                        indTxQElement->txQPkt->PeekHeader(peekedPayloadHdr);
-
-                        indTxQElement->txQPkt->AddHeader(peekedMacHdr);
-                        indTxQElement->txQPkt->AddTrailer(peekedTrailer);
-                        
-                        if (peekedPayloadHdr.GetCommandFrameType() == CommandPayloadHeader::ASSOCIATION_RESP) {
-                            // howard: 用不到
-                            // SendAssocResponseCommand(m_rxPkt->Copy());
-
-                        } else if (peekedPayloadHdr.GetCommandFrameType() == CommandPayloadHeader::DSME_ASSOCIATION_RESP
-                                  && m_macDSMEenabled) {
-                            // howard: 用不到
-                            // SendDsmeAssocResponseCommand(m_rxPkt->Copy());
-
-                        } else if (peekedPayloadHdr.GetCommandFrameType() == CommandPayloadHeader::DISASSOCIATION_NOTIF) {
-                            // howard: 用不到
-                            // SendDisassocNotificationCommandIndirect(m_rxPkt->Copy());
-
-                        } else if (peekedMacHdr.IsData()) {
-                            // DSME-TODO
-                            // howard: 用不到
-                            // if (receivedMacHdr.GetSrcAddrMode() == LrWpanMacHeader::EXTADDR) {
-                            //     elementFound = DequeueInd(receivedMacHdr.GetExtSrcAddr(), indTxQElement);
-                            // } else {
-                            //     elementFound = DequeueInd(receivedMacHdr.GetShortSrcAddr(), indTxQElement);
-                            // }
-
-                            if (elementFound) {
-                                Ptr<TxQueueElement> txQElement = Create<TxQueueElement>();
-                                txQElement->txQPkt = indTxQElement->txQPkt;
-                                EnqueueTxQElement(txQElement);
-
-                            } else {
-                                NS_LOG_DEBUG("Requested element not found in pending list");
-                            }
-                        }
-
-                    } else {
-                        NS_LOG_DEBUG("Requested element not found in pending list");
-                    }          
-
-                } else if (receivedMacPayload.GetCommandFrameType() 
-                            == CommandPayloadHeader::COOR_REALIGN) {
-                    // DSME-TODO
-
-                } else if (receivedMacPayload.GetCommandFrameType()
-                            == CommandPayloadHeader::DSME_GTS_REQ) {
-                    if (receivedMacPayload.GetDsmeGtsManagementField().GetManagementType()
-                        == 0b000) {
-                        // howard: 用不到
-                        // if (!CheckDsmeGtsSABFromReqCmdWithDsmeACT(receivedMacPayload.GetDsmeGtsSABSpec())) {
-                        //     // Send DSME-GTS reply command frame with management type = zero
-                        //     // and the Status field shall be set to two (INVALID_PARAMETER)
-                        //     // howard: 用不到
-                        //     // SendDsmeGtsReplyWithInvalidParam(receivedMacHdr.GetShortSrcAddr(), 
-                        //     //                                 receivedMacPayload.GetDsmeGtsSABSpec());
-
-                        //     // Clear the packet buffer for the ACK packet sent.
-                        //     m_txPkt = nullptr;   
-
-                        //     return;
-                        // } 
-                    }
-                
-                    if (!m_mlmeDsmeGtsIndicationCallback.IsNull()) {
-                        MlmeDsmeGtsIndicationParams gtsIndicationParams;
-                        
-                        gtsIndicationParams.m_devAddr = receivedMacHdr.GetShortSrcAddr();
-                        gtsIndicationParams.m_manageType = static_cast<ManagementType>(receivedMacPayload.GetDsmeGtsManagementField()
-                                                                             .GetManagementType());
-
-                        gtsIndicationParams.m_direction = receivedMacPayload.GetDsmeGtsManagementField()
-                                                                            .IsDirectionRX();
-
-                        gtsIndicationParams.m_prioritizedChAccess = receivedMacPayload.GetDsmeGtsManagementField()
-                                                                                      .IsHighPriority();
-
-                        if (receivedMacPayload.GetDsmeGtsManagementField().GetManagementType()
-                            == 0b001) {
-                            gtsIndicationParams.m_numSlot = receivedMacPayload.GetDsmeGtsNumOfSlot();
-                            gtsIndicationParams.m_preferredSuperframeID = receivedMacPayload.GetDsmeGtsPreferredSuperframeId();
-                            gtsIndicationParams.m_preferredSlotID = receivedMacPayload.GetDsmeGtsPreferredSlotId();
-                        }
-                        
-                        gtsIndicationParams.m_dsmeSABSpec = receivedMacPayload.GetDsmeGtsSABSpec();
-
-                        // gtsIndicationParams.m_dsmeSABSpec.Print(std::cout); // debug
-
-                        // The higher layer will make the decision on the allocation//deallocation 
-                        // using the value of DsmeSabSpecification parameter 
-                        // as the slot availability information.
-                        m_mlmeDsmeGtsIndicationCallback(gtsIndicationParams);
-                    }
-
-                } else if (receivedMacPayload.GetCommandFrameType()
-                            == CommandPayloadHeader::DSME_GTS_NOTIFY) {   
-                    // Deallocation
-                    if (receivedMacPayload.GetDsmeGtsManagementField().GetManagementType() == 0b000) {
-                        if (receivedMacPayload.GetDsmeGtsDestAddress() == GetShortAddress()) {
-                            if (!m_mlmeCommStatusIndicationCallback.IsNull()) {
-                                MlmeCommStatusIndicationParams commStatusParams;
-                                commStatusParams.m_panId = m_macPanId;
-                                commStatusParams.m_srcAddrMode = LrWpanMacHeader::EXTADDR;
-                                commStatusParams.m_srcExtAddr = macHdr.GetExtSrcAddr();
-                                commStatusParams.m_dstAddrMode = LrWpanMacHeader::EXTADDR;
-                                commStatusParams.m_dstExtAddr = macHdr.GetExtDstAddr();
-                                commStatusParams.m_status = MLMECOMMSTATUS_SUCCESS;
-
-                                m_mlmeCommStatusIndicationCallback(commStatusParams);           
-                            }
-
-                        } else {
-                            // he device shall update macDSMESAB according to the DSMESABSpecification 
-                            // in this command frame to reflect the neighbor’s m_deallocated DSME-GTSs.
-
-                            // DSME-TODO
-                            DSMESABSpecificationField partialSAB = receivedMacPayload.GetDsmeGtsSABSpec();
-
-                            if (partialSAB.isCAPReduction()) {
-                                std::vector<uint16_t> subBlk = partialSAB.GetSABSubBlk();
-
-                                for (int i = 0; i < partialSAB.GetSABSubBlkLen(); ++i) {
-                                    m_macDSMESAB[partialSAB.GetSABSubBlkIdx() + i] = 
-                                        m_macDSMESAB[partialSAB.GetSABSubBlkIdx() + i] ^ subBlk[i];                                 
-                                }
-
-                            } else {
-                                std::vector<uint8_t> subBlkCapOff = partialSAB.GetSABSubBlkCapOff();
-
-                                for (int i = 0; i < partialSAB.GetSABSubBlkLen(); ++i) {
-                                    m_macDSMESABCapOff[partialSAB.GetSABSubBlkIdx() + i] = 
-                                        m_macDSMESABCapOff[partialSAB.GetSABSubBlkIdx() + i] ^ subBlkCapOff[i];   
-                                }
-                            }
-                        }
-
-                    } else if (receivedMacPayload.GetDsmeGtsManagementField().GetManagementType() == 0b001) // allocatioin
-                    {
-                        if (receivedMacPayload.GetDsmeGtsDestAddress() == GetShortAddress()) 
-                        {
-                            if (!m_mlmeCommStatusIndicationCallback.IsNull()) 
-                            {
-                                MlmeCommStatusIndicationParams commStatusParams;
-                                commStatusParams.m_panId = m_macPanId;
-                                commStatusParams.m_srcAddrMode = LrWpanMacHeader::EXTADDR;
-                                commStatusParams.m_srcExtAddr = macHdr.GetExtSrcAddr();
-                                commStatusParams.m_dstAddrMode = LrWpanMacHeader::EXTADDR;
-                                commStatusParams.m_dstExtAddr = macHdr.GetExtDstAddr();
-                                commStatusParams.m_status = MLMECOMMSTATUS_SUCCESS;
-
-                                m_mlmeCommStatusIndicationCallback(commStatusParams);           
-                            }
-
-                            // The device shall update macDsmeAct according the value of 
-                            // DSME SAB Specification field of the DSME GTS Notify command.
-
-                            // DSME-TODO
-                            // Update()
-                            // The device shall update macDsmeAct according the value of DSME SAB Specification 
-                            // field of the DSME GTS Notify command.
-                            macDSMEACTEntity entity;
-                            entity.m_superframeID = m_gtsSuperframeIDs.back();
-                            entity.m_slotID = std::get<0>(m_gtsStartAndLens.back());
-                            entity.m_numSlot = std::get<1>(m_gtsStartAndLens.back());
-
-                            // DSME-TODO
-                            entity.m_channelID = m_macChannelOfs;
-
-                            entity.m_direction = !receivedMacPayload.GetDsmeGtsManagementField()
-                                                                                .IsDirectionRX();
-                            entity.m_type = 0x00;
-
-                            entity.m_prioritizedChAccess = receivedMacPayload.GetDsmeGtsManagementField()
-                                                                                        .IsHighPriority();
-                            if (entity.m_direction) {
-                                entity.m_dstAddr = receivedMacHdr.GetShortSrcAddr();
-                            } else {
-                                entity.m_srcAddr = receivedMacHdr.GetShortSrcAddr();
-                            }                                                 
-                            
-                            entity.m_cnt = 0;
-
-                            // DSME-TODO
-                            // entity.m_linkQuality = ;
-                            m_macDsmeACT[m_gtsSuperframeIDs.back()].push_back(entity);
-
-                            // DSME-TODO      
-                            DSMESABSpecificationField partialSAB = receivedMacPayload.GetDsmeGtsSABSpec();
-
-                            if (partialSAB.isCAPReduction()) {
-                                std::vector<uint16_t> subBlk = partialSAB.GetSABSubBlk();
-
-                                for (int i = 0; i < partialSAB.GetSABSubBlkLen(); ++i) {
-                                    m_macDSMESAB[partialSAB.GetSABSubBlkIdx() + i] = 
-                                        m_macDSMESAB[partialSAB.GetSABSubBlkIdx() + i] | subBlk[i];                                 
-                                }  
-
-                            } else {
-                                std::vector<uint8_t> subBlkCapOff = partialSAB.GetSABSubBlkCapOff();
-
-                                for (int i = 0; i < partialSAB.GetSABSubBlkLen(); ++i) {
-                                    m_macDSMESABCapOff[partialSAB.GetSABSubBlkIdx() + i] = 
-                                        m_macDSMESABCapOff[partialSAB.GetSABSubBlkIdx() + i] | subBlkCapOff[i];   
-                                }
-                            }
-
-                        } else {
-                            // device shall check if the slots marked as one in this command 
-                            // is conflicting with the readily allocated slots in macDsmeAct
-
-                            // howard: 改這樣
-                            if (false) {
-                                // the device shall send a DSME GTS Request command 
-                                // with Management Type field set to duplicated allocation notification
-                                // DSME-TODO
-
-                            } else {
-                                // the device shall update macDSMESAB according to the DSMESABSpecification 
-                                // in this command frame to reflect the neighbor’s allocated DSME-GTSs.
-                                
-                                // DSME-TODO      
-                                DSMESABSpecificationField partialSAB = receivedMacPayload.GetDsmeGtsSABSpec();
-
-                                if (partialSAB.isCAPReduction()) {
-                                    std::vector<uint16_t> subBlk = partialSAB.GetSABSubBlk();
-
-                                    for (int i = 0; i < partialSAB.GetSABSubBlkLen(); ++i) {
-                                        m_macDSMESAB[partialSAB.GetSABSubBlkIdx() + i] = 
-                                            m_macDSMESAB[partialSAB.GetSABSubBlkIdx() + i] | subBlk[i];                                 
-                                    }  
-
-                                } else {
-                                    std::vector<uint8_t> subBlkCapOff = partialSAB.GetSABSubBlkCapOff();
-
-                                    for (int i = 0; i < partialSAB.GetSABSubBlkLen(); ++i) {
-                                        m_macDSMESABCapOff[partialSAB.GetSABSubBlkIdx() + i] = 
-                                            m_macDSMESABCapOff[partialSAB.GetSABSubBlkIdx() + i] | subBlkCapOff[i];   
-                                    }
-                                }
-                            }
-                        }
-                    }
-                                   
-                } else if (receivedMacPayload.GetCommandFrameType()
-                            == CommandPayloadHeader::DSME_GTS_REPLY) {
-                    // The device who request allocation received GTS response/reply here, prepare send GTS notify command and report GTS.confirm to the higher layer.
-                    // Deallocation
-                    if (receivedMacPayload.GetDsmeGtsManagementField().GetManagementType() == 0b000) {  // 0b000 deallocation
-                        if (receivedMacPayload.GetDsmeGtsDestAddress() == GetShortAddress()) 
-                        {
-                            if (!m_mlmeDsmeGtsConfirmCallback.IsNull()) 
-                            {
-                                // howard: 用不到
-                                //! device MAC send GTS.confirm to its higher layer
-                                MlmeDsmeGtsConfirmParams confirmParams;    
-                                confirmParams.m_devAddr = receivedMacHdr.GetShortSrcAddr();
-                                confirmParams.m_manageType = static_cast<ManagementType>(receivedMacPayload.GetDsmeGtsManagementField().GetManagementType());
-                                confirmParams.m_direction = receivedMacPayload.GetDsmeGtsManagementField().IsDirectionRX();
-                                confirmParams.m_prioritizedChAccess = receivedMacPayload.GetDsmeGtsManagementField().IsHighPriority();                                                                                        
-                                confirmParams.m_channelOfs = receivedMacPayload.GetChannelOfs();
-                                confirmParams.m_dsmeSABSpec = receivedMacPayload.GetDsmeGtsSABSpec();
-                                confirmParams.m_status = static_cast<LrWpanMlmeDsmeGtsRequestStatus>(receivedMacPayload
-                                                                                                    .GetDsmeGtsManagementField()
-                                                                                                    .GetStatus());
-                                m_mlmeDsmeGtsConfirmCallback(confirmParams);
-                            }  
-
-                            if (receivedMacPayload.GetDsmeGtsManagementField().GetStatus() == 0b000)
-                            {
-                                //! device MAC prepare send GTS notify command
-                                // howard: 用不到
-                                // SendDsmeGtsNotifyCommand(receivedMacHdr.GetShortSrcAddr(), receivedMacPayload);
-                                // UpdateDsmeACTAndDeallocate(receivedMacPayload.GetDsmeGtsSABSpec());
-
-                                // DSME-TODO
-                                DSMESABSpecificationField partialSAB = receivedMacPayload.GetDsmeGtsSABSpec();
-
-                                if (partialSAB.isCAPReduction()) 
-                                {
-                                    std::vector<uint16_t> subBlk = partialSAB.GetSABSubBlk();
-
-                                    for (int i = 0; i < partialSAB.GetSABSubBlkLen(); ++i) {
-                                        m_macDSMESAB[partialSAB.GetSABSubBlkIdx() + i] = 
-                                            m_macDSMESAB[partialSAB.GetSABSubBlkIdx() + i] ^ subBlk[i];                                 
-                                    }
-
-                                } 
-                                else 
-                                {
-                                    std::vector<uint8_t> subBlkCapOff = partialSAB.GetSABSubBlkCapOff();
-
-                                    for (int i = 0; i < partialSAB.GetSABSubBlkLen(); ++i) {
-                                        m_macDSMESABCapOff[partialSAB.GetSABSubBlkIdx() + i] = 
-                                            m_macDSMESABCapOff[partialSAB.GetSABSubBlkIdx() + i] ^ subBlkCapOff[i];   
-                                    }
-                                }
-                            }
-
-                        } 
-                        else 
-                        {
-                            if (receivedMacPayload.GetDsmeGtsManagementField().GetStatus() == 0b000){
-                                // the device shall update macDSMESAB according to the DSMESABSpecification 
-                                // in this command frame to reflect the neighbor’s m_deallocated DSME-GTSs
-
-                                // DSME-TODO
-                                DSMESABSpecificationField partialSAB = receivedMacPayload.GetDsmeGtsSABSpec();
-
-                                if (partialSAB.isCAPReduction()) {
-                                    std::vector<uint16_t> subBlk = partialSAB.GetSABSubBlk();
-
-                                    for (int i = 0; i < partialSAB.GetSABSubBlkLen(); ++i) {
-                                        m_macDSMESAB[partialSAB.GetSABSubBlkIdx() + i] = 
-                                            m_macDSMESAB[partialSAB.GetSABSubBlkIdx() + i] ^ subBlk[i];                                 
-                                    }
-                                    
-                                } else {
-                                    std::vector<uint8_t> subBlkCapOff = partialSAB.GetSABSubBlkCapOff();
-
-                                    for (int i = 0; i < partialSAB.GetSABSubBlkLen(); ++i) {
-                                        m_macDSMESABCapOff[partialSAB.GetSABSubBlkIdx() + i] = 
-                                            m_macDSMESABCapOff[partialSAB.GetSABSubBlkIdx() + i] ^ subBlkCapOff[i];   
-                                    }    
-                                }
-                            }
-                        }
-                    // allocation
-                    } 
-                    else if (receivedMacPayload.GetDsmeGtsManagementField().GetManagementType() == 0b001)  // 0b001 allocation
-                    { 
-                        if (receivedMacPayload.GetDsmeGtsDestAddress() == GetShortAddress()) 
-                        {
-                            //! device MAC send GTS.confirm to its higher layer
-                            // howard: 用不到
-                            if (!m_mlmeDsmeGtsConfirmCallback.IsNull()) 
-                            {
-                                MlmeDsmeGtsConfirmParams confirmParams;
-    
-                                confirmParams.m_devAddr = receivedMacHdr.GetShortSrcAddr();
-                                confirmParams.m_manageType = static_cast<ManagementType>(receivedMacPayload.GetDsmeGtsManagementField()
-                                                                            .GetManagementType());
-
-                                confirmParams.m_direction = receivedMacPayload.GetDsmeGtsManagementField()
-                                                                            .IsDirectionRX();
-
-                                confirmParams.m_prioritizedChAccess = receivedMacPayload.GetDsmeGtsManagementField()
-                                                                                        .IsHighPriority();
-                                                                                        
-                                confirmParams.m_channelOfs = receivedMacPayload.GetChannelOfs();
-                                confirmParams.m_dsmeSABSpec = receivedMacPayload.GetDsmeGtsSABSpec();
-                                confirmParams.m_status = static_cast<LrWpanMlmeDsmeGtsRequestStatus>(receivedMacPayload
-                                                                                                    .GetDsmeGtsManagementField()
-                                                                                                    .GetStatus());
-
-                                m_mlmeDsmeGtsConfirmCallback(confirmParams);
-                            }  
-
-                            if (receivedMacPayload.GetDsmeGtsManagementField().GetStatus() == 0b000) // SUCCESS
-                            {
-                                // howard: 用不到
-                                // SendDsmeGtsNotifyCommand(receivedMacHdr.GetShortSrcAddr(), receivedMacPayload);
-
-                                m_gtsDirections.push_back(receivedMacPayload.GetDsmeGtsManagementField()
-                                                                            .IsDirectionRX());
-
-                                // howard: 用不到
-                                // CheckDsmeGtsSABFromReplyCmd(receivedMacPayload.GetDsmeGtsSABSpec());
-
-                                // NS_LOG_DEBUG(" GTS Superframe ID: " << m_gtsSuperframeIDs.back() << std::endl
-                                //             << " Direction: " << m_gtsDirections.back() << std::endl
-                                //             << " Slot ID: " << std::get<0>(m_gtsStartAndLens.back()) << std::endl
-                                //             << " GTS Length:  " << std::get<1>(m_gtsStartAndLens.back()) << std::endl);
-
-                                // the device shall update macDsmeAct according to 
-                                // the DSME SAB Specification field in the received command.
-                                // DSME-TODO
-                                macDSMEACTEntity entity;
-                                entity.m_superframeID = m_gtsSuperframeIDs.back();
-                                entity.m_slotID = std::get<0>(m_gtsStartAndLens.back());
-                                entity.m_numSlot = std::get<1>(m_gtsStartAndLens.back());
-
-                                // DSME-TODO
-                                entity.m_channelID = m_macChannelOfs;
-
-                                entity.m_direction = receivedMacPayload.GetDsmeGtsManagementField()
-                                                                                .IsDirectionRX();
-                                entity.m_type = 0x00;
-
-                                entity.m_prioritizedChAccess = receivedMacPayload.GetDsmeGtsManagementField()
-                                                                                            .IsHighPriority();
-                                if (entity.m_direction) {
-                                    entity.m_srcAddr = receivedMacHdr.GetShortSrcAddr();
-                                } else {
-                                    entity.m_dstAddr = receivedMacHdr.GetShortSrcAddr();
-                                }                                                 
-                                
-                                entity.m_cnt = 0;
-
-                                // DSME-TODO
-                                // entity.m_linkQuality = ;
-                                m_macDsmeACT[m_gtsSuperframeIDs.back()].push_back(entity);
-                                
-                                m_macChannelOfs = receivedMacPayload.GetChannelOfs();
-
-                                // DSME-TODO      
-                                DSMESABSpecificationField partialSAB = receivedMacPayload.GetDsmeGtsSABSpec();
-                                                  
-                                if (partialSAB.isCAPReduction()) 
-                                {
-                                    std::vector<uint16_t> subBlk = partialSAB.GetSABSubBlk();
-                    
-                                    for (int i = 0; i < partialSAB.GetSABSubBlkLen(); ++i) {
-                                        m_macDSMESAB[partialSAB.GetSABSubBlkIdx() + i] = 
-                                            m_macDSMESAB[partialSAB.GetSABSubBlkIdx() + i] | subBlk[i];                                 
-                                    }
-
-                                } else 
-                                {
-                                    std::vector<uint8_t> subBlkCapOff = partialSAB.GetSABSubBlkCapOff();
-
-                                    for (int i = 0; i < partialSAB.GetSABSubBlkLen(); ++i) {
-                                        m_macDSMESABCapOff[partialSAB.GetSABSubBlkIdx() + i] = 
-                                            m_macDSMESABCapOff[partialSAB.GetSABSubBlkIdx() + i] | subBlkCapOff[i];   
-                                    }
-                                }
-                            } 
-
-                        } 
-                        else 
-                        {
-                            if (receivedMacPayload.GetDsmeGtsManagementField().GetStatus() == 0b000) 
-                            {
-                                // the device shall check if the slots marked as one in the command 
-                                // is conflicting with the readily allocated slots in macDsmeAct
-
-                                // DSME-TODO
-                                // howard: 改這樣
-                                if (false) 
-                                {
-                                    // the device shall send a DSME GTS Request command 
-                                    // with Management Type field set to duplicated allocation notification
-
-                                } else 
-                                {    
-                                    // update macDsmeSab
-                                    DSMESABSpecificationField partialSAB = receivedMacPayload.GetDsmeGtsSABSpec();
-                                                               
-                                    if (partialSAB.isCAPReduction()) 
-                                    {
-                                        std::vector<uint16_t> subBlk = partialSAB.GetSABSubBlk();
-
-                                        for (int i = 0; i < partialSAB.GetSABSubBlkLen(); ++i) 
-                                        {
-                                            m_macDSMESAB[partialSAB.GetSABSubBlkIdx() + i] = 
-                                                m_macDSMESAB[partialSAB.GetSABSubBlkIdx() + i] | subBlk[i];                                 
-                                        }
-
-                                    } 
-                                    else 
-                                    {
-                                        std::vector<uint8_t> subBlkCapOff = partialSAB.GetSABSubBlkCapOff();
-                                        for (int i = 0; i < partialSAB.GetSABSubBlkLen(); ++i) 
-                                        {
-                                            m_macDSMESABCapOff[partialSAB.GetSABSubBlkIdx() + i] = 
-                                                m_macDSMESABCapOff[partialSAB.GetSABSubBlkIdx() + i] | subBlkCapOff[i];   
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Clear the packet buffer for the ACK packet sent.
-            m_txPkt = nullptr;
-        }
-    }
-    else if (status == IEEE_802_15_4_PHY_UNSPECIFIED)
-    {
-        if (!macHdr.IsAcknowledgment())
-        {
-            NS_ASSERT_MSG(m_txQueue.size() > 0, "TxQsize = 0");
-            Ptr<TxQueueElement> txQElement = m_txQueue.front();
-            m_macTxDropTrace(txQElement->txQPkt);
-            if (!m_mcpsDataConfirmCallback.IsNull())
-            {
-                McpsDataConfirmParams confirmParams;
-                confirmParams.m_msduHandle = txQElement->txQMsduHandle;
-                confirmParams.m_status = IEEE_802_15_4_FRAME_TOO_LONG;
-                m_mcpsDataConfirmCallback(confirmParams);
-            }
-            RemoveFirstTxQElement();
-        }
-        else
-        {
-            NS_LOG_ERROR("Unable to send ACK");
-        }
-    }
-    else
-    {
-        // Something went really wrong. The PHY is not in the correct state for
-        // data transmission.
-        NS_FATAL_ERROR("Transmission attempt failed with PHY status " << status);
     }
 
-    if (!ifsWaitTime.IsZero())
+    if(!ifsWaitTime.IsZero())
     {
         m_ifsEvent = Simulator::Schedule(ifsWaitTime, &LrWpanMac::IfsWaitTimeout, this, ifsWaitTime);
     }
 
-    if (m_incGtsEvent.IsRunning() || m_gtsEvent.IsRunning()) {
+    if(m_incGtsEvent.IsRunning() || m_gtsEvent.IsRunning())
+    {
         m_setMacState.Cancel();
         m_setMacState = Simulator::ScheduleNow(&LrWpanMac::SetLrWpanMacStateToGTS
                                                 , this
                                                 , m_curGTSSuperframeID
                                                 , m_curGTSIdx);
-
-    } else {
+    }
+    else
+    {
         m_setMacState.Cancel();
         m_setMacState = Simulator::ScheduleNow(&LrWpanMac::SetLrWpanMacState, this, MAC_IDLE);
     }
@@ -4720,118 +3242,8 @@ void
 LrWpanMac::PlmeSetAttributeConfirm(LrWpanPhyEnumeration status, LrWpanPibAttributeIdentifier id)
 {
     NS_LOG_FUNCTION(this << status << id);
-    if (id == LrWpanPibAttributeIdentifier::phyCurrentPage && m_pendPrimitive == MLME_SCAN_REQ)
-    {
-        if (status == LrWpanPhyEnumeration::IEEE_802_15_4_PHY_SUCCESS)
-        {
-            // get the first channel to scan from scan channel list
-            bool channelFound = false;
-            for (int i = m_channelScanIndex; i <= 26; i++)
-            {
-                if ((m_scanParams.m_scanChannels & (1 << m_channelScanIndex)) != 0)
-                {
-                    channelFound = true;
-                    break;
-                }
-                m_channelScanIndex++;
-            }
-
-            if (channelFound)
-            {
-                LrWpanPhyPibAttributes pibAttr;
-                pibAttr.phyCurrentChannel = m_channelScanIndex;
-                m_phy->PlmeSetAttributeRequest(LrWpanPibAttributeIdentifier::phyCurrentChannel,
-                                               &pibAttr);
-            }
-        }
-        else
-        {
-            if (!m_mlmeScanConfirmCallback.IsNull())
-            {
-                MlmeScanConfirmParams confirmParams;
-                confirmParams.m_scanType = m_scanParams.m_scanType;
-                confirmParams.m_chPage = m_scanParams.m_chPage;
-                confirmParams.m_status = MLMESCAN_INVALID_PARAMETER;
-                m_mlmeScanConfirmCallback(confirmParams);
-            }
-            NS_LOG_ERROR(this << "Channel Scan: Invalid channel page");
-        }
-    }
-    else if (id == LrWpanPibAttributeIdentifier::phyCurrentChannel &&
-             m_pendPrimitive == MLME_SCAN_REQ)
-    {
-        if (status == LrWpanPhyEnumeration::IEEE_802_15_4_PHY_SUCCESS)
-        {
-            uint64_t symbolRate = static_cast<uint64_t>(m_phy->GetDataOrSymbolRate(false));
-            uint64_t scanDuration = aBaseSuperframeDuration *
-                                    ((static_cast<uint32_t>(1 << m_scanParams.m_scanDuration)) + 1);
-            Time nextScanTime = Seconds(static_cast<double>(scanDuration /(double) symbolRate));
-            Time respWaitTime = Seconds(static_cast<double>(m_macResponseWaitTime) /
-                                                            (double) symbolRate);
-            
-            switch (m_scanParams.m_scanType) {
-                case MLMESCAN_ED:
-                    m_maxEnergyLevel = 0;
-                    // howard: 用不到
-                    // m_scanEnergyEvent = Simulator::Schedule(nextScanTime, &LrWpanMac::EndChannelEnergyScan, this);
-                    // set phy to RX_ON and kick start  the first PLME-ED.request
-                    m_phy->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_RX_ON);
-                    break;
-
-                case MLMESCAN_ACTIVE:
-                    // m_scanEvent = Simulator::Schedule(nextScanTime, &LrWpanMac::EndChannelScan, this);
-                    // howard: 用不到
-                    // SendBeaconRequestCommand();
-                    break;
-
-                case MLMESCAN_PASSIVE:
-                    // m_scanEvent = Simulator::Schedule(nextScanTime, &LrWpanMac::EndChannelScan, this);
-                    // turn back the phy to RX_ON after setting Page/channel
-                    m_phy->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_RX_ON);
-                    break;
-
-                case MLMESCAN_ORPHAN:
-                    // DSME-TODO: add orphan scan support
-                    // howard: 用不到
-                    // SendOrphanNotificationCmd();
-                    //m_scanEvent = Simulator::Schedule(respWaitTime, &LrWpanMac::EndOrphanScan, this);
-                    break;
-
-                case MLMESCAN_ENHANCED_ACTIVE_SCAN:
-                    // m_scanEvent = Simulator::Schedule(nextScanTime, &LrWpanMac::EndChannelScan, this);
-                    // howard: 用不到
-                    // SendEnhancedBeaconRequestCommand();
-                    break;
-
-                default:
-                    MlmeScanConfirmParams confirmParams;
-                    confirmParams.m_scanType = m_scanParams.m_scanType;
-                    confirmParams.m_chPage = m_scanParams.m_chPage;
-                    confirmParams.m_status = MLMESCAN_INVALID_PARAMETER;
-
-                    if (!m_mlmeScanConfirmCallback.IsNull()) {
-                        m_mlmeScanConfirmCallback(confirmParams);
-                    }
-
-                    NS_LOG_ERROR("Scan Type currently not supported");
-                    return;
-            }
-        }
-        else
-        {
-            if (!m_mlmeScanConfirmCallback.IsNull())
-            {
-                MlmeScanConfirmParams confirmParams;
-                confirmParams.m_scanType = m_scanParams.m_scanType;
-                confirmParams.m_chPage = m_scanParams.m_chPage;
-                confirmParams.m_status = MLMESCAN_INVALID_PARAMETER;
-                m_mlmeScanConfirmCallback(confirmParams);
-            }
-            NS_LOG_ERROR("Channel " << m_channelScanIndex
-                                    << " could not be set in the current page");
-        }
-    }
-    else if (id == LrWpanPibAttributeIdentifier::phyCurrentPage &&
+    
+    if (id == LrWpanPibAttributeIdentifier::phyCurrentPage &&
              m_pendPrimitive == MLME_START_REQ)
     {
         if (status == LrWpanPhyEnumeration::IEEE_802_15_4_PHY_SUCCESS)
@@ -4858,124 +3270,13 @@ LrWpanMac::PlmeSetAttributeConfirm(LrWpanPhyEnumeration status, LrWpanPibAttribu
         if (status == LrWpanPhyEnumeration::IEEE_802_15_4_PHY_SUCCESS)
         {
             m_originalChannelInCAP = m_startParams.m_logCh;
-            NS_LOG_INFO("AAA");
             EndStartRequest();
         }
-        else
-        {
-            if (!m_mlmeStartConfirmCallback.IsNull())
-            {
-                MlmeStartConfirmParams confirmParams;
-                confirmParams.m_status = MLMESTART_INVALID_PARAMETER;
-                m_mlmeStartConfirmCallback(confirmParams);
-            }
-            NS_LOG_ERROR("Invalid channel parameter in MLME-start");
-        }
-    }
-    else if (id == LrWpanPibAttributeIdentifier::phyCurrentPage &&
-             m_pendPrimitive == MLME_ASSOC_REQ)
-    {
-        if (status == LrWpanPhyEnumeration::IEEE_802_15_4_PHY_SUCCESS)
-        {
-            LrWpanPhyPibAttributes pibAttr;
-            pibAttr.phyCurrentChannel = m_associateParams.m_chNum;
-            m_phy->PlmeSetAttributeRequest(LrWpanPibAttributeIdentifier::phyCurrentChannel,
-                                           &pibAttr);
-        }
-        else
-        {
-            m_macPanId = 0xffff;
-            m_macCoordShortAddress = Mac16Address("FF:FF");
-            m_macCoordExtendedAddress = Mac64Address("ff:ff:ff:ff:ff:ff:ff:ed");
-            m_incCapEvent.Cancel();
-            m_incCfpEvent.Cancel();
-            m_csmaCa->SetUnSlottedCsmaCa();
-            m_incomingBeaconOrder = 15;
-            m_incomingSuperframeOrder = 15;
-
-            if (!m_mlmeAssociateConfirmCallback.IsNull())
-            {
-                MlmeAssociateConfirmParams confirmParams;
-                confirmParams.m_assocShortAddr = Mac16Address("FF:FF");
-                confirmParams.m_status = MLMEASSOC_INVALID_PARAMETER;
-                m_mlmeAssociateConfirmCallback(confirmParams);
-            }
-            NS_LOG_ERROR("Invalid page parameter in MLME-associate");
-        }
-    }
-    else if (id == LrWpanPibAttributeIdentifier::phyCurrentChannel &&
-             m_pendPrimitive == MLME_ASSOC_REQ)
-    {
-        if (status == LrWpanPhyEnumeration::IEEE_802_15_4_PHY_SUCCESS)
-        {
-            m_originalChannelInCAP = m_associateParams.m_chNum;
-            // howard: 用不到
-            // EndAssociateRequest();
-        }
-        else
-        {
-            m_macPanId = 0xffff;
-            m_macCoordShortAddress = Mac16Address("FF:FF");
-            m_macCoordExtendedAddress = Mac64Address("ff:ff:ff:ff:ff:ff:ff:ed");
-            m_incCapEvent.Cancel();
-            m_incCfpEvent.Cancel();
-            m_csmaCa->SetUnSlottedCsmaCa();
-            m_incomingBeaconOrder = 15;
-            m_incomingSuperframeOrder = 15;
-
-            if (!m_mlmeAssociateConfirmCallback.IsNull())
-            {
-                MlmeAssociateConfirmParams confirmParams;
-                confirmParams.m_assocShortAddr = Mac16Address("FF:FF");
-                confirmParams.m_status = MLMEASSOC_INVALID_PARAMETER;
-                m_mlmeAssociateConfirmCallback(confirmParams);
-            }
-            NS_LOG_ERROR("Invalid channel parameter in MLME-associate");
-        }
-    }    
-    else if (id == LrWpanPibAttributeIdentifier::phyCurrentPage &&
-             m_pendPrimitive == MLME_START_REALGN) {
-        if (status == LrWpanPhyEnumeration::IEEE_802_15_4_PHY_SUCCESS) {
-            LrWpanPhyPibAttributes pibAttr;
-            pibAttr.phyCurrentChannel = m_startParams.m_logCh;
-            m_phy->PlmeSetAttributeRequest(LrWpanPibAttributeIdentifier::phyCurrentChannel,
-                                           &pibAttr);
-
-        } else {
-            if (!m_mlmeStartConfirmCallback.IsNull()) {
-                MlmeStartConfirmParams confirmParams;
-                confirmParams.m_status = MLMESTART_INVALID_PARAMETER;
-                m_mlmeStartConfirmCallback(confirmParams);
-            }
-
-            NS_LOG_ERROR("Invalid page parameter in MLME-start");
-        }        
-    }
-
-    else if (id == LrWpanPibAttributeIdentifier::phyCurrentChannel &&
-             m_pendPrimitive == MLME_START_REALGN) {
-        if (status == LrWpanPhyEnumeration::IEEE_802_15_4_PHY_SUCCESS) {
-            m_originalChannelInCAP = m_startParams.m_logCh;
-
-        } else {
-            if (!m_mlmeStartConfirmCallback.IsNull()) {
-                MlmeStartConfirmParams confirmParams;
-                confirmParams.m_status = MLMESTART_INVALID_PARAMETER;
-                m_mlmeStartConfirmCallback(confirmParams);
-            }
-
-            NS_LOG_ERROR("Invalid channel parameter in MLME-start");
-        }        
     }
 }
 
 void LrWpanMac::SetLrWpanMacStateToGTS(uint16_t superframeID, int idx) {
     ChangeMacState(MAC_GTS);
-
-    // if (m_gtsRetrieve) {
-    //     m_phy->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_RX_ON);
-    //     return;
-    // }
 
     if (m_macDsmeACT[superframeID][idx].m_direction) 
     {
@@ -4985,8 +3286,6 @@ void LrWpanMac::SetLrWpanMacStateToGTS(uint16_t superframeID, int idx) {
     {
         m_phy->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_TX_ON);
     }
-
-    // m_phy->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_RX_ON);
 }
 
 void
@@ -5019,161 +3318,6 @@ LrWpanMac::SetLrWpanMacState(LrWpanMacState macState)
         // Channel is idle, set transmitter to TX_ON
         ChangeMacState(MAC_SENDING);
         m_phy->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_TX_ON);
-
-    } else if (m_lrWpanMacState == MAC_CSMA && macState == CHANNEL_ACCESS_FAILURE) {
-        NS_ASSERT(m_txPkt);
-
-        // Cannot find a clear channel, drop the current packet
-        // and send the proper confirm/indication according to the packet type
-        NS_LOG_DEBUG(this << " cannot find clear channel");
-
-        m_macTxDropTrace(m_txPkt);
-
-        Ptr<Packet> pkt = m_txPkt->Copy();
-        LrWpanMacHeader macHdr;
-        pkt->RemoveHeader(macHdr);
-
-        if (macHdr.IsCommand())
-        {
-            CommandPayloadHeader cmdPayload;
-            pkt->RemoveHeader(cmdPayload);
-
-            switch (cmdPayload.GetCommandFrameType())
-            {
-            case CommandPayloadHeader::ASSOCIATION_REQ: {
-                m_macPanId = 0xffff;
-                m_macCoordShortAddress = Mac16Address("FF:FF");
-                m_macCoordExtendedAddress = Mac64Address("ff:ff:ff:ff:ff:ff:ff:ed");
-                m_incCapEvent.Cancel();
-                m_incCfpEvent.Cancel();
-                m_csmaCa->SetUnSlottedCsmaCa();
-                m_incomingBeaconOrder = 15;
-                m_incomingSuperframeOrder = 15;
-
-                if (!m_mlmeAssociateConfirmCallback.IsNull())
-                {
-                    MlmeAssociateConfirmParams confirmParams;
-                    confirmParams.m_assocShortAddr = Mac16Address("FF:FF");
-                    confirmParams.m_status = MLMEASSOC_CHANNEL_ACCESS_FAILURE;
-                    m_mlmeAssociateConfirmCallback(confirmParams);
-                }
-                break;
-            }
-            case CommandPayloadHeader::ASSOCIATION_RESP: {
-                if (!m_mlmeCommStatusIndicationCallback.IsNull())
-                {
-                    MlmeCommStatusIndicationParams commStatusParams;
-                    commStatusParams.m_panId = m_macPanId;
-                    commStatusParams.m_srcAddrMode = LrWpanMacHeader::EXTADDR;
-                    commStatusParams.m_srcExtAddr = macHdr.GetExtSrcAddr();
-                    commStatusParams.m_dstAddrMode = LrWpanMacHeader::EXTADDR;
-                    commStatusParams.m_dstExtAddr = macHdr.GetExtDstAddr();
-                    commStatusParams.m_status =
-                        LrWpanMlmeCommStatus::MLMECOMMSTATUS_CHANNEL_ACCESS_FAILURE;
-                    m_mlmeCommStatusIndicationCallback(commStatusParams);
-                }
-                RemovePendTxQElement(m_txPkt->Copy());
-                break;
-            }
-
-            // DSME
-            case CommandPayloadHeader::DSME_ASSOCIATION_REQ: {
-                m_macPanId = 0xffff;
-                m_macCoordShortAddress = Mac16Address("FF:FF");
-                m_macCoordExtendedAddress = Mac64Address("ff:ff:ff:ff:ff:ff:ff:ed");
-                m_incCapEvent.Cancel();
-                m_incCfpEvent.Cancel();
-                m_csmaCa->SetUnSlottedCsmaCa();
-                m_incomingBeaconOrder = 15;
-                m_incomingSuperframeOrder = 15;
-                // m_incomingMultisuperframeOrder = 15;
-
-                if (!m_mlmeAssociateConfirmCallback.IsNull()) {
-                    MlmeAssociateConfirmParams confirmParams;
-                    confirmParams.m_assocShortAddr = Mac16Address("FF:FF");
-                    confirmParams.m_status = MLMEASSOC_CHANNEL_ACCESS_FAILURE;
-                    m_mlmeAssociateConfirmCallback(confirmParams);
-                }
-
-                break;
-            }
-            // DSME
-            case CommandPayloadHeader::DSME_ASSOCIATION_RESP: {
-                if (!m_mlmeCommStatusIndicationCallback.IsNull()) {
-                    MlmeCommStatusIndicationParams commStatusParams;
-                    commStatusParams.m_panId = m_macPanId;
-                    commStatusParams.m_srcAddrMode = LrWpanMacHeader::EXTADDR;
-                    commStatusParams.m_srcExtAddr = macHdr.GetExtSrcAddr();
-                    commStatusParams.m_dstAddrMode = LrWpanMacHeader::EXTADDR;
-                    commStatusParams.m_dstExtAddr = macHdr.GetExtDstAddr();
-                    commStatusParams.m_status =
-                        LrWpanMlmeCommStatus::MLMECOMMSTATUS_CHANNEL_ACCESS_FAILURE;
-                    m_mlmeCommStatusIndicationCallback(commStatusParams);
-                }
-
-                RemovePendTxQElement(m_txPkt->Copy());
-                break;
-            }
-            // DSME
-            case CommandPayloadHeader::COOR_REALIGN: {
-                // DSME-TODO
-            }         
-
-            case CommandPayloadHeader::DATA_REQ: {
-                m_macPanId = 0xffff;
-                m_macCoordShortAddress = Mac16Address("FF:FF");
-                m_macCoordExtendedAddress = Mac64Address("ff:ff:ff:ff:ff:ff:ff:ed");
-                m_incCapEvent.Cancel();
-                m_incCfpEvent.Cancel();
-                m_csmaCa->SetUnSlottedCsmaCa();
-                m_incomingBeaconOrder = 15;
-                m_incomingSuperframeOrder = 15;
-
-                if (!m_mlmePollConfirmCallback.IsNull())
-                {
-                    MlmePollConfirmParams pollConfirmParams;
-                    pollConfirmParams.m_status =
-                        LrWpanMlmePollConfirmStatus::MLMEPOLL_CHANNEL_ACCESS_FAILURE;
-                    m_mlmePollConfirmCallback(pollConfirmParams);
-                }
-                break;
-            }
-            default: {
-                // TODO: Other commands(e.g. Orphan Request)
-                break;
-            }
-            }
-            RemoveFirstTxQElement();
-        }
-        else if (macHdr.IsData())
-        {
-            if (!m_mcpsDataConfirmCallback.IsNull())
-            {
-                McpsDataConfirmParams confirmParams;
-                confirmParams.m_msduHandle = m_txQueue.front()->txQMsduHandle;
-                confirmParams.m_status = IEEE_802_15_4_CHANNEL_ACCESS_FAILURE;
-                m_mcpsDataConfirmCallback(confirmParams);
-            }
-            // remove the copy of the packet that was just sent
-            RemoveFirstTxQElement();
-        }
-        else
-        {
-            // TODO:: specify behavior for other packets
-            m_txPkt = nullptr;
-            m_retransmission = 0;
-            m_numCsmacaRetry = 0;
-        }
-
-        ChangeMacState(MAC_IDLE);
-        if (m_macRxOnWhenIdle)
-        {
-            m_phy->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_RX_ON);
-        }
-        else
-        {
-            m_phy->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_TRX_OFF);
-        }
 
     } else if (m_lrWpanMacState == MAC_CSMA && macState == MAC_CSMA_DEFERRED) {
         ChangeMacState(MAC_IDLE);
@@ -5231,12 +3375,6 @@ LrWpanMac::GetCoordShortAddress() const
     return m_macCoordShortAddress;
 }
 
-Mac64Address
-LrWpanMac::GetCoordExtAddress() const
-{
-    return m_macCoordExtendedAddress;
-}
-
 uint16_t LrWpanMac::GetChannelOffset() const {
     return m_macChannelOfs;
 }
@@ -5258,7 +3396,6 @@ LrWpanMac::ChangeMacState(LrWpanMacState newState)
 
 void LrWpanMac::SetDsmeModeEnabled() {
     NS_ASSERT(m_macDSMEcapable);
-    NS_LOG_INFO("進來SetDsmeModeEnabled");
     m_macDSMEenabled = true;
 }
 
@@ -5374,12 +3511,6 @@ LrWpanMac::SetAssociatedCoor(Mac16Address mac)
     m_macCoordShortAddress = mac;
 }
 
-void
-LrWpanMac::SetAssociatedCoor(Mac64Address mac)
-{
-    m_macCoordExtendedAddress = mac;
-}
-
 uint64_t
 LrWpanMac::GetTxPacketSymbols()
 {
@@ -5397,244 +3528,6 @@ LrWpanMac::isTxAckReq()
     m_txPkt->PeekHeader(macHdr);
 
     return macHdr.IsAckReq();
-}
-
-uint16_t LrWpanMac::GetDsmeCurrentHoppingChannel() {
-
-    // TODO : Need to fix here
-    // m_macChannelOfs;
-    // m_macHoppingSeqList.m_len;
-    m_macHoppingSeqList.GetChannel(10);
-    // m_macPANCoordinatorBSN;
-
-    if (m_macCAPReductionFlag) {
-
-    }
-
-    return 10;
-}
-
-void
-LrWpanMac::SetBcnSchedulingAllocStatus(uint8_t allocStatus)
-{
-    m_macBcnSchedulingAllocStatus = allocStatus;
-}
-uint8_t
-LrWpanMac::GetBcnSchedulingAllocStatus() const
-{
-    return m_macBcnSchedulingAllocStatus;
-}
-
-void
-LrWpanMac::SetBcnCollision()
-{
-    m_isBcnAllocCollision = true;
-}
-
-void
-LrWpanMac::SetBcnDoNotCollision()
-{
-    m_isBcnAllocCollision = false;
-}
-
-bool
-LrWpanMac::IsBcnCollision()
-{
-    return m_isBcnAllocCollision;
-}
-
-void
-LrWpanMac::SetBcnSchedulingTime(Time time)
-{
-    m_bcnSchedulingTime = time;
-}
-
-Time
-LrWpanMac::GetBcnSchedulingTime()
-{
-    return m_bcnSchedulingTime;
-}
-
-void
-LrWpanMac::SetBcnSchedulingDevCnt(uint32_t devCnt)
-{
-    m_bcnSchedulingDevCnt = devCnt;
-}
-
-uint32_t
-LrWpanMac::GetBcnSchedulingDevCnt()
-{
-    return m_bcnSchedulingDevCnt;
-}
-
-void
-LrWpanMac::SetBcnSchedulingCtrlPktCnt(uint32_t ctrlPktCount)
-{
-    m_bcnSchedulingCtrlPktCount = ctrlPktCount;
-}
-
-uint32_t
-LrWpanMac::GetBcnSchedulingCtrlPktCnt()
-{
-    return m_bcnSchedulingCtrlPktCount;
-}
-
-int
-LrWpanMac::GetDescIndexOfAssociatedPan()
-{
-    return m_descIdxOfAssociatedPan;
-}
-
-uint32_t
-LrWpanMac::GetBcnSchedulingFailCnt()
-{
-    return m_bcnScehdulingFailCnt;
-}
-
-void
-LrWpanMac::SetAllocationSeq(uint16_t allocSeq)
-{
-    m_allocationSequence = allocSeq;
-}
-
-uint16_t
-LrWpanMac::GetAllocationSeq()
-{
-    return m_allocationSequence;
-}
-
-void 
-LrWpanMac::SetMlmeScanReqTime(Time scanReqTime)
-{
-    m_mlmeScanReqTime = scanReqTime;
-}
-
-Time 
-LrWpanMac::GetMlmeScanReqTime()
-{
-    return m_mlmeScanReqTime;
-}
-
-void 
-LrWpanMac::SetMlmeStartReqTime(Time startReqTime)
-{
-    m_mlmeStartReqTime = startReqTime;
-}
-
-Time 
-LrWpanMac::GetMlmeStartReqTime()
-{
-    return m_mlmeStartReqTime;
-}
-
-template <typename T>
-LinkedList<T>::LinkedList()
-{
-    this->head = nullptr;
-}
-
-template <typename T>
-void
-LinkedList<T>::insertAtBeginning(T data)
-{
-    ListNode<T>* newNode = new ListNode<T>(data);
-    newNode->next = head;
-    head = newNode;
-}
-
-template <typename T>
-void
-LinkedList<T>::insertAtEnd(T data)
-{
-    ListNode<T>* newNode = new ListNode<T>(data);
-    if (head == nullptr)
-    {
-        head = newNode;
-        return;
-    }
-    
-    ListNode<T>* temp = head;
-    while (temp->next != nullptr)
-    {
-        temp = temp->next;
-    }
-    temp->next = newNode;
-}
-
-template <typename T>
-void
-LinkedList<T>::deleteAtBeginning()
-{
-    if (head == nullptr)
-    {
-        return;
-    }
-
-    ListNode<T>* temp = head;
-    head = head->next;
-    delete temp;
-}
-
-template <typename T>
-void
-LinkedList<T>::deleteAtEnd()
-{
-    if (head == nullptr)
-    {
-        return;
-    }
-    if (head->next == nullptr)
-    {
-        delete head;
-        head = nullptr;
-        return;
-    }
-
-    ListNode<T>* temp = head;
-    while (temp->next->next != nullptr)
-    {
-        temp = temp->next;
-    }
-    delete temp->next;
-    temp->next = nullptr;
-}
-
-template <typename T>
-void
-LinkedList<T>::printList()
-{
-    ListNode<T>* temp = head;
-    std::cout << "element in linked list : ";
-    while (temp != nullptr)
-    {
-        std::cout << temp->data << " ";
-        temp = temp->next;
-    }
-    std::cout << std::endl;
-}
-
-template <typename T>
-uint16_t
-LinkedList<T>::GetHeadNodeData()
-{
-    return head->data;
-}
-
-
-Mac16Address
-LrWpanMac::ConvertExtAddrToShortAddr(Mac64Address ExtAddr)
-{
-    uint8_t buffer64MacAddr[8];
-    uint8_t buffer16MacAddr[2];
-
-    ExtAddr.CopyTo(buffer64MacAddr);
-    buffer16MacAddr[1] = buffer64MacAddr[7];
-    buffer16MacAddr[0] = buffer64MacAddr[6];
-
-    Mac16Address shortAddr;
-    shortAddr.CopyFrom(buffer16MacAddr);
-
-    return shortAddr;
 }
 
 uint16_t
@@ -5782,15 +3675,7 @@ void LrWpanMac::SendEnhancedGroupAck()
     /**
      *  Set Source addr
      */
-    if (GetShortAddress() == Mac16Address("ff:fe")) 
-    {
-        macHdr.SetSrcAddrMode(LrWpanMacHeader::EXTADDR);
-        macHdr.SetSrcAddrFields(GetPanId(), GetExtendedAddress());
-    } 
-    else 
-    {
-        macHdr.SetSrcAddrFields(GetPanId(), GetShortAddress());
-    }
+    macHdr.SetSrcAddrFields(GetPanId(), GetShortAddress());
 
     /**
      * Set Enhanced Group Payload IE 
@@ -5895,15 +3780,7 @@ void LrWpanMac::SendLegacyGroupAck()
     /**
      *  Set Source addr
      */
-    if (GetShortAddress() == Mac16Address("ff:fe")) 
-    {
-        macHdr.SetSrcAddrMode(LrWpanMacHeader::EXTADDR);
-        macHdr.SetSrcAddrFields(GetPanId(), GetExtendedAddress());
-    } 
-    else 
-    {
-        macHdr.SetSrcAddrFields(GetPanId(), GetShortAddress());
-    }
+    macHdr.SetSrcAddrFields(GetPanId(), GetShortAddress());
 
     /**
      * Set legacy Group Payload IE 
@@ -5974,18 +3851,6 @@ void LrWpanMac::ResetDsmeGtsGackPayloadLength()
 void LrWpanMac::ResetDsmeGtsGroupAckBuffer()
 {
     m_dsmeGtsGroupAckPktBuffer.clear();
-}
-
-bool LrWpanMac::CheckAddrExist(Mac16Address addr)
-{
-    for(int index = 0; index < (int)m_dsmeGtsGackPayloads.size(); index++)
-    {
-        if(m_dsmeGtsGackPayloads[index].nodeAddr == addr)
-        {
-            return true;
-        }
-    }    
-    return false;
 }
 
 } // namespace ns3
