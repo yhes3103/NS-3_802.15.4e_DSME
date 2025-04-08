@@ -597,9 +597,10 @@ LrWpanNetDevice::McpsDataIndication(McpsDataIndicationParams params, Ptr<Packet>
     NS_LOG_FUNCTION(this);
     // TODO: Use the PromiscReceiveCallback if the MAC is in promiscuous mode.
 
-    if (params.m_dstAddrMode == SHORT_ADDR)
+    if(params.m_dstAddrMode == SHORT_ADDR)
     {
-        m_receiveCallback(this, pkt, 0, BuildPseudoMacAddress(params.m_srcPanId, params.m_srcAddr));
+        // howard: 把資料傳到 6lowapn netdevice ReceiveFromDevice
+        m_receiveCallback(this, pkt, 0x86DD, BuildPseudoMacAddress(params.m_srcPanId, params.m_srcAddr));
     }
     else
     {

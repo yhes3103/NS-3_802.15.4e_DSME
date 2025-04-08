@@ -344,13 +344,15 @@ CsmaNetDevice::AddHeader(Ptr<Packet> p,
         // since they will be written to pcap files and compared in regression
         // trace files.
         //
-        if (p->GetSize() < 46)
-        {
-            uint8_t buffer[46];
-            memset(buffer, 0, 46);
-            Ptr<Packet> padd = Create<Packet>(buffer, 46 - p->GetSize());
-            p->AddAtEnd(padd);
-        }
+
+        // howard: 註解掉這裡，測試用
+        // if (p->GetSize() < 46)
+        // {
+        //     uint8_t buffer[46];
+        //     memset(buffer, 0, 46);
+        //     Ptr<Packet> padd = Create<Packet>(buffer, 46 - p->GetSize());
+        //     p->AddAtEnd(padd);
+        // }
         break;
     case LLC: {
         NS_LOG_LOGIC("Encapsulating packet as LLC (length interpretation)");
@@ -1047,6 +1049,7 @@ void
 CsmaNetDevice::SetReceiveCallback(NetDevice::ReceiveCallback cb)
 {
     NS_LOG_FUNCTION(&cb);
+    NS_LOG_INFO("進來綁定");
     m_rxCallback = cb;
 }
 

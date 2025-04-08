@@ -98,7 +98,7 @@
          LogComponentEnableAll(LOG_PREFIX_TIME);
          LogComponentEnableAll(LOG_PREFIX_FUNC);
          LogComponentEnable("LrWpanMac", LOG_LEVEL_INFO);
-         LogComponentEnable("LrWpanPhy", LOG_LEVEL_INFO);
+         // LogComponentEnable("LrWpanPhy", LOG_LEVEL_INFO);
          // LogComponentEnable("LrWpanCsmaCa", LOG_LEVEL_INFO);
          // LogComponentEnable("LrWpanHelper", LOG_LEVEL_ALL);
          // LogComponentEnable("LrWpanNetDevice", LOG_LEVEL_ALL);
@@ -374,6 +374,7 @@
      // lrWpanHelper.EnableAsciiAll(ascii.CreateFileStream("Gack.tr"));
      // lrWpanHelper.EnablePcapAll(std::string("Gack"), true);
      // Simulator::Stop(Seconds(1.474559997));
+
      Simulator::Stop(Seconds(1.474560001));
      Simulator::Run();
  

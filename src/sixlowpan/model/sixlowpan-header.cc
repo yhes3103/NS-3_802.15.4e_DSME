@@ -136,7 +136,9 @@ SixLowPanHc1::Print(std::ostream& os) const
 uint32_t
 SixLowPanHc1::GetSerializedSize() const
 {
-    uint32_t serializedSize = 3;
+    // howard: 修改這裡，把 3 變成 2 (省去 HC1 Header 中的 Hop limit 1 bytes)
+    //         因此 Ipv6 Header = HC1 Dispatch (1 bytes) + HC1 Header (Encoding 1 bytes) = 2 bytes
+    uint32_t serializedSize = 2;
 
     switch (m_srcCompression)
     {
@@ -177,6 +179,12 @@ SixLowPanHc1::GetSerializedSize() const
         serializedSize++;
     }
 
+    // howard: 新增這裡，可省掉 Hop Limit 1 bytes
+    if(m_hopLimit != 1)
+    {
+        serializedSize += 1;
+    }
+
     return serializedSize;
 }
 
@@ -197,7 +205,13 @@ SixLowPanHc1::Serialize(Buffer::Iterator start) const
 
     i.WriteU8(SixLowPanDispatch::LOWPAN_HC1);
     i.WriteU8(encoding);
-    i.WriteU8(m_hopLimit);
+
+    // howard: 新增這裡，可省掉 Hop Limit
+    if(m_hopLimit != 1)
+    {
+        i.WriteU8(m_hopLimit);
+    }
+    
     switch (m_srcCompression)
     {
     case HC1_PIII:
@@ -2009,7 +2023,8 @@ SixLowPanMesh::GetSerializedSize() const
 {
     uint32_t serializedSize = 1;
 
-    if (m_hopsLeft >= 0xF)
+    // howard: 修改這裡讓它支援 0XF
+    if (m_hopsLeft > 0xF)
     {
         serializedSize++;
     }
@@ -2051,7 +2066,8 @@ SixLowPanMesh::Serialize(Buffer::Iterator start) const
         dispatch |= 0x10;
     }
 
-    if (m_hopsLeft < 0xF)
+    // howard: 修改這裡讓它支援 0XF
+    if (m_hopsLeft <= 0xF)
     {
         dispatch |= m_hopsLeft;
         i.WriteU8(dispatch);
@@ -2101,10 +2117,11 @@ SixLowPanMesh::Deserialize(Buffer::Iterator start)
     m_f = temp & 0x10;
     m_hopsLeft = temp & 0xF;
 
-    if (m_hopsLeft == 0xF)
-    {
-        m_hopsLeft = i.ReadU8();
-    }
+    // howard: 修改這裡讓它支援 0XF
+    // if (m_hopsLeft == 0xF)
+    // {
+    //     m_hopsLeft = i.ReadU8();
+    // }
 
     uint8_t buffer[8];
     uint8_t addrSize;

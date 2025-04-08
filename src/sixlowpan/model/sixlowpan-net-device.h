@@ -79,6 +79,7 @@ class SixLowPanNetDevice : public NetDevice
     // howard: 新增
     void SetHC1CompMethod(bool HC1);
     void SetMeshUnder(bool MeshUnder);
+    void SetDataFlooding(bool DataFlooding);
 
     enum DropReason
     {
@@ -266,6 +267,7 @@ class SixLowPanNetDevice : public NetDevice
     // howard: 新增
     bool six_useHC1;
     bool six_meshUnder;
+    bool six_dataflooding;
     
     /**
      * \brief Receives all the packets from a NetDevice for further processing.

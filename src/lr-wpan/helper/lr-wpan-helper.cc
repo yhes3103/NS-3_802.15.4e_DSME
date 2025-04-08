@@ -279,11 +279,12 @@ void LrWpanHelper::AddGtsInCfp(Ptr<NetDevice> dev
     entity.m_type = 0x00;
     entity.m_prioritizedChAccess = 1;
 
-    if (rx) {
-        entity.m_srcAddr = dev->GetObject<LrWpanNetDevice>()->GetMac()->GetShortAddress();
-    } else {
-        entity.m_dstAddr = dev->GetObject<LrWpanNetDevice>()->GetMac()->GetShortAddress();
-    }
+    // howard: 不知道在幹嘛
+    // if (rx) {
+    //     entity.m_srcAddr = dev->GetObject<LrWpanNetDevice>()->GetMac()->GetShortAddress();
+    // } else {
+    //     entity.m_dstAddr = dev->GetObject<LrWpanNetDevice>()->GetMac()->GetShortAddress();
+    // }
 
     entity.m_cnt = 0;
     NS_LOG_INFO("設定GTS");

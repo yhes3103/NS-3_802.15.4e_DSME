@@ -474,6 +474,7 @@ LrWpanMac::McpsDataRequest(McpsDataRequestParams params, Ptr<Packet> p)
         }
 
         p->AddTrailer(macTrailer);
+        // NS_LOG_INFO("MAC Layer Packet = " << p->GetSize() << " bytes");
 
         if((m_incGtsEvent.IsRunning() || m_gtsEvent.IsRunning()) && m_lrWpanMacState == MAC_GTS)
         {
@@ -512,6 +513,7 @@ LrWpanMac::McpsDataRequest(McpsDataRequestParams params, Ptr<Packet> p)
             macTrailer.SetFcs(p);
         }
         p->AddTrailer(macTrailer);
+        NS_LOG_INFO("MAC Layer Packet = " << p->GetSize() << " bytes");
 
         Ptr<TxQueueElement> txQElement = Create<TxQueueElement>();
         txQElement->txQMsduHandle = params.m_msduHandle;
@@ -1021,7 +1023,6 @@ void LrWpanMac::StartCAP(SuperframeType superframeType)
         cap_Duration = each_Timeslot_Duration * (m_incomingFnlCapSlot + 1);
         cap_time = Seconds((double)(cap_Duration - m_rxBeaconSymbols) / symbolRate);
 
-        NS_LOG_INFO("m_rxBeaconSymbols = " << m_rxBeaconSymbols);
         NS_LOG_DEBUG("Incoming superframe CAP duration " << (cap_time.GetSeconds() * symbolRate) << " symbols (" << cap_time.As(Time::S) << ")");
         NS_LOG_DEBUG("Each time slot duration " << each_Timeslot_Duration << " symbols");
         m_incCapEvent = Simulator::Schedule(cap_time, &LrWpanMac::StartCFP, this, SuperframeType::INCOMING);
@@ -1165,11 +1166,10 @@ void LrWpanMac::ScheduleGts(bool indication)
         {
             for(unsigned int i = 0; i < it->second.size(); ++i) 
             {
-                NS_LOG_INFO("second.size() = " << it->second.size());
                 // m_allocated default = false
                 if(!it->second[i].m_allocated)
                 {
-                    // 這裡可能要重新畫圖會比較了解，0s 到第一個 Superframe 之間是沒有東西的，所以才可以直接做時間相加
+                    // howard: 這裡可能要重新畫圖會比較了解，0s 到第一個 Superframe 之間是沒有東西的，所以才可以直接做時間相加
                     uint32_t each_Timeslot_Duration;
                     uint64_t first_Timeslot;
                     uint64_t superframe_Duration;
@@ -2609,13 +2609,13 @@ void LrWpanMac::PdDataIndication(uint32_t psduLength, Ptr<Packet> p, uint8_t lqi
             {
                 // If it is a data frame, push it up the stack.
                 // Fow hilow
-                if (!m_acceptAllHilowPkt) {
-                    NS_LOG_DEBUG("Data Packet is for me; forwarding up");
-                    m_mcpsDataIndicationCallback(params, p);
-                }
+                // if (!m_acceptAllHilowPkt) {
+                //     NS_LOG_DEBUG("Data Packet is for me; forwarding up");
+                //     m_mcpsDataIndicationCallback(params, p);
+                // }
 
-                // NS_LOG_DEBUG("Data Packet is for me; forwarding up");
-                // m_mcpsDataIndicationCallback(params, p);
+                NS_LOG_DEBUG("Data Packet is for me; forwarding up");
+                m_mcpsDataIndicationCallback(params, p);
 
                 if (m_incGtsEvent.IsRunning()) {
                     m_macDsmeACT[m_curGTSSuperframeID][m_curGTSIdx].m_cnt = 0;
@@ -3071,6 +3071,7 @@ LrWpanMac::PdDataConfirm(LrWpanPhyEnumeration status)
                     Ptr<TxQueueElement> txQElement = m_txQueue.front();
                     confirmParams.m_msduHandle = txQElement->txQMsduHandle;
                     confirmParams.m_status = IEEE_802_15_4_SUCCESS;
+                    NS_LOG_INFO("進來呼叫上層");
                     m_mcpsDataConfirmCallback(confirmParams);
                 }
                 ifsWaitTime = Seconds(static_cast<double>(GetIfsSize()) / symbolRate);

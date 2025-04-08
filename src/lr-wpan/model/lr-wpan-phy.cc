@@ -386,7 +386,7 @@ LrWpanPhy::StartRx(Ptr<SpectrumSignalParameters> spectrumRxParams)
         }
         else
         {
-            // NS_LOG_INFO("進來丟資料1");
+            NS_LOG_INFO("進來丟資料1");
             m_phyRxDropTrace(p);
         }
     }
@@ -631,6 +631,7 @@ LrWpanPhy::PdDataRequest(const uint32_t psduLength, Ptr<Packet> p)
             pb->AddPacket(p);
             txParams->packetBurst = pb;
 
+            NS_LOG_INFO("Phy Layer Packet = " << pb->GetSize() << " bytes");
             // howard: 傳資料到 channel，但不清楚 StartTx 定義在哪邊
             m_channel->StartTx(txParams);
             m_pdDataRequest = Simulator::Schedule(txParams->duration, &LrWpanPhy::EndTx, this);
