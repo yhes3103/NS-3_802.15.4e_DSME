@@ -225,8 +225,8 @@ LrWpanCsmaCa::GetTimeToNextSlot() const
 
         Time beaconTime [[maybe_unused]] = Seconds((double)m_mac->m_rxBeaconSymbols / symbolRate);
         Time elapsedCap [[maybe_unused]] = elapsedSuperframe - beaconTime;
-        NS_LOG_DEBUG("Elapsed incoming CAP symbols: " << (elapsedCap.GetSeconds() * symbolRate)
-                                                      << " (" << elapsedCap.As(Time::S) << ")");
+        // NS_LOG_DEBUG("Elapsed incoming CAP symbols: " << (elapsedCap.GetSeconds() * symbolRate)
+        //                                               << " (" << elapsedCap.As(Time::S) << ")");
     }
     else
     {
@@ -269,7 +269,8 @@ LrWpanCsmaCa::Start()
         //       public is necessary. Alternatively, the current PHY used
         //       can be known using phyCurrentPage variable.
 
-        m_CW = 2;
+        // howard: 改成 1，原本是 2 會做兩次 CCA
+        m_CW = 1;
 
         /* howard: m_BE (退避指數) 會決定 backoff time (退避時間) 的長度
                    公式: backoff time = random(0 * 2^m_BE - 1) * slot time
@@ -281,6 +282,7 @@ LrWpanCsmaCa::Start()
         }
         else
         {
+            // 目前 BE = 3
             m_BE = m_macMinBE;
         }
 
@@ -291,9 +293,11 @@ LrWpanCsmaCa::Start()
 
         // Locate backoff period boundary. (i.e. a time delay to align with the next backoff period
         // boundary)
+
+        // howard: 改成這樣
         Time backoffBoundary = GetTimeToNextSlot();
-        m_randomBackoffEvent =
-            Simulator::Schedule(backoffBoundary, &LrWpanCsmaCa::RandomBackoffDelay, this);
+        m_randomBackoffEvent = Simulator::Schedule(backoffBoundary, &LrWpanCsmaCa::RandomBackoffDelay, this);
+        // m_randomBackoffEvent = Simulator::ScheduleNow(&LrWpanCsmaCa::RandomBackoffDelay, this);
     }
     else
     {
@@ -317,6 +321,7 @@ LrWpanCsmaCa::RandomBackoffDelay()
     NS_LOG_FUNCTION(this);
 
     uint64_t upperBound = (uint64_t)pow(2, m_BE) - 1;
+
     Time randomBackoff;
     uint64_t symbolRate;
     Time timeLeftInCap;
@@ -328,10 +333,10 @@ LrWpanCsmaCa::RandomBackoffDelay()
     if (m_randomBackoffPeriodsLeft == 0 || IsUnSlottedCsmaCa())
     {
         m_randomBackoffPeriodsLeft = (uint64_t)m_random->GetValue(0, upperBound + 1);
+        // NS_LOG_INFO("m_randomBackoffPeriodsLeft = " << m_randomBackoffPeriodsLeft);
     }
 
-    randomBackoff =
-        Seconds((double)(m_randomBackoffPeriodsLeft * GetUnitBackoffPeriod()) / symbolRate);
+    randomBackoff = Seconds((double)(m_randomBackoffPeriodsLeft * GetUnitBackoffPeriod()) / symbolRate);
 
     if (IsUnSlottedCsmaCa())
     {
@@ -347,15 +352,20 @@ LrWpanCsmaCa::RandomBackoffDelay()
         // IFS)
         timeLeftInCap = GetTimeLeftInCap();
 
-        NS_LOG_DEBUG("Slotted CSMA-CA: proceeding after random backoff of "
-                     << m_randomBackoffPeriodsLeft << " periods ("
-                     << (randomBackoff.GetSeconds() * symbolRate) << " symbols or "
-                     << randomBackoff.As(Time::S) << ")");
+        NS_LOG_DEBUG("Random backoff of "
+                        << m_randomBackoffPeriodsLeft << " periods ("
+                        << (randomBackoff.GetSeconds() * symbolRate) << " symbols or "
+                        << randomBackoff.As(Time::S) << ")");
+        
+        // NS_LOG_DEBUG("Slotted CSMA-CA: proceeding after random backoff of "
+        //              << m_randomBackoffPeriodsLeft << " periods ("
+        //              << (randomBackoff.GetSeconds() * symbolRate) << " symbols or "
+        //              << randomBackoff.As(Time::S) << ")");
 
-        NS_LOG_DEBUG("Backoff periods left in CAP: "
-                     << ((timeLeftInCap.GetSeconds() * symbolRate) / m_aUnitBackoffPeriod) << " ("
-                     << (timeLeftInCap.GetSeconds() * symbolRate) << " symbols or "
-                     << timeLeftInCap.As(Time::S) << ")");
+        // NS_LOG_DEBUG("Backoff periods left in CAP: "
+        //              << ((timeLeftInCap.GetSeconds() * symbolRate) / m_aUnitBackoffPeriod) << " ("
+        //              << (timeLeftInCap.GetSeconds() * symbolRate) << " symbols or "
+        //              << timeLeftInCap.As(Time::S) << ")");
 
         if (randomBackoff >= timeLeftInCap)
         {
@@ -482,8 +492,8 @@ LrWpanCsmaCa::CanProceed()
     }
 
     transactionTime = Seconds((double)transactionSymbols / symbolRate);
-    NS_LOG_DEBUG("Total required transaction: " << transactionSymbols << " symbols ("
-                                                << transactionTime.As(Time::S) << ")");
+    // NS_LOG_DEBUG("Total required transaction: " << transactionSymbols << " symbols ("
+    //                                             << transactionTime.As(Time::S) << ")");
 
     if (transactionTime > timeLeftInCap)
     {
@@ -538,13 +548,13 @@ LrWpanCsmaCa::PlmeCcaConfirm(LrWpanPhyEnumeration status)
                     // inform MAC channel is idle
                     if (!m_lrWpanMacStateCallback.IsNull())
                     {
-                        NS_LOG_LOGIC("Notifying MAC of idle channel");
+                        NS_LOG_INFO("Notifying MAC of idle channel");
                         m_lrWpanMacStateCallback(CHANNEL_IDLE);
                     }
                 }
                 else
                 {
-                    NS_LOG_LOGIC("Perform CCA again, m_CW = " << m_CW);
+                    NS_LOG_INFO("Perform CCA again, m_CW = " << std::to_string(m_CW));
                     m_requestCcaEvent = Simulator::ScheduleNow(&LrWpanCsmaCa::RequestCCA,
                                                                this); // Perform CCA again
                 }

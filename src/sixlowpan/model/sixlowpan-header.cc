@@ -2220,4 +2220,89 @@ operator<<(std::ostream& os, const SixLowPanMesh& h)
     return os;
 }
 
+/*
+ * SixLowPanHelloHeader
+ */
+NS_OBJECT_ENSURE_REGISTERED(SixLowPanHelloHeader);
+
+SixLowPanHelloHeader::SixLowPanHelloHeader()
+{
+    m_address= Address();
+    m_dx = 0;
+    m_dy = 0;
+}
+
+TypeId
+SixLowPanHelloHeader::GetTypeId()
+{
+    static TypeId tid = TypeId("ns3::SixLowPanHelloHeader")
+                            .SetParent<Header>()
+                            .SetGroupName("SixLowPan")
+                            .AddConstructor<SixLowPanHelloHeader>();
+    return tid;
+}
+
+TypeId
+SixLowPanHelloHeader::GetInstanceTypeId() const
+{
+    return GetTypeId();
+}
+
+void
+SixLowPanHelloHeader::Print(std::ostream& os) const
+{
+    os << "Hello from " << m_address << " at (" << m_dx << ", " << m_dy << ")";
+}
+
+uint32_t
+SixLowPanHelloHeader::GetSerializedSize() const
+{
+    return m_address.GetLength() + 2 + 2;
+}
+
+void
+SixLowPanHelloHeader::Serialize(Buffer::Iterator i) const
+{
+    uint8_t buf[2];
+    m_address.CopyTo(buf);   // 只複製 2 bytes
+    i.Write(buf, 2);
+    i.WriteHtonU16(m_dx);
+    i.WriteHtonU16(m_dy);
+}
+
+
+uint32_t
+SixLowPanHelloHeader::Deserialize(Buffer::Iterator i)
+{
+    uint8_t buf[2];
+    i.Read(buf, 2);
+    m_address.CopyFrom(buf, 2);
+    m_dx = i.ReadNtohU16();
+    m_dy = i.ReadNtohU16();
+    return 2 + 2 + 2;
+}
+
+void SixLowPanHelloHeader::SetInfo(Address addr, int16_t x, int16_t y)
+{
+    m_address = addr;
+    m_dx = x;
+    m_dy = y;
+}
+
+Address SixLowPanHelloHeader::GetAddress() const
+{ 
+    return m_address;
+}
+
+int16_t SixLowPanHelloHeader::GetX() const
+{
+    return m_dx;
+}
+
+int16_t SixLowPanHelloHeader::GetY() const
+{
+    return m_dy;
+}
+
+
 } // namespace ns3

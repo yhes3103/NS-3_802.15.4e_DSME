@@ -600,6 +600,7 @@ LrWpanNetDevice::McpsDataIndication(McpsDataIndicationParams params, Ptr<Packet>
     if(params.m_dstAddrMode == SHORT_ADDR)
     {
         // howard: 把資料傳到 6lowapn netdevice ReceiveFromDevice
+        NS_LOG_INFO(BuildPseudoMacAddress(params.m_srcPanId, params.m_srcAddr));
         m_receiveCallback(this, pkt, 0x86DD, BuildPseudoMacAddress(params.m_srcPanId, params.m_srcAddr));
     }
     else
@@ -622,19 +623,23 @@ LrWpanNetDevice::BuildPseudoMacAddress(uint16_t panId, Mac16Address shortAddr) c
 
     uint8_t buf[6];
 
-    if (m_pseudoMacMode == RFC4944)
-    {
-        buf[0] = panId >> 8;
-        // Make sure the U/L bit is set
-        buf[0] |= 0x02;
-        buf[1] = panId & 0xff;
-    }
-    else
-    {
-        // Make sure the U/L bit is set
-        buf[0] = 0x02;
-        buf[1] = 0x00;
-    }
+    // if (m_pseudoMacMode == RFC4944)
+    // {
+    //     buf[0] = panId >> 8;
+    //     // Make sure the U/L bit is set
+    //     buf[0] |= 0x02;
+    //     buf[1] = panId & 0xff;
+    // }
+    // else
+    // {
+    //     // Make sure the U/L bit is set
+    //     buf[0] = 0x02;
+    //     buf[1] = 0x00;
+    // }
+
+    // howard: IEEE 802.15.4 位址是通用唯一識別碼，所以 U/L 要設成 0
+    buf[0] = 0;
+    buf[1] = panId & 0xff;
     buf[2] = 0;
     buf[3] = 0;
     shortAddr.CopyTo(buf + 4);

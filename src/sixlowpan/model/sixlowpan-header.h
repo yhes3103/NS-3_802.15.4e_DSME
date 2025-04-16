@@ -1374,6 +1374,28 @@ class SixLowPanMesh : public Header
     Address m_dst;      //!< Destination (final) address.
 };
 
+class SixLowPanHelloHeader : public Header
+{
+  public:
+    SixLowPanHelloHeader();
+    void SetInfo(Address addr, int16_t x, int16_t y);
+    Address GetAddress() const;
+    int16_t GetX() const;
+    int16_t GetY() const;
+
+    static TypeId GetTypeId(void);
+    virtual TypeId GetInstanceTypeId(void) const override;
+    virtual void Print(std::ostream &os) const override;
+    virtual uint32_t GetSerializedSize(void) const override;
+    virtual void Serialize(Buffer::Iterator start) const override;
+    virtual uint32_t Deserialize(Buffer::Iterator start) override;
+
+  private:
+    Address m_address;
+    int16_t m_dx;
+    int16_t m_dy;
+};
+
 /**
  * \brief Stream insertion operator.
  *

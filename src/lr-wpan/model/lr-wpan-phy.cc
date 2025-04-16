@@ -386,7 +386,7 @@ LrWpanPhy::StartRx(Ptr<SpectrumSignalParameters> spectrumRxParams)
         }
         else
         {
-            NS_LOG_INFO("進來丟資料1");
+            // NS_LOG_INFO("進來丟資料1");
             m_phyRxDropTrace(p);
         }
     }
@@ -430,7 +430,11 @@ LrWpanPhy::StartRx(Ptr<SpectrumSignalParameters> spectrumRxParams)
 
     // Always call EndRx to update the interference.
     // We keep track of this event, and if necessary cancel this event when a TX of a packet.
-    Simulator::Schedule(spectrumRxParams->duration, &LrWpanPhy::EndRx, this, spectrumRxParams);
+
+    // Simulator::Schedule(spectrumRxParams->duration, &LrWpanPhy::EndRx, this, spectrumRxParams);
+
+    // howard: 改成這樣，0.000000236 是實際送到 dst 的時間
+    Simulator::Schedule(spectrumRxParams->duration - Seconds(0.000000236), &LrWpanPhy::EndRx, this, spectrumRxParams);
 }
 
 void
@@ -541,6 +545,7 @@ LrWpanPhy::EndRx(Ptr<SpectrumSignalParameters> par)
             if(!m_pdDataIndicationCallback.IsNull())
             {
                 NS_LOG_INFO("把 PHY Layer 的封包送往 MAC Layer");
+                // NS_LOG_INFO(std::to_string(tag.Get()));
                 m_pdDataIndicationCallback(currentPacket->GetSize(), currentPacket, tag.Get());
             }
         }
@@ -631,7 +636,7 @@ LrWpanPhy::PdDataRequest(const uint32_t psduLength, Ptr<Packet> p)
             pb->AddPacket(p);
             txParams->packetBurst = pb;
 
-            NS_LOG_INFO("Phy Layer Packet = " << pb->GetSize() << " bytes");
+            NS_LOG_INFO("Sending packet to the channel: " << txParams->duration.GetSeconds() * 62500 / 2.0 << " bytes");
             // howard: 傳資料到 channel，但不清楚 StartTx 定義在哪邊
             m_channel->StartTx(txParams);
             m_pdDataRequest = Simulator::Schedule(txParams->duration, &LrWpanPhy::EndTx, this);
@@ -677,6 +682,8 @@ LrWpanPhy::PlmeCcaRequest()
 
     if (m_trxState == IEEE_802_15_4_PHY_RX_ON || m_trxState == IEEE_802_15_4_PHY_BUSY_RX)
     {
+        Time StartCCATime = Seconds(8.0 / GetDataOrSymbolRate(false));
+        NS_LOG_INFO("Start CCA" << " (" << 8 << " symbols" << " or " << StartCCATime.As(Time::S) << ")");
         m_ccaPeakPower = 0.0;
         Time ccaTime = Seconds(8.0 / GetDataOrSymbolRate(false));
         m_ccaRequest = Simulator::Schedule(ccaTime, &LrWpanPhy::EndCca, this);
@@ -775,6 +782,7 @@ LrWpanPhy::PlmeSetTRXStateRequest(LrWpanPhyEnumeration state)
 {
     NS_LOG_FUNCTION(this << state);
 
+    // NS_LOG_INFO("進來了PHY");
     // Check valid states (Table 14)
     NS_ABORT_IF((state != IEEE_802_15_4_PHY_RX_ON) && (state != IEEE_802_15_4_PHY_TRX_OFF) &&
                 (state != IEEE_802_15_4_PHY_FORCE_TRX_OFF) && (state != IEEE_802_15_4_PHY_TX_ON));
@@ -801,6 +809,7 @@ LrWpanPhy::PlmeSetTRXStateRequest(LrWpanPhyEnumeration state)
 
     if (state == m_trxState)
     {
+        NS_LOG_DEBUG("turn on PHY_RX_ON");
         if (!m_plmeSetTRXStateConfirmCallback.IsNull())
         {
             m_plmeSetTRXStateConfirmCallback(state);
@@ -1471,6 +1480,7 @@ LrWpanPhy::EndCca()
 
     if (!m_plmeCcaConfirmCallback.IsNull())
     {
+        NS_LOG_INFO("End CCA");
         m_plmeCcaConfirmCallback(sensedChannelState);
     }
 }
@@ -1508,10 +1518,13 @@ LrWpanPhy::EndTx()
     {
         // howard: 這是一個 fake message，真正的 data 早在 StartRx() 就收到了
         // 這邊只是假裝要傳這麼久 (根據封包大小所計算的傳送時間)
-        NS_LOG_DEBUG("PHY Layer 成功接收到封包");
+
+        NS_LOG_INFO("Packet received successfully");
+        
         m_phyTxEndTrace(m_currentTxPacket.first);
         if (!m_pdDataConfirmCallback.IsNull())
         {
+            // howard: Callback 回 MAC PdDataConfirm()
             m_pdDataConfirmCallback(IEEE_802_15_4_PHY_SUCCESS);
         }
     }
@@ -1612,12 +1625,12 @@ LrWpanPhy::GetPpduHeaderTxTime()
 
     NS_ASSERT(m_phyOption < IEEE_802_15_4_INVALID_PHY_OPTION);
 
-    // howard: 共佔 6 bytes
-    // 1 bytes = 2 symbol，因此需要花 (6 * 2.0 / 62500) = 0.00192s
+    // howard: 共佔 6 bytes (1 bytes = 2 symbol)
     totalPpduHdrSymbols = ppduHeaderSymbolNumbers[m_phyOption].shrPreamble +
                           ppduHeaderSymbolNumbers[m_phyOption].shrSfd +
                           ppduHeaderSymbolNumbers[m_phyOption].phr;
 
+    NS_LOG_INFO("Phy header: " << totalPpduHdrSymbols / 2 << " bytes");
     return Seconds(totalPpduHdrSymbols / GetDataOrSymbolRate(isData));
 }
 

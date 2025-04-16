@@ -80,6 +80,8 @@ class SixLowPanNetDevice : public NetDevice
     void SetHC1CompMethod(bool HC1);
     void SetMeshUnder(bool MeshUnder);
     void SetDataFlooding(bool DataFlooding);
+    void SetHelloMessage(bool Hello);
+    void PrintNeighborTable();
 
     enum DropReason
     {
@@ -135,6 +137,9 @@ class SixLowPanNetDevice : public NetDevice
                   const Address& source,
                   const Address& dest,
                   uint16_t protocolNumber) override;
+
+    // howard: 新增
+    bool SendHello(Ptr<Packet> packet, uint16_t x, uint16_t y);
     Ptr<Node> GetNode() const override;
     void SetNode(Ptr<Node> node) override;
     bool NeedsArp() const override;
@@ -268,6 +273,8 @@ class SixLowPanNetDevice : public NetDevice
     bool six_useHC1;
     bool six_meshUnder;
     bool six_dataflooding;
+    bool six_hello;
+    std::map<Address, std::pair<int16_t, int16_t>> m_neighborTable;
     
     /**
      * \brief Receives all the packets from a NetDevice for further processing.

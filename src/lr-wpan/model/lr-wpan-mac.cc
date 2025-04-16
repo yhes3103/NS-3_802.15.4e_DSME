@@ -504,6 +504,7 @@ LrWpanMac::McpsDataRequest(McpsDataRequestParams params, Ptr<Packet> p)
         // received a valid beacon or not.
 
         p->AddHeader(macHdr);
+        NS_LOG_INFO("MAC header: " << macHdr.GetSerializedSize() << " bytes");
 
         LrWpanMacTrailer macTrailer;
         // Calculate FCS if the global attribute ChecksumEnable is set.
@@ -513,7 +514,7 @@ LrWpanMac::McpsDataRequest(McpsDataRequestParams params, Ptr<Packet> p)
             macTrailer.SetFcs(p);
         }
         p->AddTrailer(macTrailer);
-        NS_LOG_INFO("MAC Layer Packet = " << p->GetSize() << " bytes");
+        NS_LOG_INFO("MAC Footer: " << macTrailer.GetSerializedSize() << " bytes");
 
         Ptr<TxQueueElement> txQElement = Create<TxQueueElement>();
         txQElement->txQMsduHandle = params.m_msduHandle;
@@ -1730,15 +1731,21 @@ LrWpanMac::BeaconSearchTimeout() {
 void LrWpanMac::CheckQueue() {
     NS_LOG_FUNCTION(this);
 
+    // NS_LOG_INFO("進來CheckQueue1");
     // Pull a packet from the queue and start sending if we are not already sending.
-    if (m_lrWpanMacState == MAC_IDLE && !m_txQueue.empty() && !m_setMacState.IsRunning()) {
+    if(m_lrWpanMacState == MAC_IDLE && !m_txQueue.empty() && !m_setMacState.IsRunning()) {
         // TODO: this should check if the node is a coordinator and using the outcoming superframe
         // not just the PAN coordinator
-        if (m_csmaCa->IsUnSlottedCsmaCa() || (m_outSuperframeStatus == CAP && m_coord) ||
-            m_incSuperframeStatus == CAP) {
-
+        // NS_LOG_INFO("進來CheckQueue2");
+        // NS_LOG_INFO("m_coord = " << m_coord);
+        // NS_LOG_INFO("m_panCoor = " << m_panCoor);
+        // howard: 如果 PAN-C 或 Coord 在 outgoing superframe 收資料
+        if(m_csmaCa->IsUnSlottedCsmaCa() || (m_outSuperframeStatus == CAP && m_coord) || m_incSuperframeStatus == CAP)
+        {
+            // NS_LOG_INFO("進來CheckQueue3");
             // check MAC is not in a IFS
             if (!m_ifsEvent.IsRunning()) {
+                // NS_LOG_INFO("進來CheckQueue4");
                 Ptr<TxQueueElement> txQElement = m_txQueue.front();
                 m_txPkt = txQElement->txQPkt;
 
@@ -2885,7 +2892,6 @@ LrWpanMac::IfsWaitTimeout(Time ifsTime)
 
     m_macIfsEndTrace(ifsTime);
     CheckQueue();
-
 }
 
 void
@@ -2913,9 +2919,10 @@ LrWpanMac::RemovePendTxQElement(Ptr<Packet> p)
 void
 LrWpanMac::PdDataConfirm(LrWpanPhyEnumeration status)
 {
-    // NS_LOG_DEBUG("PdDataConfirm");
     NS_ASSERT(m_lrWpanMacState == MAC_SENDING || m_lrWpanMacState == MAC_GTS_SENDING);
     NS_LOG_FUNCTION(this << status << m_txQueue.size());
+
+    // NS_LOG_DEBUG("進來 PdDataConfirm");
 
     LrWpanMacHeader macHdr;
     Time ifsWaitTime;
@@ -3071,7 +3078,7 @@ LrWpanMac::PdDataConfirm(LrWpanPhyEnumeration status)
                     Ptr<TxQueueElement> txQElement = m_txQueue.front();
                     confirmParams.m_msduHandle = txQElement->txQMsduHandle;
                     confirmParams.m_status = IEEE_802_15_4_SUCCESS;
-                    NS_LOG_INFO("進來呼叫上層");
+                    NS_LOG_INFO("callback 上層傳送成功");
                     m_mcpsDataConfirmCallback(confirmParams);
                 }
                 ifsWaitTime = Seconds(static_cast<double>(GetIfsSize()) / symbolRate);
@@ -3141,7 +3148,7 @@ void
 LrWpanMac::PlmeSetTRXStateConfirm(LrWpanPhyEnumeration status)
 {
     NS_LOG_FUNCTION(this << status);
-
+    // NS_LOG_INFO("進來了");
     if (m_lrWpanMacState == MAC_SENDING &&
         (status == IEEE_802_15_4_PHY_TX_ON || status == IEEE_802_15_4_PHY_SUCCESS))
     {
@@ -3151,7 +3158,9 @@ LrWpanMac::PlmeSetTRXStateConfirm(LrWpanPhyEnumeration status)
         m_promiscSnifferTrace(m_txPkt);
         m_snifferTrace(m_txPkt);
         m_macTxTrace(m_txPkt);
-        
+
+        // howard: MAC CAP 正式傳資料到 PHY
+        NS_LOG_INFO("Sending packet to the PHY layer: " << m_txPkt->GetSize() << " bytes");
         m_phy->PdDataRequest(m_txPkt->GetSize(), m_txPkt);
         
     } else if (m_lrWpanMacState == MAC_GTS_SENDING &&
@@ -3293,12 +3302,12 @@ void
 LrWpanMac::SetLrWpanMacState(LrWpanMacState macState)
 {
     NS_LOG_FUNCTION(this << "mac state = " << macState);
-
     if (macState == MAC_IDLE) {
         ChangeMacState(MAC_IDLE);
 
         if (m_macRxOnWhenIdle)
         {
+            // howard: CAP 進來這裡
             m_phy->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_RX_ON);
         }
         else
@@ -3312,11 +3321,13 @@ LrWpanMac::SetLrWpanMacState(LrWpanMacState macState)
 
     } else if (macState == MAC_CSMA) {
         NS_ASSERT(m_lrWpanMacState == MAC_IDLE || m_lrWpanMacState == MAC_ACK_PENDING);
+        NS_LOG_INFO("Use carrier sensing and switch receiver state to RX_ON");
         ChangeMacState(MAC_CSMA);
         m_phy->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_RX_ON);
 
     } else if (m_lrWpanMacState == MAC_CSMA && macState == CHANNEL_IDLE) {
         // Channel is idle, set transmitter to TX_ON
+        NS_LOG_INFO("Channel is idle, switch transmitter to TX_ON");
         ChangeMacState(MAC_SENDING);
         m_phy->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_TX_ON);
 
@@ -3328,7 +3339,7 @@ LrWpanMac::SetLrWpanMacState(LrWpanMacState macState)
         // The PHY state does not change from its current form. The PHY change (RX_ON) will be
         // triggered by the scheduled beacon event.
 
-        NS_LOG_DEBUG("****** PACKET DEFERRED to the next superframe *****");
+        NS_LOG_INFO("****** PACKET DEFERRED to the next superframe *****");
     }
 }
 
