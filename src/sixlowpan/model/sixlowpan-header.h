@@ -88,7 +88,13 @@ class SixLowPanDispatch
         LOWPAN_FRAG1_N = 0xC7,
         LOWPAN_FRAGN = 0xE0,
         LOWPAN_FRAGN_N = 0xE7,
-        LOWPAN_UNSUPPORTED = 0xFF
+        LOWPAN_UNSUPPORTED = 0xFF,
+
+        // howard: 新增 0100 1111
+        LOWPAN_Hello_M = 0x4F,
+        LOWPAN_MESH_GEO = 0x81,
+        LOWPAN_RREQ = 0x51,
+        LOWPAN_RREP = 0x52
     };
 
     /**
@@ -1395,6 +1401,121 @@ class SixLowPanHelloHeader : public Header
     int16_t m_dx;
     int16_t m_dy;
 };
+
+class SixLowPanMesh_GEO : public Header
+{
+  public:
+    SixLowPanMesh_GEO();
+
+    /**
+     * \brief Get the type ID.
+     * \return The object TypeId.
+     */
+    static TypeId GetTypeId();
+
+    /**
+     * \brief Return the instance type identifier.
+     * \return Instance type ID.
+     */
+    TypeId GetInstanceTypeId() const override;
+
+    void Print(std::ostream& os) const override;
+
+    /**
+     * \brief Get the serialized size of the packet.
+     * \return Size.
+     */
+    uint32_t GetSerializedSize() const override;
+
+    /**
+     * \brief Serialize the packet.
+     * \param [in] start Buffer iterator.
+     */
+    void Serialize(Buffer::Iterator start) const override;
+
+    /**
+     * \brief Deserialize the packet.
+     * \param [in] start Buffer iterator.
+     * \return Size of the packet.
+     */
+    uint32_t Deserialize(Buffer::Iterator start) override;
+
+    /**
+     * \brief Set the "Hops Left" field.
+     * \param [in] hopsLeft The number of hops left.
+     */
+    void SetHopsLeft(uint8_t hopsLeft);
+
+    /**
+     * \brief Get the "Hops Left" field.
+     * \return The number of hops left.
+     */
+    uint8_t GetHopsLeft() const;
+
+    /**
+     * \brief Set the "Originator" address.
+     * \param [in] originator The Originator address (Mac64Address or Mac16Address).
+     */
+    void SetOriginator(Address originator);
+
+    /**
+     * \brief Get the "Originator" address.
+     * \return The Originator address (Mac64Address or Mac16Address).
+     */
+    Address GetOriginator() const;
+
+    /**
+     * \brief Set the "Final Destination" address.
+     * \param [in] finalDst The Final Destination address (Mac64Address or Mac16Address).
+     */
+    void SetFinalDst(Address finalDst);
+
+    /**
+     * \brief Get the "Final Destination" address.
+     * \return The Final Destination address (Mac64Address or Mac16Address).
+     */
+    Address GetFinalDst() const;
+
+    void SetDstPosition(int16_t x, int16_t y);
+    int16_t GetX() const;
+    int16_t GetY() const;
+
+  private:
+    uint8_t m_hopsLeft; //!< Hops left.
+    bool m_v;           //!< True if Originator address is 16 bit
+    bool m_f;           //!< True if Destination address is 16 bit
+    Address m_src;      //!< Originator (source) address.
+    Address m_dst;      //!< Destination (final) address.
+    int16_t m_dst_dx;
+    int16_t m_dst_dy;
+};
+
+class SixLowPanRREQHeader : public Header
+{
+  public:
+    SixLowPanRREQHeader();
+
+    static TypeId GetTypeId(void);
+    virtual TypeId GetInstanceTypeId(void) const override;
+    virtual void Print(std::ostream &os) const override;
+    virtual uint32_t GetSerializedSize(void) const override;
+    virtual void Serialize(Buffer::Iterator start) const override;
+    virtual uint32_t Deserialize(Buffer::Iterator start) override;
+};
+
+class SixLowPanRREPHeader : public Header
+{
+  public:
+    SixLowPanRREPHeader();
+
+    static TypeId GetTypeId(void);
+    virtual TypeId GetInstanceTypeId(void) const override;
+    virtual void Print(std::ostream &os) const override;
+    virtual uint32_t GetSerializedSize(void) const override;
+    virtual void Serialize(Buffer::Iterator start) const override;
+    virtual uint32_t Deserialize(Buffer::Iterator start) override;
+};
+
 
 /**
  * \brief Stream insertion operator.

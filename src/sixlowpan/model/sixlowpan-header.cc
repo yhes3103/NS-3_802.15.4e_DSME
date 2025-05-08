@@ -45,6 +45,23 @@ SixLowPanDispatch::GetDispatchType(uint8_t dispatch)
     {
         return LOWPAN_NALP;
     }
+    // howard: 新增
+    else if (dispatch == LOWPAN_Hello_M)
+    {
+        return LOWPAN_Hello_M;
+    }
+    else if (dispatch == LOWPAN_RREQ)
+    {
+        return LOWPAN_RREQ;
+    }
+    else if (dispatch == LOWPAN_RREP)
+    {
+        return LOWPAN_RREP;
+    }
+    else if ((dispatch & 0xC1) == LOWPAN_MESH_GEO)
+    {
+        return LOWPAN_MESH_GEO;
+    }
     else if (dispatch == LOWPAN_IPv6)
     {
         return LOWPAN_IPv6;
@@ -2257,15 +2274,18 @@ SixLowPanHelloHeader::Print(std::ostream& os) const
 uint32_t
 SixLowPanHelloHeader::GetSerializedSize() const
 {
-    return m_address.GetLength() + 2 + 2;
+    return 7;
 }
 
 void
 SixLowPanHelloHeader::Serialize(Buffer::Iterator i) const
 {
+    i.WriteU8(0x4F);
+
     uint8_t buf[2];
-    m_address.CopyTo(buf);   // 只複製 2 bytes
+    m_address.CopyTo(buf);   // 複製 2 bytes (Short Address)
     i.Write(buf, 2);
+
     i.WriteHtonU16(m_dx);
     i.WriteHtonU16(m_dy);
 }
@@ -2274,12 +2294,20 @@ SixLowPanHelloHeader::Serialize(Buffer::Iterator i) const
 uint32_t
 SixLowPanHelloHeader::Deserialize(Buffer::Iterator i)
 {
+    uint8_t dispatch = i.ReadU8();
+    if(dispatch != 0x4F)
+    {
+        return 0;
+    }
+
     uint8_t buf[2];
     i.Read(buf, 2);
     m_address.CopyFrom(buf, 2);
+
     m_dx = i.ReadNtohU16();
     m_dy = i.ReadNtohU16();
-    return 2 + 2 + 2;
+
+    return 7;
 }
 
 void SixLowPanHelloHeader::SetInfo(Address addr, int16_t x, int16_t y)
@@ -2304,5 +2332,371 @@ int16_t SixLowPanHelloHeader::GetY() const
     return m_dy;
 }
 
+/*
+ * SixLowPanMesh_GEO
+ */
+NS_OBJECT_ENSURE_REGISTERED(SixLowPanMesh_GEO);
+
+SixLowPanMesh_GEO::SixLowPanMesh_GEO()
+{
+    m_hopsLeft = 0;
+    m_src = Address();
+    m_dst = Address();
+    m_v = false;
+    m_f = false;
+    m_dst_dx = 0;
+    m_dst_dy = 0;
+}
+
+TypeId
+SixLowPanMesh_GEO::GetTypeId()
+{
+    static TypeId tid = TypeId("ns3::SixLowPanMesh_GEO")
+                            .SetParent<Header>()
+                            .SetGroupName("SixLowPan")
+                            .AddConstructor<SixLowPanMesh_GEO>();
+    return tid;
+}
+
+TypeId
+SixLowPanMesh_GEO::GetInstanceTypeId() const
+{
+    return GetTypeId();
+}
+
+void SixLowPanMesh_GEO::Print(std::ostream& os) const
+{
+    os << "Hops left: " << +m_hopsLeft << ", src: " << m_src << ", dst: " << m_dst
+       << ", dst_pos: (" << m_dst_dx << ", " << m_dst_dy << ")";
+}
+
+uint32_t
+SixLowPanMesh_GEO::GetSerializedSize() const
+{
+    uint32_t serializedSize = 1;
+
+    // howard: 修改這裡讓它支援 0XF
+    if (m_hopsLeft > 0xF)
+    {
+        serializedSize++;
+    }
+
+    if (m_v)
+    {
+        serializedSize += 2;
+    }
+    else
+    {
+        serializedSize += 8;
+    }
+
+    if (m_f)
+    {
+        serializedSize += 2;
+    }
+    else
+    {
+        serializedSize += 8;
+    }
+
+    serializedSize += 4;  // m_dst_dx + m_dst_dy
+
+    return serializedSize;
+}
+
+void
+SixLowPanMesh_GEO::Serialize(Buffer::Iterator start) const
+{
+    Buffer::Iterator i = start;
+
+    uint8_t dispatch = 0x81;
+
+    if (m_v)
+    {
+        dispatch |= 0x20;
+    }
+    if (m_f)
+    {
+        dispatch |= 0x10;
+    }
+
+    // howard: 修改這裡讓它支援 0XF
+    if (m_hopsLeft <= 0xF)
+    {
+        dispatch |= m_hopsLeft;
+        i.WriteU8(dispatch);
+    }
+    else
+    {
+        dispatch |= 0xF;
+        i.WriteU8(dispatch);
+        i.WriteU8(m_hopsLeft);
+    }
+
+    uint8_t buffer[8];
+
+    m_src.CopyTo(buffer);
+    if (m_v)
+    {
+        i.Write(buffer, 2);
+    }
+    else
+    {
+        i.Write(buffer, 8);
+    }
+
+    m_dst.CopyTo(buffer);
+    if (m_f)
+    {
+        i.Write(buffer, 2);
+    }
+    else
+    {
+        i.Write(buffer, 8);
+    }
+
+    i.WriteHtonU16(m_dst_dx);
+    i.WriteHtonU16(m_dst_dy);
+}
+
+uint32_t
+SixLowPanMesh_GEO::Deserialize(Buffer::Iterator start)
+{
+    Buffer::Iterator i = start;
+    uint8_t temp = i.ReadU8();
+
+    m_v = temp & 0x20;
+    m_f = temp & 0x10;
+    m_hopsLeft = temp & 0xF;
+
+    // howard: 修改這裡讓它支援 0XF
+    // if (m_hopsLeft == 0xF)
+    // {
+    //     m_hopsLeft = i.ReadU8();
+    // }
+
+    uint8_t buffer[8];
+    uint8_t addrSize;
+
+    if (m_v)
+    {
+        addrSize = 2;
+    }
+    else
+    {
+        addrSize = 8;
+    }
+    i.Read(buffer, addrSize);
+    m_src.CopyFrom(buffer, addrSize);
+
+    if (m_f)
+    {
+        addrSize = 2;
+    }
+    else
+    {
+        addrSize = 8;
+    }
+    i.Read(buffer, addrSize);
+    m_dst.CopyFrom(buffer, addrSize);
+
+    m_dst_dx = i.ReadNtohU16();
+    m_dst_dy = i.ReadNtohU16();
+
+    return GetSerializedSize();
+}
+
+void
+SixLowPanMesh_GEO::SetOriginator(Address originator)
+{
+    if (Mac64Address::IsMatchingType(originator))
+    {
+        m_v = false;
+    }
+    else if (Mac16Address::IsMatchingType(originator))
+    {
+        m_v = true;
+    }
+    else
+    {
+        NS_ABORT_MSG("SixLowPanMesh_GEO::SetOriginator - incompatible address");
+    }
+
+    m_src = originator;
+}
+
+Address
+SixLowPanMesh_GEO::GetOriginator() const
+{
+    return m_src;
+}
+
+void
+SixLowPanMesh_GEO::SetFinalDst(Address finalDst)
+{
+    if (Mac64Address::IsMatchingType(finalDst))
+    {
+        m_f = false;
+    }
+    else if (Mac16Address::IsMatchingType(finalDst))
+    {
+        m_f = true;
+    }
+    else
+    {
+        NS_ABORT_MSG("SixLowPanMesh_GEO::SetFinalDst - incompatible address");
+    }
+
+    m_dst = finalDst;
+}
+
+Address
+SixLowPanMesh_GEO::GetFinalDst() const
+{
+    return m_dst;
+}
+
+void
+SixLowPanMesh_GEO::SetHopsLeft(uint8_t hopsLeft)
+{
+    m_hopsLeft = hopsLeft;
+}
+
+uint8_t
+SixLowPanMesh_GEO::GetHopsLeft() const
+{
+    return m_hopsLeft;
+}
+
+void SixLowPanMesh_GEO::SetDstPosition(int16_t x, int16_t y)
+{
+    m_dst_dx = x;
+    m_dst_dy = y;
+}
+
+int16_t SixLowPanMesh_GEO::GetX() const
+{
+    return m_dst_dx;
+}
+
+int16_t SixLowPanMesh_GEO::GetY() const
+{
+    return m_dst_dy;
+}
+
+/*
+ * SixLowPanRREQHeader
+ */
+NS_OBJECT_ENSURE_REGISTERED(SixLowPanRREQHeader);
+
+SixLowPanRREQHeader::SixLowPanRREQHeader()
+{
+
+}
+
+TypeId
+SixLowPanRREQHeader::GetTypeId()
+{
+    static TypeId tid = TypeId ("ns3::SixLowPanRREQHeader")
+                            .SetParent<Header> ()
+                            .SetGroupName ("SixLowPan")
+                            .AddConstructor<SixLowPanRREQHeader> ();
+    return tid;
+}
+
+TypeId
+SixLowPanRREQHeader::GetInstanceTypeId() const
+{
+    return GetTypeId();
+}
+
+uint32_t
+SixLowPanRREQHeader::GetSerializedSize() const
+{
+    return 1;
+}
+
+void
+SixLowPanRREQHeader::Serialize(Buffer::Iterator i) const
+{
+    i.WriteU8(0x51);               // dispatch
+}
+
+uint32_t
+SixLowPanRREQHeader::Deserialize(Buffer::Iterator i)
+{
+    uint8_t dispatch = i.ReadU8();
+
+    if(dispatch != 0x51)
+    {
+        return 0;
+    }
+
+    return 1;
+}
+
+void
+SixLowPanRREQHeader::Print(std::ostream& os) const
+{
+  os << "RREQ ";
+}
+
+
+/*
+ * SixLowPanRREPHeader
+ */
+NS_OBJECT_ENSURE_REGISTERED(SixLowPanRREPHeader);
+
+SixLowPanRREPHeader::SixLowPanRREPHeader()
+{
+
+}
+
+TypeId
+SixLowPanRREPHeader::GetTypeId()
+{
+    static TypeId tid = TypeId ("ns3::SixLowPanRREPHeader")
+                            .SetParent<Header> ()
+                            .SetGroupName ("SixLowPan")
+                            .AddConstructor<SixLowPanRREPHeader> ();
+    return tid;
+}
+
+TypeId
+SixLowPanRREPHeader::GetInstanceTypeId() const
+{
+    return GetTypeId();
+}
+
+uint32_t
+SixLowPanRREPHeader::GetSerializedSize() const
+{
+    return 1;
+}
+
+void
+SixLowPanRREPHeader::Serialize(Buffer::Iterator i) const
+{
+    i.WriteU8(0x52);               // dispatch
+}
+
+uint32_t
+SixLowPanRREPHeader::Deserialize(Buffer::Iterator i)
+{
+    uint8_t dispatch = i.ReadU8();
+
+    if(dispatch != 0x52)
+    {
+        return 0;
+    }
+
+    return 1;
+}
+
+void
+SixLowPanRREPHeader::Print(std::ostream& os) const
+{
+    os << "RREP ";
+}
 
 } // namespace ns3

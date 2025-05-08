@@ -1630,7 +1630,7 @@ LrWpanPhy::GetPpduHeaderTxTime()
                           ppduHeaderSymbolNumbers[m_phyOption].shrSfd +
                           ppduHeaderSymbolNumbers[m_phyOption].phr;
 
-    NS_LOG_INFO("Phy header: " << totalPpduHdrSymbols / 2 << " bytes");
+    NS_LOG_INFO("Phy Header: " << totalPpduHdrSymbols / 2 << " bytes");
     return Seconds(totalPpduHdrSymbols / GetDataOrSymbolRate(isData));
 }
 

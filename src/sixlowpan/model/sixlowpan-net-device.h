@@ -82,6 +82,9 @@ class SixLowPanNetDevice : public NetDevice
     void SetDataFlooding(bool DataFlooding);
     void SetHelloMessage(bool Hello);
     void PrintNeighborTable();
+    void SetGreedyRouting(bool GreedyRouting);
+    void SetLoadRouting(bool LoadRouting);
+    void PrintLoadTable();
 
     enum DropReason
     {
@@ -139,7 +142,21 @@ class SixLowPanNetDevice : public NetDevice
                   uint16_t protocolNumber) override;
 
     // howard: 新增
-    bool SendHello(Ptr<Packet> packet, uint16_t x, uint16_t y);
+    bool SendHello(Ptr<Packet> packet, int16_t x, int16_t y);
+
+    bool SendLoad(Ptr<Packet> packet, const Address& dest);
+    bool DoSendLoad();
+    bool DoSendLoadForwarding(Ptr<Packet> packet);
+
+    bool SendRREQ(Ptr<Packet> packet, const Address& dest);
+    bool DoSendRREQ(Ptr<Packet> packet, const Address& dest);
+
+    bool SendRREP(Ptr<Packet> packet, const Address& dest);
+    bool DoSendRREP(Ptr<Packet> packet);
+
+    bool DoSendGreedy(Ptr<Packet> packet, const Address& dest, int16_t x, int16_t y, uint16_t protocolNumber);
+    bool DoSendGreedyForwarding(Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber);
+    
     Ptr<Node> GetNode() const override;
     void SetNode(Ptr<Node> node) override;
     bool NeedsArp() const override;
@@ -274,7 +291,18 @@ class SixLowPanNetDevice : public NetDevice
     bool six_meshUnder;
     bool six_dataflooding;
     bool six_hello;
+    bool six_greedyrouting;
+    bool six_loadrouting;
     std::map<Address, std::pair<int16_t, int16_t>> m_neighborTable;
+
+    struct LoadEntry
+    {
+        Address nextAddr;
+    };
+
+    std::map<Address, LoadEntry> m_loadTable;
+
+    Ptr<Packet> LoadPacket = Create<Packet>();
     
     /**
      * \brief Receives all the packets from a NetDevice for further processing.

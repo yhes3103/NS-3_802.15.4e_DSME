@@ -320,7 +320,8 @@ LrWpanCsmaCa::RandomBackoffDelay()
 {
     NS_LOG_FUNCTION(this);
 
-    uint64_t upperBound = (uint64_t)pow(2, m_BE) - 1;
+    // uint64_t upperBound = (uint64_t)pow(2, m_BE) - 1;
+    // NS_LOG_INFO(std::to_string(m_BE));
 
     Time randomBackoff;
     uint64_t symbolRate;
@@ -332,7 +333,10 @@ LrWpanCsmaCa::RandomBackoffDelay()
     // transmission was previously deferred (m_randomBackoffPeriods != 0)
     if (m_randomBackoffPeriodsLeft == 0 || IsUnSlottedCsmaCa())
     {
-        m_randomBackoffPeriodsLeft = (uint64_t)m_random->GetValue(0, upperBound + 1);
+        // m_randomBackoffPeriodsLeft = (uint64_t)m_random->GetValue(0, upperBound + 1);
+        
+        // howard: 改成這樣，直接預設 m_BE = 3，m_randomBackoffPeriodsLeft 會介於 [0, 2^BE-1] 之間
+        m_randomBackoffPeriodsLeft = (uint64_t)m_random->GetValue(0, 7);
         // NS_LOG_INFO("m_randomBackoffPeriodsLeft = " << m_randomBackoffPeriodsLeft);
     }
 

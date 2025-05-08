@@ -166,8 +166,8 @@ LrWpanMac::LrWpanMac() {
     m_rxPkt = nullptr;
     m_ifs = 0;
 
-    m_macLIFSPeriod = 40;
-    m_macSIFSPeriod = 12;
+    m_macLIFSPeriod = 40;  // 40
+    m_macSIFSPeriod = 12;  // 12
 
     m_panCoor = false;
     m_coord = false;
@@ -424,6 +424,8 @@ LrWpanMac::McpsDataRequest(McpsDataRequestParams params, Ptr<Packet> p)
     int b2 = params.m_txOptions & TX_OPTION_INDIRECT;
     int b3 = params.m_txOptions & TX_OPTION_DIRECT;
 
+    // NS_LOG_INFO("params.m_txOptions = " << std::to_string(params.m_txOptions));
+
     if (b0 == TX_OPTION_ACK)
     {
         // Set AckReq bit only if the destination is not the broadcast address.
@@ -441,7 +443,9 @@ LrWpanMac::McpsDataRequest(McpsDataRequestParams params, Ptr<Packet> p)
             }
             else
             {
-                macHdr.SetAckReq();
+                // howard: 改成這樣，取消 ACK
+                // macHdr.SetAckReq();
+                macHdr.SetNoAckReq();
             }
         }
         else
@@ -456,7 +460,7 @@ LrWpanMac::McpsDataRequest(McpsDataRequestParams params, Ptr<Packet> p)
     }
 
     if (b1 == TX_OPTION_GTS) {
-
+        NS_LOG_INFO("進來 CFP 傳資料");
 #if MCPS_DATA_SENDING_LOG
         NS_LOG_DEBUG("Sending a data packet during a GTS period.");
 #endif
@@ -474,11 +478,15 @@ LrWpanMac::McpsDataRequest(McpsDataRequestParams params, Ptr<Packet> p)
         }
 
         p->AddTrailer(macTrailer);
-        // NS_LOG_INFO("MAC Layer Packet = " << p->GetSize() << " bytes");
+        NS_LOG_INFO("MAC Header: " << macHdr.GetSerializedSize() << " bytes");
+        NS_LOG_INFO("MAC Footer: " << macTrailer.GetSerializedSize() << " bytes");
+
+        NS_LOG_INFO(m_incGtsEvent.IsRunning());
+        NS_LOG_INFO(m_gtsEvent.IsRunning());
 
         if((m_incGtsEvent.IsRunning() || m_gtsEvent.IsRunning()) && m_lrWpanMacState == MAC_GTS)
         {
-            NS_LOG_INFO("進來 CFP 傳資料");
+            // NS_LOG_INFO("進來 CFP 傳資料");
             m_txPkt = p;
             ChangeMacState(MAC_GTS_SENDING);
             m_phy->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_TX_ON);
@@ -504,7 +512,7 @@ LrWpanMac::McpsDataRequest(McpsDataRequestParams params, Ptr<Packet> p)
         // received a valid beacon or not.
 
         p->AddHeader(macHdr);
-        NS_LOG_INFO("MAC header: " << macHdr.GetSerializedSize() << " bytes");
+        NS_LOG_INFO("MAC Header: " << macHdr.GetSerializedSize() << " bytes");
 
         LrWpanMacTrailer macTrailer;
         // Calculate FCS if the global attribute ChecksumEnable is set.
@@ -2208,7 +2216,7 @@ void LrWpanMac::PdDataIndication(uint32_t psduLength, Ptr<Packet> p, uint8_t lqi
                 }
                 else // Normal flow
                 {
-                    m_setMacState = Simulator::ScheduleNow(&LrWpanMac::SendAck, this, receivedMacHdr.GetSeqNum());
+                    // m_setMacState = Simulator::ScheduleNow(&LrWpanMac::SendAck, this, receivedMacHdr.GetSeqNum());
                 }                                               
             }
 
@@ -2752,41 +2760,41 @@ void LrWpanMac::PdDataIndication(uint32_t psduLength, Ptr<Packet> p, uint8_t lqi
     }
 }
 
-void
-LrWpanMac::SendAck(uint8_t seqno)
-{
-    NS_LOG_FUNCTION(this << static_cast<uint32_t>(seqno));
-    NS_LOG_DEBUG("Send Ack");
-    NS_ASSERT(m_lrWpanMacState == MAC_IDLE);
+// void
+// LrWpanMac::SendAck(uint8_t seqno)
+// {
+//     NS_LOG_FUNCTION(this << static_cast<uint32_t>(seqno));
+//     NS_LOG_DEBUG("Send Ack");
+//     NS_ASSERT(m_lrWpanMacState == MAC_IDLE);
 
-    // Generate a corresponding ACK Frame.
-    LrWpanMacHeader macHdr(LrWpanMacHeader::LRWPAN_MAC_ACKNOWLEDGMENT, seqno);
-    LrWpanMacTrailer macTrailer;
-    Ptr<Packet> ackPacket = Create<Packet>(0);
-    ackPacket->AddHeader(macHdr);
+//     // Generate a corresponding ACK Frame.
+//     LrWpanMacHeader macHdr(LrWpanMacHeader::LRWPAN_MAC_ACKNOWLEDGMENT, seqno);
+//     LrWpanMacTrailer macTrailer;
+//     Ptr<Packet> ackPacket = Create<Packet>(0);
+//     ackPacket->AddHeader(macHdr);
 
-    // Calculate FCS if the global attribute ChecksumEnable is set.
-    if (Node::ChecksumEnabled()) {
-        macTrailer.EnableFcs(true);
-        macTrailer.SetFcs(ackPacket);
-    }
+//     // Calculate FCS if the global attribute ChecksumEnable is set.
+//     if (Node::ChecksumEnabled()) {
+//         macTrailer.EnableFcs(true);
+//         macTrailer.SetFcs(ackPacket);
+//     }
 
-    ackPacket->AddTrailer(macTrailer);
+//     ackPacket->AddTrailer(macTrailer);
 
-    // Enqueue the ACK packet for further processing
-    // when the transmitter is activated.
-    m_txPkt = ackPacket;
+//     // Enqueue the ACK packet for further processing
+//     // when the transmitter is activated.
+//     m_txPkt = ackPacket;
 
-    // Switch transceiver to TX mode. Proceed sending the Ack on confirm.
+//     // Switch transceiver to TX mode. Proceed sending the Ack on confirm.
 
-    if (m_incGtsEvent.IsRunning() || m_gtsEvent.IsRunning()) { 
-        ChangeMacState(MAC_GTS_SENDING);
-    } else {
-        ChangeMacState(MAC_SENDING);
-    }
+//     if (m_incGtsEvent.IsRunning() || m_gtsEvent.IsRunning()) { 
+//         ChangeMacState(MAC_GTS_SENDING);
+//     } else {
+//         ChangeMacState(MAC_SENDING);
+//     }
     
-    m_phy->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_TX_ON);
-}
+//     m_phy->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_TX_ON);
+// }
 
 void
 LrWpanMac::EnqueueTxQElement(Ptr<TxQueueElement> txQElement)
@@ -2922,7 +2930,7 @@ LrWpanMac::PdDataConfirm(LrWpanPhyEnumeration status)
     NS_ASSERT(m_lrWpanMacState == MAC_SENDING || m_lrWpanMacState == MAC_GTS_SENDING);
     NS_LOG_FUNCTION(this << status << m_txQueue.size());
 
-    // NS_LOG_DEBUG("進來 PdDataConfirm");
+    NS_LOG_DEBUG("進來 PdDataConfirm");
 
     LrWpanMacHeader macHdr;
     Time ifsWaitTime;
@@ -2934,6 +2942,7 @@ LrWpanMac::PdDataConfirm(LrWpanPhyEnumeration status)
     if (status == IEEE_802_15_4_PHY_SUCCESS) {
         if (!macHdr.IsAcknowledgment()) 
         {
+            NS_LOG_INFO("進來了1");
             if (macHdr.IsBeacon()) 
             {
                 // Start CAP only if we are in beacon mode (i.e. if slotted csma-ca is running)
@@ -3003,7 +3012,6 @@ LrWpanMac::PdDataConfirm(LrWpanPhyEnumeration status)
                         m_mlmeStartConfirmCallback(mlmeConfirmParams);
                     }
                 }
-
                 ifsWaitTime = Seconds(static_cast<double>(GetIfsSize()) / symbolRate);
                 m_txPkt = nullptr;
 
@@ -3069,6 +3077,7 @@ LrWpanMac::PdDataConfirm(LrWpanPhyEnumeration status)
             } 
             else 
             {
+                NS_LOG_INFO("進來了2");
                 m_macTxOkTrace(m_txPkt);
                 // remove the copy of the packet that was just sent
                 if (!m_mcpsDataConfirmCallback.IsNull())
@@ -3082,6 +3091,8 @@ LrWpanMac::PdDataConfirm(LrWpanPhyEnumeration status)
                     m_mcpsDataConfirmCallback(confirmParams);
                 }
                 ifsWaitTime = Seconds(static_cast<double>(GetIfsSize()) / symbolRate);
+                NS_LOG_INFO("進來了3");
+                // 這裡要改，應該是 CAP 有問題
                 RemoveFirstTxQElement();
             }
         }
