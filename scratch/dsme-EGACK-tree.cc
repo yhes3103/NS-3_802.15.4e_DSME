@@ -98,7 +98,7 @@
          LogComponentEnableAll(LOG_PREFIX_TIME);
          LogComponentEnableAll(LOG_PREFIX_FUNC);
          LogComponentEnable("LrWpanMac", LOG_LEVEL_INFO);
-         // LogComponentEnable("LrWpanPhy", LOG_LEVEL_INFO);
+         LogComponentEnable("LrWpanPhy", LOG_LEVEL_INFO);
          // LogComponentEnable("LrWpanCsmaCa", LOG_LEVEL_INFO);
          // LogComponentEnable("LrWpanHelper", LOG_LEVEL_ALL);
          // LogComponentEnable("LrWpanNetDevice", LOG_LEVEL_ALL);
@@ -382,8 +382,8 @@
      std::cout << "pktRecv: " << pktRecv << std::endl;
      std::cout << "Delivery ratio: " << pktRecv / pktSent << std::endl;
  
-     double totalSendSize = (double)(pktRecv * (double)pktSize * 8);  //23040  34560
-     double superframeDuration = (double)(960 * 8 / (double)62500);  //0.12288 0.49152
+     double totalSendSize = (double)(pktRecv * (double)pktSize * 8);
+     double superframeDuration = (double)(960 * 8 / (double)62500);
  
      std::cout << "Throughput: " << (double)(totalSendSize / (double)(superframeDuration * 4) / (double)1000) << " (kbits/sec)" << std::endl;
  

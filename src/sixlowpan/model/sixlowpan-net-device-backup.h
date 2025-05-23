@@ -26,6 +26,7 @@
 #include "ns3/random-variable-stream.h"
 #include "ns3/simulator.h"
 #include "ns3/traced-callback.h"
+#include "ns3/sixlowpan-header.h"
 
 #include <map>
 #include <stdint.h>
@@ -59,6 +60,17 @@ class EventId;
  * \defgroup sixlowpan-tests 6LoWPAN module tests
  */
 
+struct NeighborTableEntry {
+      uint16_t m_panId;
+      Address m_neighborAddr;
+      uint16_t m_neighborAddrNum;
+
+      uint8_t m_devType;
+      uint8_t m_neighorRelation;
+
+      uint8_t m_depth;
+};
+
 /**
  * \ingroup sixlowpan
  *
@@ -75,18 +87,6 @@ class SixLowPanNetDevice : public NetDevice
     /**
      * Enumeration of the dropping reasons in SixLoWPAN.
      */
-
-    // howard: 新增
-    void SetHC1CompMethod(bool HC1);
-    void SetMeshUnder(bool MeshUnder);
-    void SetDataFlooding(bool DataFlooding);
-    void SetHelloMessage(bool Hello);
-    void PrintNeighborTable();
-    void SetGreedyRouting(bool GreedyRouting);
-    void SetLoadRouting(bool LoadRouting);
-    void PrintLoadTable();
-    void SetDirect(bool Direct);
-
     enum DropReason
     {
         DROP_FRAGMENT_TIMEOUT = 1,           //!< Fragment timeout exceeded
@@ -141,23 +141,6 @@ class SixLowPanNetDevice : public NetDevice
                   const Address& source,
                   const Address& dest,
                   uint16_t protocolNumber) override;
-
-    // howard: 新增
-    bool SendHello(Ptr<Packet> packet, int16_t x, int16_t y);
-
-    bool SendLoad(Ptr<Packet> packet, const Address& dest);
-    bool DoSendLoad();
-    bool DoSendLoadForwarding(Ptr<Packet> packet);
-
-    bool SendRREQ(Ptr<Packet> packet, const Address& dest);
-    bool DoSendRREQ(Ptr<Packet> packet, const Address& dest);
-
-    bool SendRREP(Ptr<Packet> packet, const Address& dest);
-    bool DoSendRREP(Ptr<Packet> packet);
-
-    bool DoSendGreedy(Ptr<Packet> packet, const Address& dest, int16_t x, int16_t y, uint16_t protocolNumber);
-    bool DoSendGreedyForwarding(Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber);
-    
     Ptr<Node> GetNode() const override;
     void SetNode(Ptr<Node> node) override;
     bool NeedsArp() const override;
@@ -165,6 +148,20 @@ class SixLowPanNetDevice : public NetDevice
     void SetPromiscReceiveCallback(NetDevice::PromiscReceiveCallback cb) override;
     bool SupportsSendFrom() const override;
     Address GetMulticast(Ipv6Address addr) const override;
+
+    bool SendHiLow(Ptr<Packet> packet
+                  , const Address& dest
+                  , uint16_t protocolNumber
+                  , SixLowPanMesh meshHdr
+                  , SixLowPanBc0 bc0Hdr);
+
+    bool DoSendHiLow(Ptr<Packet> packet,
+                    const Address& src,
+                    const Address& dest,
+                    uint16_t protocolNumber,
+                    bool doSendFrom,
+                    SixLowPanMesh meshHdr, 
+                    SixLowPanBc0 bc0Hdr);
 
     /**
      * \brief Returns a smart pointer to the underlying NetDevice.
@@ -282,30 +279,22 @@ class SixLowPanNetDevice : public NetDevice
      */
     void RemoveContext(uint8_t contextId);
 
+    void AddNeighborTableEntry(uint16_t panId
+                                , Address addr
+                                , uint8_t devType
+                                , uint8_t relation
+                                , uint8_t depth);
+
+    void SetHilow(bool on);
+    void SetDepth(uint8_t depth);
+    void SetHilowMC(double mc);
+    void SetRecord(std::map<Address, std::pair<Address, std::vector<int64_t>>> &record);
+    void SetRecord(std::map<std::pair<Address, Address>, std::vector<std::pair<int64_t, int64_t>>> &record);
+
   protected:
     void DoDispose() override;
 
   private:
-    
-    // howard: 新增
-    bool six_useHC1;
-    bool six_meshUnder;
-    bool six_dataflooding;
-    bool six_hello;
-    bool six_greedyrouting;
-    bool six_loadrouting;
-    bool six_direct;
-    std::map<Address, std::pair<int16_t, int16_t>> m_neighborTable;
-
-    struct LoadEntry
-    {
-        Address nextAddr;
-    };
-
-    std::map<Address, LoadEntry> m_loadTable;
-
-    Ptr<Packet> LoadPacket = Create<Packet>();
-    
     /**
      * \brief Receives all the packets from a NetDevice for further processing.
      * \param [in] device The NetDevice the packet ws received from.
@@ -703,6 +692,17 @@ class SixLowPanNetDevice : public NetDevice
     std::map<uint8_t, ContextEntry>
         m_contextTable; //!< Table of the contexts used in compression/decompression
 
+    std::vector<NeighborTableEntry> m_neighborTable;
+
+    uint8_t m_depth;
+
+    bool m_useHiLow = true;
+
+    double m_mc;
+
+    std::map<Address, std::pair<Address, std::vector<int64_t>>> *m_record;
+    std::map<std::pair<Address, Address>, std::vector<std::pair<int64_t, int64_t>>> *m_record2;
+
     /**
      * \brief Finds if the given unicast address matches a context for compression
      *
@@ -732,6 +732,8 @@ class SixLowPanNetDevice : public NetDevice
      * \return An address with the prefix zeroed.
      */
     Ipv6Address CleanPrefix(Ipv6Address address, Ipv6Prefix prefix);
+
+    uint16_t ComputeAscendantNodeAddress(uint16_t curAddr);
 };
 
 } // namespace ns3

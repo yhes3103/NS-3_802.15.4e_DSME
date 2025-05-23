@@ -1513,6 +1513,9 @@ class LrWpanMac : public Object
     LrWpanMac();
     ~LrWpanMac() override;
 
+    // howard: 讓 sixlowpan 傳下來的 Data 不要有 ACK
+    void Set6lowpanDataNoACK(bool NoACK);
+
     /**
      * Get the type ID.
      *
@@ -2293,6 +2296,8 @@ class LrWpanMac : public Object
      */
     bool m_gtsContinuePktSendingFromCap;
 
+    bool m_enhancedGTSForwarding;
+
     /**
      * 16 bits id of PAN on which this device is operating. 0xffff means not
      * associated.
@@ -2970,6 +2975,8 @@ class LrWpanMac : public Object
     void SetAcceptAllHilowPkt(bool on);
     
     void SetGtsContinuePktSendingFromCap(bool on);
+
+    void SetEnhancedGTSForwarding(bool on);
 
     /**
      * Check if the packet destination is its coordinator
@@ -4246,6 +4253,8 @@ class LrWpanMac : public Object
      * Scheduler event for the sending the Dsme-Beacon allocation notification command
      */
     EventId m_sendDsmeBcnAllocNotifiCmd;
+
+    bool m_NoACK;
 
 }; // class LrWpanMac 
 

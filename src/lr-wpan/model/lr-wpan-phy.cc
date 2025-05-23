@@ -302,7 +302,6 @@ void
 LrWpanPhy::StartRx(Ptr<SpectrumSignalParameters> spectrumRxParams)
 {
     NS_LOG_FUNCTION(this << spectrumRxParams);
-
     if (!m_edRequest.IsExpired())
     {
         // Update the average receive power during ED.
@@ -343,6 +342,7 @@ LrWpanPhy::StartRx(Ptr<SpectrumSignalParameters> spectrumRxParams)
     // Prevent PHY from receiving another packet while switching the transceiver state.
     if (m_trxState == IEEE_802_15_4_PHY_RX_ON && !m_setTRXState.IsRunning())
     {
+        // NS_LOG_INFO("進來2");
         // The specification doesn't seem to refer to BUSY_RX, but vendor
         // data sheets suggest that this is a substate of the RX_ON state
         // that is entered after preamble detection when the digital receiver
@@ -376,8 +376,10 @@ LrWpanPhy::StartRx(Ptr<SpectrumSignalParameters> spectrumRxParams)
         // Std. 802.15.4-2006, appendix E, Figure E.2
         // At SNR < -5 the BER is less than 10e-1.
         // It's useless to even *try* to decode the packet.
+        // NS_LOG_INFO("sirn = " << sinr);
         if(10 * log10(sinr) > -5)
         {
+            // NS_LOG_INFO("進來3");
             ChangeTrxState(IEEE_802_15_4_PHY_BUSY_RX);
             m_currentRxPacket = std::make_pair(lrWpanRxParams, false);
             m_phyRxBeginTrace(p);
@@ -491,6 +493,7 @@ void
 LrWpanPhy::EndRx(Ptr<SpectrumSignalParameters> par)
 {
     NS_LOG_FUNCTION(this);
+    // NS_LOG_INFO("進來ENDRX");
 
     Ptr<LrWpanSpectrumSignalParameters> params = DynamicCast<LrWpanSpectrumSignalParameters>(par);
 
@@ -521,6 +524,10 @@ LrWpanPhy::EndRx(Ptr<SpectrumSignalParameters> par)
         return;
     }
 
+    // NS_LOG_INFO("currentRxParams = " << currentRxParams);
+    // NS_LOG_INFO("params = " << params);
+    // m_pdDataIndicationCallback(currentPacket->GetSize(), currentPacket, tag.Get());
+    
     // If this is the end of the currently received packet, check if reception was successful.
     if (currentRxParams == params)
     {
@@ -539,12 +546,14 @@ LrWpanPhy::EndRx(Ptr<SpectrumSignalParameters> par)
         currentPacket->PeekPacketTag(tag);
         m_phyRxEndTrace(currentPacket, tag.Get());
 
-        if(!m_currentRxPacket.second)
+        // howard: 節點擺放位置會影響 GTS，暫時不知道是什麼原因，猜測是因為收不到 PAN-C beacon 導致無法同步 GTS
+        // NS_LOG_INFO("m_currentRxPacket.second = " << m_currentRxPacket.second);
+        if(!m_currentRxPacket.second) // !m_currentRxPacket.secon
         {
             // The packet was successfully received, push it up the stack.
             if(!m_pdDataIndicationCallback.IsNull())
             {
-                NS_LOG_INFO("把 PHY Layer 的封包送往 MAC Layer");
+                // NS_LOG_INFO("把 PHY Layer 的封包送往 MAC Layer");
                 // NS_LOG_INFO(std::to_string(tag.Get()));
                 m_pdDataIndicationCallback(currentPacket->GetSize(), currentPacket, tag.Get());
             }

@@ -38,9 +38,10 @@
 #include "ns3/udp-header.h"
 #include "ns3/udp-l4-protocol.h"
 #include "ns3/uinteger.h"
-// #include "ns3/lr-wpan-net-device.h"
+#include "ns3/lr-wpan-net-device.h"
 
 #include <algorithm>
+#include <math.h>
 
 NS_LOG_COMPONENT_DEFINE("SixLowPanNetDevice");
 
@@ -96,7 +97,7 @@ SixLowPanNetDevice::GetTypeId()
                           MakeUintegerChecker<uint16_t>())
             .AddAttribute("UseMeshUnder",
                           "Use a mesh-under routing protocol.",
-                          BooleanValue(false),
+                          BooleanValue(true),
                           MakeBooleanAccessor(&SixLowPanNetDevice::m_meshUnder),
                           MakeBooleanChecker())
             .AddAttribute("MeshUnderRadius",
@@ -142,6 +143,9 @@ SixLowPanNetDevice::SixLowPanNetDevice()
     m_netDevice = nullptr;
     m_rng = CreateObject<UniformRandomVariable>();
     m_bc0Serial = 0;
+
+    m_record = nullptr;
+    m_record2 = nullptr;
 }
 
 Ptr<NetDevice>
@@ -155,9 +159,18 @@ void
 SixLowPanNetDevice::SetNetDevice(Ptr<NetDevice> device)
 {
     NS_LOG_FUNCTION(this << device);
+
+    // howard: NetDevice 是父類別，LrWpanNetDevice 是子類別，他們之間是繼承關係
+    
+    // m_netDevice 是一個 NetDevice 類型的指標，它指向 LrWpanNetDevice 類型的物件
+    // 儘管這兩個指標的類型不同，但因為是父子關係，所以可以直接進行賦值  
     m_netDevice = device;
 
-    NS_LOG_DEBUG("RegisterProtocolHandler for " << device->GetInstanceTypeId().GetName());
+    // 使用動態多型 (程式在執行時，才確定要執行哪個函式)
+    // 因為 NetDevice 裡面的 Virtual Send() 已經被 LrWpanNetDevice 裡面的 Send() 覆寫
+    // 所以 m_netDevice 調用 Send() 等同於調用 LrWpanNetDevice 裡面的 Send()，以此實現跨層通訊
+    
+    NS_LOG_DEBUG("RegisterProtocolHandler for " << m_netDevice->GetInstanceTypeId().GetName());
 
     uint16_t protocolType = 0;
     if (m_forceEtherType)
@@ -211,6 +224,8 @@ SixLowPanNetDevice::ReceiveFromDevice(Ptr<NetDevice> incomingPort,
                                       PacketType packetType)
 {
     NS_LOG_FUNCTION(this << incomingPort << packet << protocol << src << dst);
+    NS_LOG_INFO("進來ReceiveFromDevice");
+
     uint8_t dispatchRawVal = 0;
     SixLowPanDispatch::Dispatch_e dispatchVal;
     Ptr<Packet> copyPkt = packet->Copy();
@@ -220,326 +235,205 @@ SixLowPanNetDevice::ReceiveFromDevice(Ptr<NetDevice> incomingPort,
     copyPkt->CopyData(&dispatchRawVal, sizeof(dispatchRawVal));
     dispatchVal = SixLowPanDispatch::GetDispatchType(dispatchRawVal);
     bool isPktDecompressed = false;
-    // bool fragmented = false;
+    bool fragmented = false;
 
-    NS_LOG_INFO("src: " << Mac48Address::ConvertFrom(src) << " dst: " << Mac48Address::ConvertFrom(dst));
-    NS_LOG_INFO("Receive packet: " << copyPkt->GetSize() << " bytes");
+    // NS_LOG_DEBUG("Packet received: " << *copyPkt);
+    // NS_LOG_DEBUG("Packet length: " << copyPkt->GetSize());
+    // NS_LOG_DEBUG("Dispatches: " << int(dispatchRawVal) << " - " << int(dispatchVal));
 
-    SixLowPanHelloHeader helloHdr;
-    SixLowPanMesh_GEO meshGEOHdr;
     SixLowPanMesh meshHdr;
     SixLowPanBc0 bc0Hdr;
-    SixLowPanRREQHeader rreqHdr;
-    SixLowPanRREPHeader rrepHdr;
-
-    bool hasHello = false;
-    bool hasRREQ = false;
-    bool hasRREP = false;
     bool hasMesh = false;
-    
-    // howard: LOWPAN_Hello_M = 0x4F
-    if(dispatchVal == SixLowPanDispatch::LOWPAN_Hello_M)
+    bool hasBc0 = false;
+
+    if (dispatchVal == SixLowPanDispatch::LOWPAN_MESH)
     {
-        hasHello = true;
-        copyPkt->RemoveHeader(helloHdr);
+        hasMesh = true;
+        copyPkt->RemoveHeader(meshHdr);
         copyPkt->CopyData(&dispatchRawVal, sizeof(dispatchRawVal));
         dispatchVal = SixLowPanDispatch::GetDispatchType(dispatchRawVal);
     }
-
-    // howard: LOWPAN_MESH = 0x80 (128)  LOWPAN_MESH_GEO = 0x81 (129)
-    // NS_LOG_INFO("dispatchVal = " << dispatchVal);
-    if(dispatchVal == SixLowPanDispatch::LOWPAN_MESH || dispatchVal == SixLowPanDispatch::LOWPAN_MESH_GEO)
+    if (dispatchVal == SixLowPanDispatch::LOWPAN_BC0)
     {
-        if(six_dataflooding || six_direct)
-        {
-            hasMesh = true;
-            copyPkt->RemoveHeader(meshHdr);
-            copyPkt->CopyData(&dispatchRawVal, sizeof(dispatchRawVal));
-            dispatchVal = SixLowPanDispatch::GetDispatchType(dispatchRawVal);
-        }
-        else if(six_greedyrouting)
-        {
-            hasMesh = true;
-            copyPkt->RemoveHeader(meshGEOHdr);
-            copyPkt->CopyData(&dispatchRawVal, sizeof(dispatchRawVal));
-            dispatchVal = SixLowPanDispatch::GetDispatchType(dispatchRawVal);
-        }
-        else if(six_loadrouting)
-        {
-            hasMesh = true;
-            copyPkt->RemoveHeader(meshHdr);
-            copyPkt->CopyData(&dispatchRawVal, sizeof(dispatchRawVal));
-            dispatchVal = SixLowPanDispatch::GetDispatchType(dispatchRawVal);
-        }
-    }
-
-    if(dispatchVal == SixLowPanDispatch::LOWPAN_BC0)
-    {
+        hasBc0 = true;
         copyPkt->RemoveHeader(bc0Hdr);
         copyPkt->CopyData(&dispatchRawVal, sizeof(dispatchRawVal));
         dispatchVal = SixLowPanDispatch::GetDispatchType(dispatchRawVal);
     }
 
-    // howard: LOWPAN_RREQ = 0X51
-    if(dispatchVal == SixLowPanDispatch::LOWPAN_RREQ)
-    {
-        hasRREQ = true;
-        copyPkt->RemoveHeader(rreqHdr);
-        copyPkt->CopyData(&dispatchRawVal, sizeof(dispatchRawVal));
-        dispatchVal = SixLowPanDispatch::GetDispatchType(dispatchRawVal);
+    // HiLow Part
+    if (hasMesh && m_useHiLow) {
+        if (meshHdr.GetFinalDst() != Get16MacFrom48Mac(m_netDevice->GetAddress())) {
+            uint8_t hopsLeft = meshHdr.GetHopsLeft();
+
+            if (hopsLeft == 0) {
+                NS_LOG_LOGIC("Not forwarding packet -- hop limit reached");
+
+            } else if (meshHdr.GetOriginator() == Get16MacFrom48Mac(m_netDevice->GetAddress())) {
+                NS_LOG_LOGIC("Not forwarding packet -- I am the originator");
+                
+            } else if (meshHdr.GetIntermediateHop() == Get16MacFrom48Mac(m_netDevice->GetAddress())) {
+                meshHdr.SetHopsLeft(hopsLeft - 1);
+                Ptr<Packet> sendPkt = copyPkt->Copy();
+
+                // Simulator::Schedule(Time(MilliSeconds(m_meshUnderJitter->GetValue()))
+                //                     , &SixLowPanNetDevice::Send
+                //                     , this
+                //                     , sendPkt
+                //                     , meshHdr.GetFinalDst()
+                //                     , 0);
+            
+                Simulator::Schedule(Time(NanoSeconds(m_meshUnderJitter->GetValue()))
+                                    , &SixLowPanNetDevice::SendHiLow
+                                    , this
+                                    , sendPkt
+                                    , meshHdr.GetFinalDst()
+                                    , 0
+                                    , meshHdr
+                                    , bc0Hdr);
+                
+                // (*m_record)[meshHdr.GetOriginator()].first = Get16MacFrom48Mac(m_netDevice->GetAddress());
+                // (*m_record)[meshHdr.GetOriginator()].second.push_back(Simulator::Now().GetNanoSeconds());
+
+                // for (auto it = (*m_record).begin(); it != (*m_record).end(); ++it) {
+                //     if (it->first == meshHdr.GetOriginator()) {
+                //         it->second.first = Get16MacFrom48Mac(m_netDevice->GetAddress());
+                //         it->second.second.push_back(Simulator::Now().GetNanoSeconds());
+                //     }
+                // }
+            }
+
+            return;
+
+        } 
     }
 
-    // howard: LOWPAN_RREP = 0X52
-    if(dispatchVal == SixLowPanDispatch::LOWPAN_RREP)
+    if (hasMesh)
     {
-        hasRREP = true;
-        copyPkt->RemoveHeader(rrepHdr);
-        copyPkt->CopyData(&dispatchRawVal, sizeof(dispatchRawVal));
-        dispatchVal = SixLowPanDispatch::GetDispatchType(dispatchRawVal);
-    }
-
-    if(hasHello)
-    {
-        SixLowPanHelloHeader hello;
-        if(packet->PeekHeader(hello))
+        if (!hasBc0)
         {
-            Address addr = hello.GetAddress();
-            int16_t x = hello.GetX();
-            int16_t y = hello.GetY();
-            m_neighborTable[addr] = std::make_pair(x, y);
+            NS_LOG_LOGIC("Dropped packet - we only support mesh if it is paired with a BC0");
+            m_dropTrace(DROP_UNKNOWN_EXTENSION, copyPkt, this, GetIfIndex());
             return;
         }
+
+        if (find(m_seenPkts[meshHdr.GetOriginator()].begin(),
+                 m_seenPkts[meshHdr.GetOriginator()].end(),
+                 bc0Hdr.GetSequenceNumber()) != m_seenPkts[meshHdr.GetOriginator()].end()) {
+            NS_LOG_LOGIC("We have already seen this, no further processing.");
+            return;
+
+        } else { // hilow
+            NS_LOG_DEBUG("Packet from: " << Get16MacFrom48Mac(src) << " reached the destination: " << Get16MacFrom48Mac(m_netDevice->GetAddress()));
+            std::cout << Simulator::Now().GetNanoSeconds() << ", " << Get16MacFrom48Mac(m_netDevice->GetAddress())
+                        << " Packet from: " << Get16MacFrom48Mac(src) 
+                        << " reached the destination: " << Get16MacFrom48Mac(m_netDevice->GetAddress()) << std::endl;
+            
+            if (m_record != nullptr) {
+                for (auto it = (*m_record).begin(); it != (*m_record).end(); ++it) {
+                    if (it->first == meshHdr.GetOriginator()) {
+                        it->second.first = Get16MacFrom48Mac(m_netDevice->GetAddress());
+                        it->second.second.push_back(Simulator::Now().GetNanoSeconds());
+                    }
+                }
+            }
+
+            if (m_record2 != nullptr) {
+                for (auto it = (*m_record2).begin(); it != (*m_record2).end(); ++it) {
+                    if (it->first.first == meshHdr.GetOriginator()
+                        && it->first.second == meshHdr.GetFinalDst()) {
+                        it->second[it->second.size() - 1].first = Simulator::Now().GetNanoSeconds();
+                        it->second.push_back(std::make_pair(0, 0));
+                    }
+                }
+            }
+
+            std::cout << std::endl;
+        }
+        
+        // m_seenPkts[meshHdr.GetOriginator()].push_back(bc0Hdr.GetSequenceNumber());
+        // if (m_seenPkts[meshHdr.GetOriginator()].size() > m_meshCacheLength)
+        // {
+        //     m_seenPkts[meshHdr.GetOriginator()].pop_front();
+        // }
+
+        NS_ABORT_MSG_IF(!Mac16Address::IsMatchingType(meshHdr.GetFinalDst()),
+                        "SixLowPan mesh-under flooding can not currently handle extended address "
+                        "final destinations: "
+                            << meshHdr.GetFinalDst());
+        NS_ABORT_MSG_IF(!Mac48Address::IsMatchingType(m_netDevice->GetAddress()),
+                        "SixLowPan mesh-under flooding can not currently handle devices using "
+                        "extended addresses: "
+                            << m_netDevice->GetAddress());
+
+        Mac16Address finalDst = Mac16Address::ConvertFrom(meshHdr.GetFinalDst());
+
+        // See if the packet is for others than me. In case forward it.
+        if (meshHdr.GetFinalDst() != Get16MacFrom48Mac(m_netDevice->GetAddress()) ||
+            finalDst.IsBroadcast() || finalDst.IsMulticast())
+        {
+            uint8_t hopsLeft = meshHdr.GetHopsLeft();
+
+            if (hopsLeft == 0)
+            {
+                NS_LOG_LOGIC("Not forwarding packet -- hop limit reached");
+            }
+            else if (meshHdr.GetOriginator() == Get16MacFrom48Mac(m_netDevice->GetAddress()))
+            {
+                NS_LOG_LOGIC("Not forwarding packet -- I am the originator");
+            }
+            else
+            {
+                meshHdr.SetHopsLeft(hopsLeft - 1);
+                Ptr<Packet> sendPkt = copyPkt->Copy();
+                sendPkt->AddHeader(bc0Hdr);
+                sendPkt->AddHeader(meshHdr);
+                Simulator::Schedule(Time(MilliSeconds(m_meshUnderJitter->GetValue())),
+                                    &NetDevice::Send,
+                                    m_netDevice,
+                                    sendPkt,
+                                    m_netDevice->GetBroadcast(),
+                                    protocol);
+            }
+
+            if (!finalDst.IsBroadcast() && !finalDst.IsMulticast())
+            {
+                return;
+            }
+
+        } 
     }
-
-    if(hasMesh)
-    {
-        if(six_dataflooding)
-        {
-            if(find(m_seenPkts[meshHdr.GetOriginator()].begin(), m_seenPkts[meshHdr.GetOriginator()].end(),
-                 bc0Hdr.GetSequenceNumber()) != m_seenPkts[meshHdr.GetOriginator()].end())
-            {
-                NS_LOG_INFO("We have already seen this, no further processing.");
-                return;
-            }
-
-            m_seenPkts[meshHdr.GetOriginator()].push_back(bc0Hdr.GetSequenceNumber());
-            if (m_seenPkts[meshHdr.GetOriginator()].size() > m_meshCacheLength)
-            {
-                m_seenPkts[meshHdr.GetOriginator()].pop_front();
-            }
-
-            // See if the packet is for others than me. In case forward it.
-            if(meshHdr.GetFinalDst() != Get16MacFrom48Mac(m_netDevice->GetAddress()))
-            {
-                uint8_t hopsLeft = meshHdr.GetHopsLeft();
-                // NS_LOG_INFO("meshHdr.SetHopsLeft = " << std::to_string(meshHdr.GetHopsLeft()));
-                // NS_LOG_INFO("hopsLeft = " << std::to_string(hopsLeft));
-                if(hopsLeft == 0)
-                {
-                    NS_LOG_INFO("Not forwarding packet -- hop limit reached");
-                }
-                else if(meshHdr.GetOriginator() == Get16MacFrom48Mac(m_netDevice->GetAddress()))
-                {
-                    NS_LOG_INFO("Not forwarding packet -- I am the originator");
-                }
-                else
-                {
-                    meshHdr.SetHopsLeft(hopsLeft - 1);
-                    Ptr<Packet> sendPkt = copyPkt->Copy();
-                    // NS_LOG_INFO("收到後還沒加任何 header " << sendPkt->GetSize() << " bytes");
-                    sendPkt->AddHeader(bc0Hdr);
-                    // NS_LOG_INFO("加上廣播 header " << sendPkt->GetSize() << " bytes");
-                    sendPkt->AddHeader(meshHdr);
-                    // NS_LOG_INFO("加上mesh header " << sendPkt->GetSize() << " bytes");
-                    // howard: 這裡要改，應該要讓 mac 去計算
-                    // Simulator::Schedule(Time(MilliSeconds(m_meshUnderJitter->GetValue())),
-                    //                     &NetDevice::Send,
-                    //                     m_netDevice,
-                    //                     sendPkt,
-                    //                     m_netDevice->GetBroadcast(),
-                    //                     protocol);
-                    Simulator::ScheduleNow(&NetDevice::Send, m_netDevice, sendPkt, m_netDevice->GetBroadcast(), protocol);
-                }
-                return;
-            }
-            else
-            {
-                NS_LOG_INFO("已經收到封包了，之後不再轉傳");
-            }
-        }
-        else if(six_greedyrouting)
-        {
-            if(meshGEOHdr.GetFinalDst() != Get16MacFrom48Mac(m_netDevice->GetAddress()))
-            {
-                uint8_t hopsLeft = meshGEOHdr.GetHopsLeft();
-                if(hopsLeft == 0)
-                {
-                    NS_LOG_INFO("Not forwarding packet -- hop limit reached");
-                    return;
-                }
-                else
-                {
-                    meshGEOHdr.SetHopsLeft(hopsLeft - 1);
-                    Ptr<Packet> sendPkt = copyPkt->Copy();
-                    sendPkt->AddHeader(meshGEOHdr);
-                    Simulator::ScheduleNow(&SixLowPanNetDevice::DoSendGreedyForwarding, this, sendPkt, meshGEOHdr.GetFinalDst(), protocol);
-                }
-            }
-            else
-            {
-                NS_LOG_INFO("已經收到封包了，之後不再轉傳");
-            }
-        }
-        else if(hasRREQ)
-        {
-            if(find(m_seenPkts[meshHdr.GetOriginator()].begin(), m_seenPkts[meshHdr.GetOriginator()].end(),
-                 bc0Hdr.GetSequenceNumber()) != m_seenPkts[meshHdr.GetOriginator()].end())
-            {
-                NS_LOG_INFO("We have already seen this, no further processing.");
-                return;
-            }
-
-            m_seenPkts[meshHdr.GetOriginator()].push_back(bc0Hdr.GetSequenceNumber());
-            if (m_seenPkts[meshHdr.GetOriginator()].size() > m_meshCacheLength)
-            {
-                m_seenPkts[meshHdr.GetOriginator()].pop_front();
-            }
-
-            if(meshHdr.GetFinalDst() != Get16MacFrom48Mac(m_netDevice->GetAddress()))
-            {
-                uint8_t hopsLeft = meshHdr.GetHopsLeft();
-                if(hopsLeft == 0)
-                {
-                    NS_LOG_INFO("Not forwarding packet -- hop limit reached");
-                }
-                else if(meshHdr.GetOriginator() == Get16MacFrom48Mac(m_netDevice->GetAddress()))
-                {
-                    NS_LOG_INFO("Not forwarding packet -- I am the originator");
-                }
-                else
-                {
-                    LoadEntry entry;
-                    entry.nextAddr = Get16MacFrom48Mac(src);
-                    m_loadTable[meshHdr.GetOriginator()] = entry;
-
-                    meshHdr.SetHopsLeft(hopsLeft - 1);
-                    Ptr<Packet> sendPkt = copyPkt->Copy();
-                    sendPkt->AddHeader(rreqHdr);
-                    sendPkt->AddHeader(bc0Hdr);
-                    sendPkt->AddHeader(meshHdr);
-                    Simulator::ScheduleNow(&SixLowPanNetDevice::DoSendRREQ, this, sendPkt, m_netDevice->GetBroadcast());
-                }
-                return;
-            }
-            else
-            {
-                LoadEntry entry;
-                entry.nextAddr = Get16MacFrom48Mac(src);
-                m_loadTable[meshHdr.GetOriginator()] = entry;
-
-                NS_LOG_INFO("已經收到封包了，之後不再轉傳 RREQ");
-
-                Ptr<Packet> p = Create<Packet>();  // RREP 封包
-                Simulator::ScheduleNow(&SixLowPanNetDevice::SendRREP, this, p, meshHdr.GetOriginator());
-                return;
-            }
-        }
-        else if(hasRREP)
-        {
-            if(meshHdr.GetFinalDst() != Get16MacFrom48Mac(m_netDevice->GetAddress()))
-            {
-                uint8_t hopsLeft = meshHdr.GetHopsLeft();
-                if(hopsLeft == 0)
-                {
-                    NS_LOG_INFO("Not forwarding packet -- hop limit reached");
-                }
-                else
-                {
-                    LoadEntry entry;
-                    entry.nextAddr = Get16MacFrom48Mac(src);
-                    m_loadTable[meshHdr.GetOriginator()] = entry;
-
-                    meshHdr.SetHopsLeft(hopsLeft - 1);
-                    Ptr<Packet> sendPkt = copyPkt->Copy();
-                    sendPkt->AddHeader(rrepHdr);
-                    sendPkt->AddHeader(meshHdr);
-                    Simulator::ScheduleNow(&SixLowPanNetDevice::DoSendRREP, this, sendPkt);
-                }
-                return;
-            }
-            else
-            {
-                LoadEntry entry;
-                entry.nextAddr = Get16MacFrom48Mac(src);
-                m_loadTable[meshHdr.GetOriginator()] = entry;
-
-                NS_LOG_INFO("收到 RREP，開始轉傳封包");
-
-                Simulator::ScheduleNow(&SixLowPanNetDevice::DoSendLoad, this);
-                return;
-            }
-        }
-        else if(six_loadrouting)
-        {
-            if(meshHdr.GetFinalDst() != Get16MacFrom48Mac(m_netDevice->GetAddress()))
-            {
-                uint8_t hopsLeft = meshHdr.GetHopsLeft();
-                if(hopsLeft == 0)
-                {
-                    NS_LOG_INFO("Not forwarding packet -- hop limit reached");
-                    return;
-                }
-                else
-                {
-                    meshHdr.SetHopsLeft(hopsLeft - 1);
-                    Ptr<Packet> sendPkt = copyPkt->Copy();
-                    sendPkt->AddHeader(meshHdr);
-                    Simulator::ScheduleNow(&SixLowPanNetDevice::DoSendLoadForwarding, this, sendPkt);
-                }
-            }
-            else
-            {
-                NS_LOG_INFO("已經收到封包了，之後不再轉傳");
-            }
-        }
-        else if(six_direct)
-        {
-            NS_LOG_INFO("已經收到封包了");
-        }
-    }
-
-    // howard: 只有目標節點會進來這裡
 
     Address realDst = dst;
     Address realSrc = src;
-    // if (hasMesh)
-    // {
-    //     realSrc = meshHdr.GetOriginator();
-    //     realDst = meshHdr.GetFinalDst();
-    // }
+    if (hasMesh)
+    {
+        realSrc = meshHdr.GetOriginator();
+        realDst = meshHdr.GetFinalDst();
+    }
 
-    // if (dispatchVal == SixLowPanDispatch::LOWPAN_FRAG1)
-    // {
-    //     isPktDecompressed = ProcessFragment(copyPkt, realSrc, realDst, true);
-    //     fragmented = true;
-    // }
-    // else if (dispatchVal == SixLowPanDispatch::LOWPAN_FRAGN)
-    // {
-    //     isPktDecompressed = ProcessFragment(copyPkt, realSrc, realDst, false);
-    //     fragmented = true;
-    // }
-    // if (fragmented)
-    // {
-    //     if (!isPktDecompressed)
-    //     {
-    //         return;
-    //     }
-    //     else
-    //     {
-    //         copyPkt->CopyData(&dispatchRawVal, sizeof(dispatchRawVal));
-    //         dispatchVal = SixLowPanDispatch::GetDispatchType(dispatchRawVal);
-    //     }
-    // }
+    if (dispatchVal == SixLowPanDispatch::LOWPAN_FRAG1)
+    {
+        isPktDecompressed = ProcessFragment(copyPkt, realSrc, realDst, true);
+        fragmented = true;
+    }
+    else if (dispatchVal == SixLowPanDispatch::LOWPAN_FRAGN)
+    {
+        isPktDecompressed = ProcessFragment(copyPkt, realSrc, realDst, false);
+        fragmented = true;
+    }
+    if (fragmented)
+    {
+        if (!isPktDecompressed)
+        {
+            return;
+        }
+        else
+        {
+            copyPkt->CopyData(&dispatchRawVal, sizeof(dispatchRawVal));
+            dispatchVal = SixLowPanDispatch::GetDispatchType(dispatchRawVal);
+        }
+    }
 
     switch (dispatchVal)
     {
@@ -552,7 +446,7 @@ SixLowPanNetDevice::ReceiveFromDevice(Ptr<NetDevice> incomingPort,
         }
         break;
     case SixLowPanDispatch::LOWPAN_HC1:
-        if(six_useHC1)
+        if (m_useIphc)
         {
             m_dropTrace(DROP_DISALLOWED_COMPRESSION, copyPkt, this, GetIfIndex());
             return;
@@ -560,21 +454,21 @@ SixLowPanNetDevice::ReceiveFromDevice(Ptr<NetDevice> incomingPort,
         DecompressLowPanHc1(copyPkt, realSrc, realDst);
         isPktDecompressed = true;
         break;
-    // case SixLowPanDispatch::LOWPAN_IPHC:
-    //     if (!m_useIphc)
-    //     {
-    //         m_dropTrace(DROP_DISALLOWED_COMPRESSION, copyPkt, this, GetIfIndex());
-    //         return;
-    //     }
-    //     if (DecompressLowPanIphc(copyPkt, realSrc, realDst))
-    //     {
-    //         m_dropTrace(DROP_SATETFUL_DECOMPRESSION_PROBLEM, copyPkt, this, GetIfIndex());
-    //     }
-    //     else
-    //     {
-    //         isPktDecompressed = true;
-    //     }
-    //     break;
+    case SixLowPanDispatch::LOWPAN_IPHC:
+        if (!m_useIphc)
+        {
+            m_dropTrace(DROP_DISALLOWED_COMPRESSION, copyPkt, this, GetIfIndex());
+            return;
+        }
+        if (DecompressLowPanIphc(copyPkt, realSrc, realDst))
+        {
+            m_dropTrace(DROP_SATETFUL_DECOMPRESSION_PROBLEM, copyPkt, this, GetIfIndex());
+        }
+        else
+        {
+            isPktDecompressed = true;
+        }
+        break;
     default:
         NS_LOG_DEBUG("Unsupported 6LoWPAN encoding: dropping.");
         m_dropTrace(DROP_UNKNOWN_EXTENSION, copyPkt, this, GetIfIndex());
@@ -598,7 +492,7 @@ SixLowPanNetDevice::ReceiveFromDevice(Ptr<NetDevice> incomingPort,
                             realDst,
                             packetType);
     }
-
+    
     m_rxCallback(this, copyPkt, Ipv6L3Protocol::PROT_NUMBER, realSrc);
 }
 
@@ -759,294 +653,12 @@ SixLowPanNetDevice::Send(Ptr<Packet> packet, const Address& dest, uint16_t proto
     return ret;
 }
 
-bool
-SixLowPanNetDevice::SendHello(Ptr<Packet> packet, int16_t x, int16_t y)
-{
+bool SixLowPanNetDevice::SendHiLow(Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber, SixLowPanMesh meshHdr, SixLowPanBc0 bc0Hdr) {
+    NS_LOG_FUNCTION(this << *packet << dest << protocolNumber);
     bool ret = false;
-    SixLowPanHelloHeader hello;
-    hello.SetInfo(Mac16Address::ConvertFrom(Get16MacFrom48Mac(m_netDevice->GetAddress())), x, y);
-    packet->AddHeader(hello);
-    NS_LOG_INFO(Mac16Address::ConvertFrom(Get16MacFrom48Mac(m_netDevice->GetAddress())));
-    NS_LOG_INFO("Sending packet to the MAC layer: " << packet->GetSize() << " bytes");
-    ret = m_netDevice->Send(packet, m_netDevice->GetBroadcast(), 0x86DD);
-    return ret;
-}
+    Address src;
 
-bool
-SixLowPanNetDevice::SendLoad(Ptr<Packet> packet, const Address& dest)
-{
-    Ptr<Packet> origPacket = packet->Copy();
-    uint32_t origHdrSize = 0;
-    LoadPacket = packet->Copy();
-    bool ret = false;
-
-    if(six_useHC1)
-    {
-        origHdrSize += CompressLowPanHc1(LoadPacket, m_netDevice->GetAddress(), dest);
-    }
-
-    SixLowPanMesh meshHdr;
-    Address source = m_netDevice->GetAddress();
-    Address destination = dest;
-
-    if(Mac48Address::IsMatchingType(source))
-    {
-        // We got a Mac48 pseudo-MAC. We need its original Mac16 here.
-        source = Get16MacFrom48Mac(source);
-    }
-    if(Mac48Address::IsMatchingType(destination))
-    {
-        // We got a Mac48 pseudo-MAC. We need its original Mac16 here.
-        destination = Get16MacFrom48Mac(destination);
-    }
-
-    meshHdr.SetOriginator(source);
-    meshHdr.SetFinalDst(destination);
-    meshHdr.SetHopsLeft(0XF);
-
-    LoadPacket->AddHeader(meshHdr);
-
-    Ptr<Packet> p = Create<Packet>();  // 空 packet
-    Simulator::ScheduleNow(&SixLowPanNetDevice::SendRREQ, this, p, meshHdr.GetFinalDst());
-    return ret;
-}
-
-bool
-SixLowPanNetDevice::DoSendLoad()
-{
-    bool ret = false;
-    SixLowPanMesh meshHdr;
-    LoadPacket->PeekHeader(meshHdr);
-
-    m_txTrace(LoadPacket, this, GetIfIndex());
-
-    if(six_meshUnder)
-    {
-        if(six_loadrouting)
-        {
-            NS_LOG_INFO("Mesh Header: " << meshHdr.GetSerializedSize() << " bytes");
-        }
-    }
-
-    Address nextAddress;
-    if(auto it = m_loadTable.find(meshHdr.GetFinalDst()); it != m_loadTable.end())
-    {
-        nextAddress = it->second.nextAddr;
-    }
-    else
-    {
-        NS_LOG_INFO("路由表中沒有路徑");
-    }
-
-    NS_LOG_INFO("Sending packet to the MAC layer: " << LoadPacket->GetSize() << " bytes");
-    ret = m_netDevice->Send(LoadPacket, nextAddress, 0x86DD);
-    return ret;
-}
-
-bool
-SixLowPanNetDevice::DoSendLoadForwarding(Ptr<Packet> packet)
-{
-    bool ret = false;
-    SixLowPanMesh meshHdr;
-
-    packet->PeekHeader(meshHdr);
-
-    m_txTrace(packet, this, GetIfIndex());
-
-    if(six_meshUnder)
-    {
-        if(six_loadrouting)
-        {
-            NS_LOG_INFO("Mesh Header: " << meshHdr.GetSerializedSize() << " bytes");
-        }
-    }
-
-    Address nextAddress;
-    if(auto it = m_loadTable.find(meshHdr.GetFinalDst()); it != m_loadTable.end())
-    {
-        nextAddress = it->second.nextAddr;
-    }
-    else
-    {
-        NS_LOG_INFO("路由表中沒有路徑");
-    }
-
-    NS_LOG_INFO("Sending packet to the MAC layer: " << packet->GetSize() << " bytes");
-    ret = m_netDevice->Send(packet, nextAddress, 0x86DD);
-    return ret;
-}
-
-bool
-SixLowPanNetDevice::SendRREQ(Ptr<Packet> packet, const Address& dest)
-{
-    bool ret = false;
-    SixLowPanMesh meshHdr;
-    SixLowPanBc0 bc0Hdr;
-    SixLowPanRREQHeader rreqHdr;
-
-    Address source = m_netDevice->GetAddress();
-    Address destination = dest;
-
-    if(Mac48Address::IsMatchingType(source))
-    {
-        // We got a Mac48 pseudo-MAC. We need its original Mac16 here.
-        source = Get16MacFrom48Mac(source);
-    }
-    if(Mac48Address::IsMatchingType(destination))
-    {
-        // We got a Mac48 pseudo-MAC. We need its original Mac16 here.
-        destination = Get16MacFrom48Mac(destination);
-    }
-
-    meshHdr.SetOriginator(source);
-    meshHdr.SetFinalDst(destination);
-    meshHdr.SetHopsLeft(0XF);
-
-    if(six_loadrouting)
-    {
-        destination = m_netDevice->GetBroadcast();
-    }
-
-    m_txTrace(packet, this, GetIfIndex());
-
-    if(six_meshUnder)
-    {
-        if(six_loadrouting)
-        {
-            packet->AddHeader(rreqHdr);
-            NS_LOG_INFO("RREQ DSP: " << rreqHdr.GetSerializedSize() << " bytes");
-
-            bc0Hdr.SetSequenceNumber(m_bc0Serial++);
-            packet->AddHeader(bc0Hdr);
-            NS_LOG_INFO("Broadcast DSP & Header: " << bc0Hdr.GetSerializedSize() << " bytes");
-        }
-        packet->AddHeader(meshHdr);
-        NS_LOG_INFO("Mesh DSP & Header: " << meshHdr.GetSerializedSize() << " bytes");
-    }
-
-    NS_LOG_INFO("Sending packet to the MAC layer: " << packet->GetSize() << " bytes");
-    ret = m_netDevice->Send(packet, m_netDevice->GetBroadcast(), 0x86DD);
-    return ret;
-}
-
-bool
-SixLowPanNetDevice::DoSendRREQ(Ptr<Packet> packet, const Address& dest)
-{
-    bool ret = false;
-    SixLowPanMesh meshHdr;
-    SixLowPanBc0 bc0Hdr;
-    SixLowPanRREQHeader rreqHdr;
-
-    packet->PeekHeader(meshHdr);
-    packet->PeekHeader(bc0Hdr);
-    packet->PeekHeader(rreqHdr);
-
-    m_txTrace(packet, this, GetIfIndex());
-
-    if(six_meshUnder)
-    {
-        if(six_loadrouting)
-        {
-            NS_LOG_INFO("RREQ DSP: " << rreqHdr.GetSerializedSize() << " bytes");
-            NS_LOG_INFO("Broadcast DSP & Header: " << bc0Hdr.GetSerializedSize() << " bytes");
-            NS_LOG_INFO("Mesh DSP & Header: " << meshHdr.GetSerializedSize() << " bytes");
-        }
-    }
-
-    NS_LOG_INFO("Sending packet to the MAC layer: " << packet->GetSize() << " bytes");
-    ret = m_netDevice->Send(packet, m_netDevice->GetBroadcast(), 0x86DD);
-    return ret;
-}
-
-bool
-SixLowPanNetDevice::SendRREP(Ptr<Packet> packet, const Address& dest)
-{
-    bool ret = false;
-    SixLowPanMesh meshHdr;
-    SixLowPanRREPHeader rrepHdr;
-
-    Address source = m_netDevice->GetAddress();
-    Address destination = dest;
-    // NS_LOG_INFO("destination = " << destination);
-
-    if(Mac48Address::IsMatchingType(source))
-    {
-        // We got a Mac48 pseudo-MAC. We need its original Mac16 here.
-        source = Get16MacFrom48Mac(source);
-        // NS_LOG_INFO("Source = " << source);
-    }
-    if(Mac48Address::IsMatchingType(destination))
-    {
-        // We got a Mac48 pseudo-MAC. We need its original Mac16 here.
-        destination = Get16MacFrom48Mac(destination);
-        // NS_LOG_INFO("destination = " << destination);
-    }
-
-    meshHdr.SetOriginator(source);
-    meshHdr.SetFinalDst(destination);
-    meshHdr.SetHopsLeft(0XF);
-
-    m_txTrace(packet, this, GetIfIndex());
-
-    if(six_meshUnder)
-    {
-        if(six_loadrouting)
-        {
-            packet->AddHeader(rrepHdr);
-            NS_LOG_INFO("RREP DSP: " << rrepHdr.GetSerializedSize() << " bytes");
-        }
-        packet->AddHeader(meshHdr);
-        NS_LOG_INFO("Mesh DSP & Header: " << meshHdr.GetSerializedSize() << " bytes");
-    }
-
-    Address nextAddress;
-    if(auto it = m_loadTable.find(destination); it != m_loadTable.end())
-    {
-        nextAddress = it->second.nextAddr;
-    }
-    else
-    {
-        NS_LOG_INFO("路由表中沒有路徑");
-    }
-
-    NS_LOG_INFO("Sending packet to the MAC layer: " << packet->GetSize() << " bytes");
-    ret = m_netDevice->Send(packet, nextAddress, 0x86DD);
-    return ret;
-}
-
-bool
-SixLowPanNetDevice::DoSendRREP(Ptr<Packet> packet)
-{
-    bool ret = false;
-    SixLowPanMesh meshHdr;
-    SixLowPanRREPHeader rrepHdr;
-
-    packet->PeekHeader(meshHdr);
-    packet->PeekHeader(rrepHdr);
-
-    m_txTrace(packet, this, GetIfIndex());
-
-    if(six_meshUnder)
-    {
-        if(six_loadrouting)
-        {
-            NS_LOG_INFO("RREP Header: " << rrepHdr.GetSerializedSize() << " bytes");
-            NS_LOG_INFO("Mesh Header: " << meshHdr.GetSerializedSize() << " bytes");
-        }
-    }
-
-    Address nextAddress;
-    if(auto it = m_loadTable.find(meshHdr.GetFinalDst()); it != m_loadTable.end())
-    {
-        nextAddress = it->second.nextAddr;
-    }
-    else
-    {
-        NS_LOG_INFO("路由表中沒有路徑");
-    }
-
-    NS_LOG_INFO("Sending packet to the MAC layer: " << packet->GetSize() << " bytes");
-    ret = m_netDevice->Send(packet, nextAddress, 0x86DD);
+    ret = DoSendHiLow(packet, src, dest, protocolNumber, false, meshHdr, bc0Hdr);
     return ret;
 }
 
@@ -1057,127 +669,10 @@ SixLowPanNetDevice::SendFrom(Ptr<Packet> packet,
                              uint16_t protocolNumber)
 {
     NS_LOG_FUNCTION(this << *packet << src << dest << protocolNumber);
+    NS_LOG_INFO("進來SendFrom");
     bool ret = false;
 
     ret = DoSend(packet, src, dest, protocolNumber, true);
-    return ret;
-}
-
-bool
-SixLowPanNetDevice::DoSendGreedy(Ptr<Packet> packet, const Address& dest, int16_t x, int16_t y, uint16_t protocolNumber)
-{
-    Ptr<Packet> origPacket = packet->Copy();
-    uint32_t origHdrSize = 0;
-    bool ret = false;
-
-    Address destination = dest;
-
-    if(six_useHC1)
-    {
-        origHdrSize += CompressLowPanHc1(packet, m_netDevice->GetAddress(), destination);
-    }
-
-    SixLowPanMesh_GEO meshGEOHdr;
-
-    meshGEOHdr.SetDstPosition(x, y);
-
-    Address source = m_netDevice->GetAddress();
-
-    if(Mac48Address::IsMatchingType(source))
-    {
-        // We got a Mac48 pseudo-MAC. We need its original Mac16 here.
-        source = Get16MacFrom48Mac(source);
-    }
-    if(Mac48Address::IsMatchingType(destination))
-    {
-        // We got a Mac48 pseudo-MAC. We need its original Mac16 here.
-        destination = Get16MacFrom48Mac(destination);
-    }
-
-    meshGEOHdr.SetOriginator(source);
-    meshGEOHdr.SetFinalDst(destination);
-
-    // howard: 目前讓它可以支援 1~0XF (15) 送 1 bytes
-    //         但送 15 以上的封包會怪怪的，還要去看 header 怎麼設定
-    meshGEOHdr.SetHopsLeft(0XF);
-
-    // 計算哪個鄰居最近
-    Address bestNeighborAddr;
-    double minDistance = std::numeric_limits<double>::max();
-    int16_t dstX = meshGEOHdr.GetX();
-    int16_t dstY = meshGEOHdr.GetY();
-
-    for(const auto & entry : m_neighborTable)
-    {
-        int16_t dx = entry.second.first;
-        int16_t dy = entry.second.second;
-        double dist = std::sqrt((dstX - dx) * (dstX - dx) + (dstY - dy) * (dstY - dy));
-
-        if(dist < minDistance)
-        {
-            minDistance = dist;
-            bestNeighborAddr = entry.first;  // 更新最近的節點位址
-        }
-    }
-
-    m_txTrace(packet, this, GetIfIndex());
-
-    packet->AddHeader(meshGEOHdr);
-    NS_LOG_INFO("MeshGEO DSP & Header: " << meshGEOHdr.GetSerializedSize() << " bytes");
-
-    NS_LOG_INFO("Sending packet to the MAC layer: " << packet->GetSize() << " bytes");
-
-    NS_LOG_INFO("Forwarding to nearest neighbor: " << Mac16Address::ConvertFrom(bestNeighborAddr));
-    destination = bestNeighborAddr;
-
-    // 傳封包到下層
-    ret = m_netDevice->Send(packet, destination, protocolNumber);
-
-    return ret;
-}
-
-bool
-SixLowPanNetDevice::DoSendGreedyForwarding(Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber)
-{
-    bool ret = false;
-
-    Address destination = dest;
-
-    SixLowPanMesh_GEO meshGEOHdr;
-
-    packet->PeekHeader(meshGEOHdr);
-    
-    // 計算哪個鄰居最近
-    Address bestNeighborAddr;
-    double minDistance = std::numeric_limits<double>::max();
-    int16_t dstX = meshGEOHdr.GetX();
-    int16_t dstY = meshGEOHdr.GetY();
-
-    for(const auto & entry : m_neighborTable)
-    {
-        int16_t nx = entry.second.first;
-        int16_t ny = entry.second.second;
-        double dist = std::sqrt((dstX - nx) * (dstX - nx) + (dstY - ny) * (dstY - ny));
-
-        if(dist < minDistance)
-        {
-            minDistance = dist;
-            bestNeighborAddr = entry.first;  // 更新最近的節點位址
-        }
-    }
-
-    m_txTrace(packet, this, GetIfIndex());
-
-    NS_LOG_INFO("MeshGEO DSP & Header: " << meshGEOHdr.GetSerializedSize() << " bytes");
-
-    NS_LOG_INFO("Sending packet to the MAC layer: " << packet->GetSize() << " bytes");
-
-    NS_LOG_INFO("Forwarding to nearest neighbor: " << Mac16Address::ConvertFrom(bestNeighborAddr));
-    destination = bestNeighborAddr;
-
-    // 傳封包到下層
-    ret = m_netDevice->Send(packet, destination, protocolNumber);
-
     return ret;
 }
 
@@ -1188,150 +683,582 @@ SixLowPanNetDevice::DoSend(Ptr<Packet> packet,
                            uint16_t protocolNumber,
                            bool doSendFrom)
 {
-    NS_LOG_FUNCTION(this << *packet << src << dest << protocolNumber << doSendFrom);
-    NS_ASSERT_MSG(m_netDevice, "Sixlowpan: can't find any lower-layer protocol " << m_netDevice);
 
     Ptr<Packet> origPacket = packet->Copy();
     uint32_t origHdrSize = 0;
-    // uint32_t origPacketSize = packet->GetSize();
+    uint32_t origPacketSize = packet->GetSize();
     bool ret = false;
 
     Address destination = dest;
 
-    // bool useMesh = m_meshUnder;
+    bool useMesh = m_meshUnder;
 
-    // if (m_forceEtherType)
+    if (m_forceEtherType)
+    {
+        protocolNumber = m_etherType;
+    }
+
+    // if (m_useIphc)
     // {
-    //     protocolNumber = m_etherType;
+    //     NS_LOG_LOGIC("Compressing packet using IPHC");
+    //     origHdrSize += CompressLowPanIphc(packet, m_netDevice->GetAddress(), destination);
+    // }
+    // else
+    // {
+    //     NS_LOG_LOGIC("Compressing packet using HC1");
+    //     origHdrSize += CompressLowPanHc1(packet, m_netDevice->GetAddress(), destination);
     // }
 
-    if(six_useHC1)
-    {
-        // NS_LOG_INFO("Compressing packet using HC1");
-
-        // m_netDevice->GetAddress() 為該節點的 MAC Address
-        origHdrSize += CompressLowPanHc1(packet, m_netDevice->GetAddress(), destination);
-    }
+    NS_LOG_LOGIC("Compressing packet using HC1");
+    origHdrSize += CompressLowPanHc1(packet, m_netDevice->GetAddress(), destination);
 
     uint16_t pktSize = packet->GetSize();
 
     SixLowPanMesh meshHdr;
     SixLowPanBc0 bc0Hdr;
-    // uint32_t extraHdrSize = 0;
+    uint32_t extraHdrSize = 0;
 
-    if(six_meshUnder)
+    if(useMesh)
     {
-        Address source = m_netDevice->GetAddress();
+        Address source = src;
+
+        if(!doSendFrom)
+        {
+            source = m_netDevice->GetAddress();
+        }
 
         if(Mac48Address::IsMatchingType(source))
         {
             // We got a Mac48 pseudo-MAC. We need its original Mac16 here.
-            // NS_LOG_INFO("source1 = " << source);
             source = Get16MacFrom48Mac(source);
-            // NS_LOG_INFO("source2 = " << source);
         }
+
         if(Mac48Address::IsMatchingType(destination))
         {
             // We got a Mac48 pseudo-MAC. We need its original Mac16 here.
-            // NS_LOG_INFO("destination1 = " << destination);
             destination = Get16MacFrom48Mac(destination);
-            // NS_LOG_INFO("destination2 = " << destination);
         }
 
         meshHdr.SetOriginator(source);
         meshHdr.SetFinalDst(destination);
 
-        // howard: 目前讓它可以支援 1~0XF (15) 送 1 bytes
-        //         但送 15 以上的封包會怪怪的，還要去看 header 怎麼設定
-        meshHdr.SetHopsLeft(0XF);
-        // NS_LOG_INFO("meshHdr.SetHopsLeft = " << std::to_string(meshHdr.GetHopsLeft()));
+        // meshHdr.SetHopsLeft(m_meshUnderHopsLeft);
+        
+        // hilow
+        meshHdr.SetHopsLeft(0xF);
 
-        if(six_dataflooding)
-        {
-            destination = m_netDevice->GetBroadcast();
-            // NS_LOG_INFO("destination = " << destination);
-        }
-
+        // hilow
+        // destination = m_netDevice->GetBroadcast();
         // We are storing sum of mesh and bc0 header sizes. We will need it if packet is fragmented.
-        // extraHdrSize = meshHdr.GetSerializedSize() + bc0Hdr.GetSerializedSize();
-        // pktSize += extraHdrSize;
+        extraHdrSize = meshHdr.GetSerializedSize() + bc0Hdr.GetSerializedSize();
+        pktSize += extraHdrSize;
+
+        if (m_record2 != nullptr) {
+            if ((*m_record2).count({source, destination}) == 0) {
+                // (*m_record2)[{source, destination}] = {};
+                // (*m_record2)[{source, destination}] = {std::make_pair(0, Simulator::Now().GetNanoSeconds())};
+                DynamicCast<LrWpanNetDevice>(m_netDevice)->PassRecordKeyAndValue(std::make_pair(source, destination), 0);
+
+            } else {
+                DynamicCast<LrWpanNetDevice>(m_netDevice)->PassRecordKeyAndValue({source, destination}, (*m_record2)[{source, destination}].size());
+            }
+        }
     }
 
-    // if (pktSize < m_compressionThreshold)
-    // {
-    //     NS_LOG_LOGIC("Compressed packet too short, using uncompressed one");
-    //     packet = origPacket;
-    //     SixLowPanIpv6 ipv6UncompressedHdr;
-    //     packet->AddHeader(ipv6UncompressedHdr);
-    //     pktSize = packet->GetSize();
-    //     if (useMesh)
-    //     {
-    //         pktSize += meshHdr.GetSerializedSize() + bc0Hdr.GetSerializedSize();
-    //     }
-    // }
+    if (pktSize < m_compressionThreshold) {
+        NS_LOG_LOGIC("Compressed packet too short, using uncompressed one");
+        packet = origPacket;
+        SixLowPanIpv6 ipv6UncompressedHdr;
+        packet->AddHeader(ipv6UncompressedHdr);
+        pktSize = packet->GetSize();
 
-    if(pktSize > m_netDevice->GetMtu())
+        if (useMesh) {
+            pktSize += meshHdr.GetSerializedSize() + bc0Hdr.GetSerializedSize();
+        }
+    }
+
+    // HiLow Part
+    if (useMesh && m_useHiLow) {
+        // NS_LOG_DEBUG("Mesh Header Hops Left: " << (uint32_t) meshHdr.GetHopsLeft());
+        // NS_LOG_DEBUG("Mesh Header Source: " << meshHdr.GetOriginator());
+        // NS_LOG_DEBUG("Mesh Header Destination: " << meshHdr.GetFinalDst());
+
+        Mac16Address dst16;
+        uint8_t buf[6];
+        m_netDevice->GetAddress().CopyTo(buf);
+        dst16.CopyFrom(buf + 4);
+
+        uint8_t idBuf[2];
+        dst16.CopyTo(idBuf);
+
+        uint16_t hilowNum = 0;
+        hilowNum += (idBuf[0]);
+        hilowNum += (idBuf[1]);
+        hilowNum -= 1;
+
+        uint16_t origHilowNum = hilowNum;
+
+        NS_LOG_DEBUG("Current Node HiLow Short Addr: " << dst16);
+        NS_LOG_DEBUG("Current Node HiLow Numbering: " << hilowNum);
+
+        uint16_t ascendantAddr = ComputeAscendantNodeAddress(hilowNum);
+
+        NS_LOG_DEBUG("Current Node's Parent Node HiLow Numbering: " << ascendantAddr);
+
+        uint8_t idBuf2[2];
+        meshHdr.GetFinalDst().CopyTo(idBuf2);
+
+        uint16_t destHilowNum = 0;
+        destHilowNum += (idBuf2[0]);
+        destHilowNum += (idBuf2[1]);
+        destHilowNum -= 1;
+
+        uint16_t origDestHilowNum = destHilowNum;
+
+        uint16_t destAscendantAddr = ComputeAscendantNodeAddress(destHilowNum);
+
+        NS_LOG_DEBUG("Destination Node HiLow Numbering: " << destHilowNum);
+        NS_LOG_DEBUG("Destination Node's Parent Node HiLow Numbering: " << destAscendantAddr);
+
+        int handledCase = 3;
+
+        if (hilowNum == 0) {
+            handledCase = 1;
+        }
+
+        if (hilowNum == destAscendantAddr) {
+            handledCase = 1;
+        }
+
+        if (destHilowNum == ascendantAddr) {
+            handledCase = 2;
+        }
+
+        while (ascendantAddr != 0 && destAscendantAddr != 0) {
+            if (destAscendantAddr == hilowNum) {
+                // Case 1
+                handledCase = 1;
+                break;
+            }
+
+            if (ascendantAddr == destHilowNum) {
+                // Case 2
+                handledCase = 2;
+                break;
+            }
+
+            hilowNum = ascendantAddr;
+            ascendantAddr = ComputeAscendantNodeAddress(ascendantAddr);
+
+            destHilowNum = destAscendantAddr;
+            destAscendantAddr = ComputeAscendantNodeAddress(destAscendantAddr);
+        }
+
+        if (handledCase == 1) {
+            NS_LOG_DEBUG("HiLow Case 1");
+
+            if (origHilowNum != ComputeAscendantNodeAddress(origDestHilowNum)) {
+                while (ComputeAscendantNodeAddress(origDestHilowNum) != 0) {
+                    origDestHilowNum = ComputeAscendantNodeAddress(origDestHilowNum);
+                }
+            } 
+
+            for (unsigned int i = 0; i < m_neighborTable.size(); ++i) {
+                // std::cout << m_depth + 1 << std::endl;
+                // std::cout << m_neighborTable[i].m_depth + 0 << std::endl;
+
+                if ((m_depth + 1) == m_neighborTable[i].m_depth) {
+                    // std::cout << origDestHilowNum << std::endl;
+                    // std::cout << m_neighborTable[i].m_neighborAddrNum << std::endl;
+
+                    if (origDestHilowNum == m_neighborTable[i].m_neighborAddrNum) {
+                        destination = Get16MacFrom48Mac(m_neighborTable[i].m_neighborAddr);
+                        meshHdr.SetIntermediateHop(destination);
+
+                        // meshHdr.SetIntermediateHop(Get16MacFrom48Mac(m_neighborTable[i].m_neighborAddr));
+
+                        NS_LOG_DEBUG("Next Hop: " << destination);
+                    }
+                }
+            }
+
+        } else if (handledCase == 2) {
+            NS_LOG_DEBUG("HiLow Case 2");
+
+            if (origDestHilowNum != ComputeAscendantNodeAddress(origHilowNum)) {
+                while (ComputeAscendantNodeAddress(origHilowNum) != 0) {
+                    origHilowNum = ComputeAscendantNodeAddress(origHilowNum);
+                }
+            }
+
+            for (unsigned int i = 0; i < m_neighborTable.size(); ++i) {
+                // std::cout << m_depth - 1 << std::endl;
+                // std::cout << m_neighborTable[i].m_depth + 0 << std::endl;
+
+                if ((m_depth - 1) == m_neighborTable[i].m_depth) {
+                    // std::cout << origHilowNum << std::endl;
+                    // std::cout << m_neighborTable[i].m_neighborAddrNum << std::endl;
+
+                    if (origHilowNum == m_neighborTable[i].m_neighborAddrNum) {
+                        destination = Get16MacFrom48Mac(m_neighborTable[i].m_neighborAddr);
+                        meshHdr.SetIntermediateHop(destination);
+
+                        // meshHdr.SetIntermediateHop(Get16MacFrom48Mac(m_neighborTable[i].m_neighborAddr));
+
+                        NS_LOG_DEBUG("Next Hop: " << destination);
+                    }
+                }
+            }
+
+        } else {
+            NS_LOG_DEBUG("HiLow Case 3");
+
+            for (unsigned int i = 0; i < m_neighborTable.size(); ++i) {
+                // std::cout << m_depth - 1 << std::endl;
+                // std::cout << m_neighborTable[i].m_depth + 0 << std::endl;
+
+                if ((m_depth - 1) == m_neighborTable[i].m_depth) {
+                    // std::cout << "ComputeAscendantNodeAddress(origHilowNum) " << ComputeAscendantNodeAddress(origHilowNum) << std::endl;
+                    // std::cout << "m_neighborTable[i].m_neighborAddrNum " << m_neighborTable[i].m_neighborAddrNum << std::endl;
+
+                    if (ComputeAscendantNodeAddress(origHilowNum) == m_neighborTable[i].m_neighborAddrNum) {
+                        destination = Get16MacFrom48Mac(m_neighborTable[i].m_neighborAddr);
+                        meshHdr.SetIntermediateHop(destination);
+
+                        // meshHdr.SetIntermediateHop(Get16MacFrom48Mac(m_neighborTable[i].m_neighborAddr));
+
+                        NS_LOG_DEBUG("Next Hop: " << destination);
+                    }
+                }
+            }
+        }
+    }
+    
+    if (pktSize > m_netDevice->GetMtu())
     {
-        // howard: 要測試的封包沒那麼大，不會進來這裡
-        // NS_LOG_LOGIC("Fragmentation: Packet size " << packet->GetSize() << " - Mtu "
-        //                                            << m_netDevice->GetMtu());
-        // // fragment
-        // std::list<Ptr<Packet>> fragmentList;
-        // DoFragmentation(packet, origPacketSize, origHdrSize, extraHdrSize, fragmentList);
-        // std::list<Ptr<Packet>>::iterator it;
-        // bool success = true;
-        // for (it = fragmentList.begin(); it != fragmentList.end(); it++)
-        // {
-        //     NS_LOG_DEBUG("SixLowPanNetDevice::Send (Fragment) " << **it);
-        //     m_txTrace(*it, this, GetIfIndex());
+        NS_LOG_LOGIC("Fragmentation: Packet size " << packet->GetSize() << " - Mtu "
+                                                   << m_netDevice->GetMtu());
+        // fragment
+        std::list<Ptr<Packet>> fragmentList;
+        DoFragmentation(packet, origPacketSize, origHdrSize, extraHdrSize, fragmentList);
+        std::list<Ptr<Packet>>::iterator it;
+        bool success = true;
+        for (it = fragmentList.begin(); it != fragmentList.end(); it++)
+        {
+            NS_LOG_DEBUG("SixLowPanNetDevice::Send (Fragment) " << **it);
+            m_txTrace(*it, this, GetIfIndex());
 
-        //     if (useMesh)
-        //     {
-        //         bc0Hdr.SetSequenceNumber(m_bc0Serial++);
-        //         (*it)->AddHeader(bc0Hdr);
-        //         (*it)->AddHeader(meshHdr);
-        //     }
-        //     if (doSendFrom)
-        //     {
-        //         success &= m_netDevice->SendFrom(*it, src, destination, protocolNumber);
-        //     }
-        //     else
-        //     {
-        //         success &= m_netDevice->Send(*it, destination, protocolNumber);
-        //     }
-        // }
-        // ret = success;
+            if (useMesh)
+            {
+                bc0Hdr.SetSequenceNumber(m_bc0Serial++);
+                (*it)->AddHeader(bc0Hdr);
+                (*it)->AddHeader(meshHdr);
+            }
+            if (doSendFrom)
+            {
+                success &= m_netDevice->SendFrom(*it, src, destination, protocolNumber);
+            }
+            else
+            {
+                success &= m_netDevice->Send(*it, destination, protocolNumber);
+            }
+        }
+        ret = success;
     }
     else
     {
         m_txTrace(packet, this, GetIfIndex());
 
-        if(six_meshUnder)
+        if (useMesh)
         {
-            if(six_dataflooding)
-            {
-                bc0Hdr.SetSequenceNumber(m_bc0Serial++);
-                packet->AddHeader(bc0Hdr);
-                NS_LOG_INFO("Broadcast DSP & Header: " << bc0Hdr.GetSerializedSize() << " bytes");
-            }
+            bc0Hdr.SetSequenceNumber(m_bc0Serial++);
+            packet->AddHeader(bc0Hdr);
             packet->AddHeader(meshHdr);
-            NS_LOG_INFO("Mesh DSP & Header: " << meshHdr.GetSerializedSize() << " bytes");
         }
 
-        if(doSendFrom)
+        if (doSendFrom)
         {
             NS_LOG_DEBUG("SixLowPanNetDevice::SendFrom " << m_node->GetId() << " " << *packet);
             ret = m_netDevice->SendFrom(packet, src, destination, protocolNumber);
         }
         else
         {
-            // howard: 進來這裡
-            NS_LOG_INFO("Sending packet to the MAC layer: " << packet->GetSize() << " bytes");
-
-            // 傳封包到下層
+            NS_LOG_DEBUG("SixLowPanNetDevice::Send " << m_node->GetId() << " " << *packet);
             ret = m_netDevice->Send(packet, destination, protocolNumber);
         }
     }
+
+    return ret;
+}
+
+bool
+SixLowPanNetDevice::DoSendHiLow(Ptr<Packet> packet,
+                           const Address& src,
+                           const Address& dest,
+                           uint16_t protocolNumber,
+                           bool doSendFrom,
+                           SixLowPanMesh meshHdr, 
+                           SixLowPanBc0 bc0Hdr) {
+    NS_LOG_FUNCTION(this << *packet << src << dest << protocolNumber << doSendFrom);
+    NS_ASSERT_MSG(m_netDevice, "Sixlowpan: can't find any lower-layer protocol " << m_netDevice);
+
+    Ptr<Packet> origPacket = packet->Copy();
+    uint32_t origHdrSize = 0;
+    uint32_t origPacketSize = packet->GetSize();
+    bool ret = false;                        
+                           
+    Address destination = dest;
+
+    bool useMesh = m_meshUnder;
+
+    if (m_forceEtherType) {
+        protocolNumber = m_etherType;
+    }
+
+    if (m_useIphc) {
+        NS_LOG_LOGIC("Compressing packet using IPHC");
+        origHdrSize += CompressLowPanIphc(packet, m_netDevice->GetAddress(), destination);
+
+    } else {
+        NS_LOG_LOGIC("Compressing packet using HC1");
+        origHdrSize += CompressLowPanHc1(packet, m_netDevice->GetAddress(), destination);
+    }
+
+    uint16_t pktSize = packet->GetSize();
+
+    uint32_t extraHdrSize = 0;
+
+    if (useMesh) {
+        Address source = src;
+
+        if (!doSendFrom) {
+            source = m_netDevice->GetAddress();
+        }
+
+        if (Mac48Address::IsMatchingType(source)) {
+            // We got a Mac48 pseudo-MAC. We need its original Mac16 here.
+            source = Get16MacFrom48Mac(source);
+        }
+
+        if (Mac48Address::IsMatchingType(destination)) {
+            // We got a Mac48 pseudo-MAC. We need its original Mac16 here.
+            destination = Get16MacFrom48Mac(destination);
+        }
+
+        // meshHdr.SetOriginator(source);
+        // meshHdr.SetFinalDst(destination);
+
+        // meshHdr.SetHopsLeft(m_meshUnderHopsLeft);
+        
+        // hilow
+        meshHdr.SetHopsLeft(0xF);
+
+        // hilow
+        // destination = m_netDevice->GetBroadcast();
+        // We are storing sum of mesh and bc0 header sizes. We will need it if packet is fragmented.
+        extraHdrSize = meshHdr.GetSerializedSize() + bc0Hdr.GetSerializedSize();
+        pktSize += extraHdrSize;
+    }
+
+    if (pktSize < m_compressionThreshold) {
+        NS_LOG_LOGIC("Compressed packet too short, using uncompressed one");
+        packet = origPacket;
+        SixLowPanIpv6 ipv6UncompressedHdr;
+        packet->AddHeader(ipv6UncompressedHdr);
+        pktSize = packet->GetSize();
+
+        if (useMesh) {
+            pktSize += meshHdr.GetSerializedSize() + bc0Hdr.GetSerializedSize();
+        }
+    }
+
+    // HiLow Part
+    if (useMesh && m_useHiLow) {
+        // NS_LOG_DEBUG("Mesh Header Hops Left: " << (uint32_t) meshHdr.GetHopsLeft());
+        // NS_LOG_DEBUG("Mesh Header Source: " << meshHdr.GetOriginator());
+        // NS_LOG_DEBUG("Mesh Header Destination: " << meshHdr.GetFinalDst());
+
+        Mac16Address dst16;
+        uint8_t buf[6];
+        m_netDevice->GetAddress().CopyTo(buf);
+        dst16.CopyFrom(buf + 4);
+
+        uint8_t idBuf[2];
+        dst16.CopyTo(idBuf);
+
+        uint16_t hilowNum = 0;
+        hilowNum += (idBuf[0]);
+        hilowNum += (idBuf[1]);
+        hilowNum -= 1;
+
+        uint16_t origHilowNum = hilowNum;
+
+        NS_LOG_DEBUG("Current Node HiLow Short Addr: " << dst16);
+        NS_LOG_DEBUG("Current Node HiLow Numbering: " << hilowNum);
+
+        uint16_t ascendantAddr = ComputeAscendantNodeAddress(hilowNum);
+
+        NS_LOG_DEBUG("Current Node's Parent Node HiLow Numbering: " << ascendantAddr);
+
+        uint8_t idBuf2[2];
+        meshHdr.GetFinalDst().CopyTo(idBuf2);
+
+        uint16_t destHilowNum = 0;
+        destHilowNum += (idBuf2[0]);
+        destHilowNum += (idBuf2[1]);
+        destHilowNum -= 1;
+
+        uint16_t origDestHilowNum = destHilowNum;
+
+        uint16_t destAscendantAddr = ComputeAscendantNodeAddress(destHilowNum);
+
+        NS_LOG_DEBUG("Destination Node HiLow Numbering: " << destHilowNum);
+        NS_LOG_DEBUG("Destination Node's Parent Node HiLow Numbering: " << destAscendantAddr);
+
+        int handledCase = 3;
+
+        if (hilowNum == 0) {
+            handledCase = 1;
+        }
+
+        if (hilowNum == destAscendantAddr) {
+            handledCase = 1;
+        }
+
+        if (destHilowNum == ascendantAddr) {
+            handledCase = 2;
+        }
+
+        while (ascendantAddr != 0 && destAscendantAddr != 0) {
+            if (destAscendantAddr == hilowNum) {
+                // Case 1
+                handledCase = 1;
+                break;
+            }
+
+            if (ascendantAddr == destHilowNum) {
+                // Case 2
+                handledCase = 2;
+                break;
+            }
+
+            hilowNum = ascendantAddr;
+            ascendantAddr = ComputeAscendantNodeAddress(ascendantAddr);
+
+            destHilowNum = destAscendantAddr;
+            destAscendantAddr = ComputeAscendantNodeAddress(destAscendantAddr);
+        }
+
+        if (handledCase == 1) {
+            NS_LOG_DEBUG("HiLow Case 1");
+
+            if (origHilowNum != ComputeAscendantNodeAddress(origDestHilowNum)) {
+                while (ComputeAscendantNodeAddress(origDestHilowNum) != 0) {
+                    origDestHilowNum = ComputeAscendantNodeAddress(origDestHilowNum);
+                }
+            } 
+
+            for (unsigned int i = 0; i < m_neighborTable.size(); ++i) {
+                if ((m_depth + 1) == m_neighborTable[i].m_depth) {
+                    if (origDestHilowNum == m_neighborTable[i].m_neighborAddrNum) {
+                        destination = Get16MacFrom48Mac(m_neighborTable[i].m_neighborAddr);
+                        meshHdr.SetIntermediateHop(destination);
+
+                        NS_LOG_DEBUG("Next Hop: " << destination);
+                    }
+                }
+            }
+
+        } else if (handledCase == 2) {
+            NS_LOG_DEBUG("HiLow Case 2");
+
+            if (origDestHilowNum != ComputeAscendantNodeAddress(origHilowNum)) {
+                while (ComputeAscendantNodeAddress(origHilowNum) != 0) {
+                    origHilowNum = ComputeAscendantNodeAddress(origHilowNum);
+                }
+            }
+
+            for (unsigned int i = 0; i < m_neighborTable.size(); ++i) {
+                if ((m_depth - 1) == m_neighborTable[i].m_depth) {
+                    if (origHilowNum == m_neighborTable[i].m_neighborAddrNum) {
+                        destination = Get16MacFrom48Mac(m_neighborTable[i].m_neighborAddr);
+                        meshHdr.SetIntermediateHop(destination);
+
+                        NS_LOG_DEBUG("Next Hop: " << destination);
+                    }
+                }
+            }
+
+        } else {
+            NS_LOG_DEBUG("HiLow Case 3");
+
+            for (unsigned int i = 0; i < m_neighborTable.size(); ++i) {
+                if ((m_depth - 1) == m_neighborTable[i].m_depth) {
+                    if (ComputeAscendantNodeAddress(origHilowNum) == m_neighborTable[i].m_neighborAddrNum) {
+                        destination = Get16MacFrom48Mac(m_neighborTable[i].m_neighborAddr);
+                        meshHdr.SetIntermediateHop(destination);
+
+                        NS_LOG_DEBUG("Next Hop: " << destination);
+                    }
+                }
+            }
+        }
+    }
+
+    if (pktSize > m_netDevice->GetMtu())
+    {
+        NS_LOG_LOGIC("Fragmentation: Packet size " << packet->GetSize() << " - Mtu "
+                                                   << m_netDevice->GetMtu());
+        // fragment
+        std::list<Ptr<Packet>> fragmentList;
+        DoFragmentation(packet, origPacketSize, origHdrSize, extraHdrSize, fragmentList);
+        std::list<Ptr<Packet>>::iterator it;
+        bool success = true;
+        for (it = fragmentList.begin(); it != fragmentList.end(); it++)
+        {
+            NS_LOG_DEBUG("SixLowPanNetDevice::Send (Fragment) " << **it);
+            m_txTrace(*it, this, GetIfIndex());
+
+            if (useMesh)
+            {
+                bc0Hdr.SetSequenceNumber(m_bc0Serial++);
+                (*it)->AddHeader(bc0Hdr);
+                (*it)->AddHeader(meshHdr);
+            }
+            if (doSendFrom)
+            {
+                success &= m_netDevice->SendFrom(*it, src, destination, protocolNumber);
+            }
+            else
+            {
+                success &= m_netDevice->Send(*it, destination, protocolNumber);
+            }
+        }
+        ret = success;
+    }
+    else
+    {
+        m_txTrace(packet, this, GetIfIndex());
+
+        if (useMesh)
+        {
+            bc0Hdr.SetSequenceNumber(m_bc0Serial++);
+            packet->AddHeader(bc0Hdr);
+            packet->AddHeader(meshHdr);
+        }
+
+        if (doSendFrom)
+        {
+            NS_LOG_DEBUG("SixLowPanNetDevice::SendFrom " << m_node->GetId() << " " << *packet);
+            ret = m_netDevice->SendFrom(packet, src, destination, protocolNumber);
+        }
+        else
+        {
+            NS_LOG_DEBUG("SixLowPanNetDevice::Send " << m_node->GetId() << " " << *packet);
+            ret = m_netDevice->Send(packet, destination, protocolNumber);
+        }
+    }
+
     return ret;
 }
 
@@ -1368,6 +1295,7 @@ SixLowPanNetDevice::SetReceiveCallback(NetDevice::ReceiveCallback cb)
 void
 SixLowPanNetDevice::SetPromiscReceiveCallback(NetDevice::PromiscReceiveCallback cb)
 {
+    
     NS_LOG_FUNCTION(this << &cb);
     m_promiscRxCallback = cb;
 }
@@ -1380,56 +1308,111 @@ SixLowPanNetDevice::SupportsSendFrom() const
 }
 
 uint32_t
-SixLowPanNetDevice::CompressLowPanHc1(Ptr<Packet> packet, const Address &src, const Address &dst)
+SixLowPanNetDevice::CompressLowPanHc1(Ptr<Packet> packet, const Address& src, const Address& dst)
 {
     NS_LOG_FUNCTION(this << *packet << src << dst);
 
     Ipv6Header ipHeader;
     SixLowPanHc1 hc1Header;
-    uint32_t Ipv6HeaderSize = 0;
+    uint32_t size = 0;
 
-    Ipv6HeaderSize = ipHeader.GetSerializedSize();
+    NS_LOG_DEBUG("Original packet: " << *packet << " Size " << packet->GetSize());
 
-    packet->RemoveHeader(ipHeader);
-
-    // howard: 詳細去看 sixlowpan-header.cc 有修改一些東西，當 HopLimit = 1 的時候可以自動壓縮這個 bytes
-    hc1Header.SetHopLimit(ipHeader.GetHopLimit());
-    // NS_LOG_INFO("hc1Header.SetHopLimit(ipHeader.GetHopLimit()) = " << std::to_string(hc1Header.GetHopLimit()));
-
-    // 壓縮 Traffic Class & FlowLabel
-    if((ipHeader.GetFlowLabel() == 0) && (ipHeader.GetTrafficClass() == 0))
+    if (packet->PeekHeader(ipHeader) != 0)
     {
-        hc1Header.SetTcflCompression(true);
+        packet->RemoveHeader(ipHeader);
+        size += ipHeader.GetSerializedSize();
+
+        hc1Header.SetHopLimit(ipHeader.GetHopLimit());
+
+        uint8_t bufOne[16];
+        uint8_t bufTwo[16];
+        Ipv6Address srcAddr = ipHeader.GetSource();
+        srcAddr.GetBytes(bufOne);
+        Ipv6Address mySrcAddr = Ipv6Address::MakeAutoconfiguredLinkLocalAddress(src);
+
+        NS_LOG_LOGIC("Checking source compression: " << mySrcAddr << " - " << srcAddr);
+
+        mySrcAddr.GetBytes(bufTwo);
+        bool isSrcSrc = (memcmp(bufOne + 8, bufTwo + 8, 8) == 0);
+
+        if (srcAddr.IsLinkLocal() && isSrcSrc)
+        {
+            hc1Header.SetSrcCompression(SixLowPanHc1::HC1_PCIC);
+        }
+        else if (srcAddr.IsLinkLocal())
+        {
+            hc1Header.SetSrcCompression(SixLowPanHc1::HC1_PCII);
+            hc1Header.SetSrcInterface(bufOne + 8);
+        }
+        else if (isSrcSrc)
+        {
+            hc1Header.SetSrcCompression(SixLowPanHc1::HC1_PIIC);
+            hc1Header.SetSrcPrefix(bufOne);
+        }
+        else
+        {
+            hc1Header.SetSrcCompression(SixLowPanHc1::HC1_PIII);
+            hc1Header.SetSrcInterface(bufOne + 8);
+            hc1Header.SetSrcPrefix(bufOne);
+        }
+
+        Ipv6Address dstAddr = ipHeader.GetDestination();
+        dstAddr.GetBytes(bufOne);
+        Ipv6Address myDstAddr = Ipv6Address::MakeAutoconfiguredLinkLocalAddress(dst);
+
+        NS_LOG_LOGIC("Checking destination compression: " << myDstAddr << " - " << dstAddr);
+
+        myDstAddr.GetBytes(bufTwo);
+        bool isDstDst = (memcmp(bufOne + 8, bufTwo + 8, 8) == 0);
+
+        if (dstAddr.IsLinkLocal() && isDstDst)
+        {
+            hc1Header.SetDstCompression(SixLowPanHc1::HC1_PCIC);
+        }
+        else if (dstAddr.IsLinkLocal())
+        {
+            hc1Header.SetDstCompression(SixLowPanHc1::HC1_PCII);
+            hc1Header.SetDstInterface(bufOne + 8);
+        }
+        else if (isDstDst)
+        {
+            hc1Header.SetDstCompression(SixLowPanHc1::HC1_PIIC);
+            hc1Header.SetDstPrefix(bufOne);
+        }
+        else
+        {
+            hc1Header.SetDstCompression(SixLowPanHc1::HC1_PIII);
+            hc1Header.SetDstInterface(bufOne + 8);
+            hc1Header.SetDstPrefix(bufOne);
+        }
+
+        if ((ipHeader.GetFlowLabel() == 0) && (ipHeader.GetTrafficClass() == 0))
+        {
+            hc1Header.SetTcflCompression(true);
+        }
+        else
+        {
+            hc1Header.SetTcflCompression(false);
+            hc1Header.SetTrafficClass(ipHeader.GetTrafficClass());
+            hc1Header.SetFlowLabel(ipHeader.GetFlowLabel());
+        }
+
+        uint8_t nextHeader = ipHeader.GetNextHeader();
+        hc1Header.SetNextHeader(nextHeader);
+
+        // \todo implement HC2 compression
+        hc1Header.SetHc2HeaderPresent(false);
+
+        NS_LOG_DEBUG("HC1 Compression - HC1 header size = " << hc1Header.GetSerializedSize());
+        NS_LOG_DEBUG("HC1 Compression - packet size = " << packet->GetSize());
+
+        packet->AddHeader(hc1Header);
+
+        return size;
     }
-    else
-    {
-        hc1Header.SetTcflCompression(false);
-        hc1Header.SetTrafficClass(ipHeader.GetTrafficClass());
-        hc1Header.SetFlowLabel(ipHeader.GetFlowLabel());
-    }
 
-    // 壓縮 Link-locak IPv6 Src Address
-    if(ipHeader.GetSource().IsLinkLocal())
-    {
-        hc1Header.SetSrcCompression(SixLowPanHc1::HC1_PCIC);
-    }
-
-    // 壓縮 Link-locak IPv6 Dst Address
-    if(ipHeader.GetDestination().IsLinkLocal())
-    {
-        hc1Header.SetDstCompression(SixLowPanHc1::HC1_PCIC);
-    }
-
-    uint8_t nextHeader = ipHeader.GetNextHeader();
-    hc1Header.SetNextHeader(nextHeader);
-
-    // NS3 沒有實作 HC2 算法，所以這裡填 false
-    hc1Header.SetHc2HeaderPresent(false);
-
-    packet->AddHeader(hc1Header);
-    NS_LOG_INFO("Packet with compressed IPv6 header: " << packet->GetSize() << " bytes");
-
-    return Ipv6HeaderSize;
+    return 0;
 }
 
 void
@@ -1553,6 +1536,7 @@ uint32_t
 SixLowPanNetDevice::CompressLowPanIphc(Ptr<Packet> packet, const Address& src, const Address& dst)
 {
     NS_LOG_FUNCTION(this << *packet << src << dst);
+
     Ipv6Header ipHeader;
     SixLowPanIphc iphcHeader;
     uint32_t size = 0;
@@ -1924,7 +1908,7 @@ SixLowPanNetDevice::CompressLowPanIphc(Ptr<Packet> packet, const Address& src, c
 
         packet->AddHeader(iphcHeader);
 
-        NS_LOG_DEBUG("Packet after IPHC compression: " << *packet);
+        NS_LOG_DEBUG("Packet after IPHC compression: " << packet->GetSize());
 
         return size;
     }
@@ -3013,13 +2997,13 @@ SixLowPanNetDevice::ProcessFragment(Ptr<Packet>& packet,
         case SixLowPanDispatch::LOWPAN_HC1:
             DecompressLowPanHc1(p, src, dst);
             break;
-        // case SixLowPanDispatch::LOWPAN_IPHC:
-        //     if (DecompressLowPanIphc(p, src, dst))
-        //     {
-        //         m_dropTrace(DROP_SATETFUL_DECOMPRESSION_PROBLEM, p, this, GetIfIndex());
-        //         return false;
-        //     }
-        //     break;
+        case SixLowPanDispatch::LOWPAN_IPHC:
+            if (DecompressLowPanIphc(p, src, dst))
+            {
+                m_dropTrace(DROP_SATETFUL_DECOMPRESSION_PROBLEM, p, this, GetIfIndex());
+                return false;
+            }
+            break;
         default:
             NS_FATAL_ERROR("Unsupported 6LoWPAN encoding, exiting.");
             break;
@@ -3427,6 +3411,62 @@ SixLowPanNetDevice::RemoveContext(uint8_t contextId)
     m_contextTable.erase(contextId);
 }
 
+void SixLowPanNetDevice::AddNeighborTableEntry(uint16_t panId
+                                                , Address addr
+                                                , uint8_t devType
+                                                , uint8_t relation
+                                                , uint8_t depth) {
+    NeighborTableEntry entry;
+    entry.m_panId = panId;
+    entry.m_neighborAddr = addr;
+
+    Mac16Address dst16;
+    uint8_t buf[6];
+    addr.CopyTo(buf);
+    dst16.CopyFrom(buf + 4);
+
+    uint8_t idBuf[2];
+    dst16.CopyTo(idBuf);
+
+    uint16_t hilowNum = 0;
+    hilowNum += (idBuf[0]);
+    hilowNum += (idBuf[1]);
+    hilowNum -= 1;
+
+    // debug
+    // NS_LOG_DEBUG("Six LowPan Addr: " << addr);
+    // NS_LOG_DEBUG("Short: " << dst16);
+    // NS_LOG_DEBUG("HiLow Numbering: " << num);
+    // NS_LOG_DEBUG(" ");
+
+    entry.m_neighborAddrNum = hilowNum;
+    entry.m_devType = devType;
+    entry.m_neighorRelation = relation;
+    entry.m_depth = depth;
+
+    m_neighborTable.push_back(entry);
+}
+
+void SixLowPanNetDevice::SetHilow(bool on) {
+    m_useHiLow = on;
+}
+
+void SixLowPanNetDevice::SetDepth(uint8_t depth) {
+    m_depth = depth;
+}
+
+void SixLowPanNetDevice::SetHilowMC(double mc) {
+    m_mc = mc;
+}
+
+void SixLowPanNetDevice::SetRecord(std::map<Address, std::pair<Address, std::vector<int64_t>>> &record) {
+    m_record = &record;
+}
+
+void SixLowPanNetDevice::SetRecord(std::map<std::pair<Address, Address>, std::vector<std::pair<int64_t, int64_t>>> &record) {
+    m_record2 = &record;
+}
+
 bool
 SixLowPanNetDevice::FindUnicastCompressionContext(Ipv6Address address, uint8_t& contextId)
 {
@@ -3521,67 +3561,15 @@ SixLowPanNetDevice::CleanPrefix(Ipv6Address address, Ipv6Prefix prefix)
     return cleanedAddress;
 }
 
-void SixLowPanNetDevice::SetHC1CompMethod(bool HC1)
-{
-    six_useHC1 = HC1;
-}
-
-void SixLowPanNetDevice::SetMeshUnder(bool MeshUnder)
-{
-    six_meshUnder = MeshUnder;
-}
-
-void SixLowPanNetDevice::SetDataFlooding(bool DataFlooding)
-{
-    six_dataflooding = DataFlooding;
-}
-
-void SixLowPanNetDevice::SetHelloMessage(bool Hello)
-{
-    six_hello = Hello;
-}
-
-void SixLowPanNetDevice::SetGreedyRouting(bool GreedyRouting)
-{
-    six_greedyrouting = GreedyRouting;
-}
-
-void SixLowPanNetDevice::PrintNeighborTable()
-{
-    NS_LOG_INFO("=== " << Mac16Address::ConvertFrom(Get16MacFrom48Mac(m_netDevice->GetAddress())) << " Neighbor Table ===");
-
-    for(const auto& entry : m_neighborTable)
-    {
-        const Address& addr = entry.first;
-        int16_t x = entry.second.first;
-        int16_t y = entry.second.second;
-        NS_LOG_INFO(Mac16Address::ConvertFrom(addr) << " at (" << x << ", " << y << ")");
+uint16_t SixLowPanNetDevice::ComputeAscendantNodeAddress(uint16_t curAddr) {
+    if (curAddr == 0) {
+        return 0;
     }
+
+    uint16_t ac = floor((curAddr - 1) / m_mc);
+
+    return ac;
 }
-
-void SixLowPanNetDevice::SetLoadRouting(bool LoadRouting)
-{
-    six_loadrouting = LoadRouting;
-}
-
-void SixLowPanNetDevice::PrintLoadTable()
-{
-    NS_LOG_INFO ("=== " << Mac16Address::ConvertFrom(Get16MacFrom48Mac(m_netDevice->GetAddress())) << " LOAD Route Table ===");
-
-    for(const auto& kv : m_loadTable)
-    {
-        const Address   &destination = kv.first;
-        const LoadEntry &entry      = kv.second;
-
-        NS_LOG_INFO("dst = " << Mac16Address::ConvertFrom(destination) << ", " << " nexthop = " << Mac16Address::ConvertFrom(entry.nextAddr));
-    }
-}
-
-void SixLowPanNetDevice::SetDirect(bool Direct)
-{
-    six_direct = Direct;
-}
-
 
 } // namespace ns3
 

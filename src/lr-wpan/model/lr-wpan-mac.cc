@@ -155,6 +155,7 @@ LrWpanMac::LrWpanMac() {
     m_forDsmeNetDeviceIntegrateWithHigerLayer = false;
     m_acceptAllHilowPkt = false;
     m_gtsContinuePktSendingFromCap = false;
+    m_enhancedGTSForwarding = false;
     m_record = nullptr;
     m_record2 = nullptr;
 
@@ -444,8 +445,16 @@ LrWpanMac::McpsDataRequest(McpsDataRequestParams params, Ptr<Packet> p)
             else
             {
                 // howard: 改成這樣，取消 ACK
+                if(m_NoACK)
+                {
+                    macHdr.SetNoAckReq();
+                }
+                else
+                {
+                    // GACK 會用到
+                    macHdr.SetAckReq();
+                }
                 // macHdr.SetAckReq();
-                macHdr.SetNoAckReq();
             }
         }
         else
@@ -490,7 +499,6 @@ LrWpanMac::McpsDataRequest(McpsDataRequestParams params, Ptr<Packet> p)
             m_txPkt = p;
             ChangeMacState(MAC_GTS_SENDING);
             m_phy->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_TX_ON);
-
         }
         // howard: 不知道在幹嘛
         // else
@@ -692,7 +700,7 @@ void LrWpanMac::SendOneEnhancedBeacon() {
     beaconPacket->AddTrailer(macTrailer);
 
     // Set the Beacon packet to be transmitted
-    // 使用 PdDataRequest() 傳到實體層
+    // howard: 使用 PdDataRequest() 傳到實體層
     m_txPkt = beaconPacket;
 
     if (m_csmaCa->IsSlottedCsmaCa()) {
@@ -1162,23 +1170,16 @@ void LrWpanMac::ScheduleGts(bool indication)
         return;
     }
 
-    // Coordinator 和 device 會進來這邊
-    // m_macDsmeACT is a map
-    // key (it->first) = uint16_t superframeID , value (it->second) = vector macDsmeACTEntity
-    // 看 superframe (key) 有幾個來決定 map 的大小，例如: superframeID = 1、3，則 m_macDsmeACT.size() = 2
     if(m_macDsmeACT.size())
     {
         uint64_t symbolRate = (uint64_t)m_phy->GetDataOrSymbolRate(false); // 62500 symbols/sec by default
         
-        // map<uint16_t, vector<macDSMEACTEntity>> m_macDsmeACT
         for(auto it = m_macDsmeACT.begin(); it != m_macDsmeACT.end(); ++it) 
         {
             for(unsigned int i = 0; i < it->second.size(); ++i) 
             {
-                // m_allocated default = false
                 if(!it->second[i].m_allocated)
                 {
-                    // howard: 這裡可能要重新畫圖會比較了解，0s 到第一個 Superframe 之間是沒有東西的，所以才可以直接做時間相加
                     uint32_t each_Timeslot_Duration;
                     uint64_t first_Timeslot;
                     uint64_t superframe_Duration;
@@ -1487,6 +1488,19 @@ void LrWpanMac::StartGTS(SuperframeType superframeType, uint16_t superframeID, i
 
     SetLrWpanMacStateToGTS(superframeID, idx);
 
+    // howard: 新增 GTS Forwarding
+    if(!m_txQueue.empty() && m_gtsContinuePktSendingFromCap)
+    {
+        Ptr<TxQueueElement> txQElement = m_txQueue.front();
+        m_txPkt = txQElement->txQPkt;
+    }
+
+    if(m_txPkt && m_gtsContinuePktSendingFromCap)
+    {
+        ChangeMacState(MAC_GTS_SENDING);
+        m_phy->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_TX_ON);
+    }
+
     // DSME-TODO
     if (m_txPktGts) {
         m_txPkt = m_txPktGts;
@@ -1739,21 +1753,14 @@ LrWpanMac::BeaconSearchTimeout() {
 void LrWpanMac::CheckQueue() {
     NS_LOG_FUNCTION(this);
 
-    // NS_LOG_INFO("進來CheckQueue1");
     // Pull a packet from the queue and start sending if we are not already sending.
     if(m_lrWpanMacState == MAC_IDLE && !m_txQueue.empty() && !m_setMacState.IsRunning()) {
         // TODO: this should check if the node is a coordinator and using the outcoming superframe
         // not just the PAN coordinator
-        // NS_LOG_INFO("進來CheckQueue2");
-        // NS_LOG_INFO("m_coord = " << m_coord);
-        // NS_LOG_INFO("m_panCoor = " << m_panCoor);
-        // howard: 如果 PAN-C 或 Coord 在 outgoing superframe 收資料
         if(m_csmaCa->IsUnSlottedCsmaCa() || (m_outSuperframeStatus == CAP && m_coord) || m_incSuperframeStatus == CAP)
         {
-            // NS_LOG_INFO("進來CheckQueue3");
             // check MAC is not in a IFS
             if (!m_ifsEvent.IsRunning()) {
-                // NS_LOG_INFO("進來CheckQueue4");
                 Ptr<TxQueueElement> txQElement = m_txQueue.front();
                 m_txPkt = txQElement->txQPkt;
 
@@ -2881,6 +2888,17 @@ LrWpanMac::IfsWaitTimeout(Time ifsTime)
             // >> More packet can be sent in the GTS
             ChangeMacState(MAC_GTS);
         }
+
+        if((m_incGtsEvent.IsRunning() || m_gtsEvent.IsRunning()) && m_enhancedGTSForwarding)
+        {
+            // howard: 新增 Enhanced GTS forwarding
+            Ptr<TxQueueElement> txElem = m_txQueue.front();
+            m_txPkt = txElem->txQPkt;
+            ChangeMacState(MAC_GTS_SENDING);
+            m_phy->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_TX_ON);
+            m_enhancedGTSForwarding = false;
+        }
+
     }
     else if (ifsTime == sifsTime)
     {
@@ -2930,7 +2948,7 @@ LrWpanMac::PdDataConfirm(LrWpanPhyEnumeration status)
     NS_ASSERT(m_lrWpanMacState == MAC_SENDING || m_lrWpanMacState == MAC_GTS_SENDING);
     NS_LOG_FUNCTION(this << status << m_txQueue.size());
 
-    NS_LOG_DEBUG("進來 PdDataConfirm");
+    // NS_LOG_DEBUG("進來 PdDataConfirm");
 
     LrWpanMacHeader macHdr;
     Time ifsWaitTime;
@@ -2942,7 +2960,6 @@ LrWpanMac::PdDataConfirm(LrWpanPhyEnumeration status)
     if (status == IEEE_802_15_4_PHY_SUCCESS) {
         if (!macHdr.IsAcknowledgment()) 
         {
-            NS_LOG_INFO("進來了1");
             if (macHdr.IsBeacon()) 
             {
                 // Start CAP only if we are in beacon mode (i.e. if slotted csma-ca is running)
@@ -3077,13 +3094,12 @@ LrWpanMac::PdDataConfirm(LrWpanPhyEnumeration status)
             } 
             else 
             {
-                NS_LOG_INFO("進來了2");
                 m_macTxOkTrace(m_txPkt);
                 // remove the copy of the packet that was just sent
                 if (!m_mcpsDataConfirmCallback.IsNull())
                 {
                     McpsDataConfirmParams confirmParams;
-                    NS_ASSERT_MSG(m_txQueue.size() > 0, "TxQsize = 0");
+                    // NS_ASSERT_MSG(m_txQueue.size() > 0, "TxQsize = 0");
                     Ptr<TxQueueElement> txQElement = m_txQueue.front();
                     confirmParams.m_msduHandle = txQElement->txQMsduHandle;
                     confirmParams.m_status = IEEE_802_15_4_SUCCESS;
@@ -3091,8 +3107,7 @@ LrWpanMac::PdDataConfirm(LrWpanPhyEnumeration status)
                     m_mcpsDataConfirmCallback(confirmParams);
                 }
                 ifsWaitTime = Seconds(static_cast<double>(GetIfsSize()) / symbolRate);
-                NS_LOG_INFO("進來了3");
-                // 這裡要改，應該是 CAP 有問題
+
                 RemoveFirstTxQElement();
             }
         }
@@ -3117,6 +3132,7 @@ LrWpanMac::PdDataConfirm(LrWpanPhyEnumeration status)
 
     if(m_incGtsEvent.IsRunning() || m_gtsEvent.IsRunning())
     {
+        // NS_LOG_INFO("進來了1");
         m_setMacState.Cancel();
         m_setMacState = Simulator::ScheduleNow(&LrWpanMac::SetLrWpanMacStateToGTS
                                                 , this
@@ -3170,7 +3186,7 @@ LrWpanMac::PlmeSetTRXStateConfirm(LrWpanPhyEnumeration status)
         m_snifferTrace(m_txPkt);
         m_macTxTrace(m_txPkt);
 
-        // howard: MAC CAP 正式傳資料到 PHY
+        // howard: CAP 正式傳資料到 PHY
         NS_LOG_INFO("Sending packet to the PHY layer: " << m_txPkt->GetSize() << " bytes");
         m_phy->PdDataRequest(m_txPkt->GetSize(), m_txPkt);
         
@@ -3212,6 +3228,7 @@ LrWpanMac::PlmeSetTRXStateConfirm(LrWpanPhyEnumeration status)
         m_promiscSnifferTrace(m_txPkt);
         m_snifferTrace(m_txPkt);
         m_macTxTrace(m_txPkt);
+        // howard: CFP 正式傳資料到 PHY
         m_phy->PdDataRequest(m_txPkt->GetSize(), m_txPkt);  
     }
     
@@ -3511,6 +3528,10 @@ void LrWpanMac::SetAcceptAllHilowPkt(bool on) {
 
 void LrWpanMac::SetGtsContinuePktSendingFromCap(bool on) {
     m_gtsContinuePktSendingFromCap = on;
+}
+
+void LrWpanMac::SetEnhancedGTSForwarding(bool on) {
+    m_enhancedGTSForwarding = on;
 }
 
 uint32_t
@@ -3874,6 +3895,11 @@ void LrWpanMac::ResetDsmeGtsGackPayloadLength()
 void LrWpanMac::ResetDsmeGtsGroupAckBuffer()
 {
     m_dsmeGtsGroupAckPktBuffer.clear();
+}
+
+void LrWpanMac::Set6lowpanDataNoACK(bool NoACK)
+{
+    m_NoACK = NoACK;
 }
 
 } // namespace ns3
