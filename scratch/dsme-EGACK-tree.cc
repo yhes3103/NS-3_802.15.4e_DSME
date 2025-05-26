@@ -291,7 +291,7 @@
          // Setting parameters of sending the data packets.
          // This will continuously TX packet in the setting interval with non-stop transmission , in order to test max throuhgput.
  
-         // double slot_0_StartTime = 1.177217;  // 為何不是 1.05216? or 1.17505 (這好像合理一點)
+         // double slot_0_StartTime = 1.177217;
          // double slot_0_StartTime = 1.0521922172;
          double coord_Rx_GTS_StartTime = 1.052160001;
          double device_Tx_GTS_StartTime = 1.054336400;
@@ -377,6 +377,9 @@
 
      Simulator::Stop(Seconds(1.474560001));
      Simulator::Run();
+
+     // 這個檔案有很多我做的筆記，不一定是對的，就參考就好
+     // 然後原本曾俊傑 GTS TX / RX 還有產生流量的方式怪怪的，我有去修改 GenerateTraffic 讓它合理一點
  
      std::cout << "pktSent: " << pktSent << std::endl;
      std::cout << "pktRecv: " << pktRecv << std::endl;

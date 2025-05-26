@@ -351,7 +351,6 @@ SixLowPanNetDevice::ReceiveFromDevice(Ptr<NetDevice> incomingPort,
                     // NS_LOG_INFO("加上廣播 header " << sendPkt->GetSize() << " bytes");
                     sendPkt->AddHeader(meshHdr);
                     // NS_LOG_INFO("加上mesh header " << sendPkt->GetSize() << " bytes");
-                    // howard: 這裡要改，應該要讓 mac 去計算
                     // Simulator::Schedule(Time(MilliSeconds(m_meshUnderJitter->GetValue())),
                     //                     &NetDevice::Send,
                     //                     m_netDevice,
@@ -505,6 +504,10 @@ SixLowPanNetDevice::ReceiveFromDevice(Ptr<NetDevice> incomingPort,
         else if(six_direct)
         {
             NS_LOG_INFO("已經收到封包了");
+            if(!m_notifyUpperCallback.IsNull())
+            {
+                m_notifyUpperCallback(copyPkt);
+            }
         }
     }
 
@@ -3580,6 +3583,11 @@ void SixLowPanNetDevice::PrintLoadTable()
 void SixLowPanNetDevice::SetDirect(bool Direct)
 {
     six_direct = Direct;
+}
+
+void SixLowPanNetDevice::SetSixLowPanNotifyCallback(SixLowPanNotifyUpperCallback cb)
+{
+    m_notifyUpperCallback = cb;
 }
 
 

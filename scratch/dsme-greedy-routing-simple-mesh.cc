@@ -285,8 +285,6 @@
      for(unsigned i = 0; i < sixlowDevices.GetN(); i++)
      {
          Ptr<SixLowPanNetDevice> dev = sixlowDevices.Get(i)->GetObject<SixLowPanNetDevice>();
-
-         // Simulator::Schedule(Seconds(1.108096099 + i * 0.00096), &SendHelleOnce, dev);
          Simulator::Schedule(Seconds(1.108096099), &SendHelleOnce, dev);
      }
 

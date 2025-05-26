@@ -69,6 +69,10 @@ class EventId;
  * To this end, the class pretend to be a normal NetDevice, masquerading some functions
  * of the underlying NetDevice.
  */
+
+// howard: 新增
+typedef Callback<void, Ptr<Packet>> SixLowPanNotifyUpperCallback;
+
 class SixLowPanNetDevice : public NetDevice
 {
   public:
@@ -86,6 +90,7 @@ class SixLowPanNetDevice : public NetDevice
     void SetLoadRouting(bool LoadRouting);
     void PrintLoadTable();
     void SetDirect(bool Direct);
+    void SetSixLowPanNotifyCallback(SixLowPanNotifyUpperCallback cb);
 
     enum DropReason
     {
@@ -295,6 +300,7 @@ class SixLowPanNetDevice : public NetDevice
     bool six_greedyrouting;
     bool six_loadrouting;
     bool six_direct;
+    
     std::map<Address, std::pair<int16_t, int16_t>> m_neighborTable;
 
     struct LoadEntry
@@ -305,6 +311,8 @@ class SixLowPanNetDevice : public NetDevice
     std::map<Address, LoadEntry> m_loadTable;
 
     Ptr<Packet> LoadPacket = Create<Packet>();
+
+    SixLowPanNotifyUpperCallback m_notifyUpperCallback;
     
     /**
      * \brief Receives all the packets from a NetDevice for further processing.

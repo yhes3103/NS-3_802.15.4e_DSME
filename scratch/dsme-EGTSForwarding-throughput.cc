@@ -34,17 +34,14 @@
  #define SO 3
  #define MO 5
  
-//  #define TREE_DEGREE 3 // The maximum degree of a node in the tree.
-//  #define NUM_COORD 4 // The number of coord, PAN-C need to be included.
-//  #define NUM_RFD (NUM_COORD - 1) * TREE_DEGREE // The number of RFD.
 
-#define NUM_COORD 3 // The number of coord, PAN-C need to be included.
-#define NUM_RFD 1 // The number of RFD.
+ #define NUM_COORD 3 // The number of coord, PAN-C need to be included.
+ #define NUM_RFD 1 // The number of RFD.
  
  #define BIT(X) (1 << 2^X)
- 
- // static double pktSent = 0;
- // static double throughput = 0;
+
+ static double pktSent = 0;
+ static double pktRecv = 0;
  
  typedef enum
  {
@@ -52,10 +49,16 @@
      CHANNEL_HOPPING = 1
  } LrWpanDsmeChannelDiversity;
 
- void SendIPv6PacketinCAP(Ptr<NetDevice> dev, Mac48Address dstMac)
+ struct SendPacketArgs
  {
-    // 最大為 52 bytes
-    Ptr<Packet> payload = Create<Packet>(30);
+    Ptr<NetDevice> dev;
+    Mac48Address dstMac;
+    int pktSize;
+ };
+
+ void SendIPv6Packet(SendPacketArgs args)
+ {
+    Ptr<Packet> payload = Create<Packet>(args.pktSize);
     NS_LOG_UNCOND("Upper layer payload: " << payload->GetSize() << " bytes");
 
     // Pseudo IPv6 header
@@ -71,24 +74,19 @@
 
     NS_LOG_UNCOND("IPv6 Header: " << ipv6Header.GetSerializedSize() << " bytes");
     NS_LOG_UNCOND("Sending packet to the sixlowpan layer: " << payload->GetSize() << " bytes");
-    dev->Send(payload, dstMac, 0x86DD);
+    args.dev->Send(payload, args.dstMac, 0x86DD);
  }
  
-//  static void
-//  dataSentMacConfirm(McpsDataConfirmParams params) // McpsDataConfirmCallBack
-//  {
-//      // In the case of transmissions with the Ack flag activated, the transaction is only
-//      // successful if the Ack was received.
-//      if (params.m_status == LrWpanMcpsDataConfirmStatus::IEEE_802_15_4_SUCCESS)
-//      {
-//          NS_LOG_UNCOND("**********" << Simulator::Now().As(Time::S)
-//                                     << " | Transmission successfully sent");
-//          pktSent += 1;
-//      }
-//  }
- 
+ static void NotifyUpperApp(Ptr<Packet> p)
+ {
+    NS_LOG_UNCOND("**********" << Simulator::Now().As(Time::S) << " | Transmission successfully sent");
+    pktRecv += 1;
+ }
  
  int main(int argc, char** argv) {
+
+     int pktSize = atoi(argv[1]);
+
      bool verbose = true;
  
      CommandLine cmd(__FILE__);
@@ -138,18 +136,6 @@
      }
  
      uint16_t numOfChannelsSupported = 6;
- 
-     // // In this example, Hopping Sequence is {1, 2, 3, 4, 5, 6}
-     // std::vector<uint16_t> hoppingSequence;
-     // for(int i = 0; i < numOfChannelsSupported; i++)
-     // {
-     //     hoppingSequence[i] = i + 1;
-     // }
- 
-     // callback hook
-     //  McpsDataConfirmCallback cb1;
-     //  cb1 = MakeCallback(&dataSentMacConfirm);
-
  
      // Dsme Network Parameters
      uint8_t panId = 7;
@@ -270,6 +256,7 @@
          dev->SetGreedyRouting(false);
          dev->SetLoadRouting(false);
          dev->SetDirect(true);
+         dev->SetSixLowPanNotifyCallback(MakeCallback(&NotifyUpperApp));
      }
 
      // GTSs setting
@@ -283,8 +270,11 @@
          lrwpanDevices.Get(i)->GetObject<LrWpanNetDevice>()->GetMac()->ResizeScheduleGTSsEvent(BO, MO, SO);
      }
 
-     lrWpanHelper.AddGtsInCfp(lrwpanDevices.Get(3)->GetObject<LrWpanNetDevice>(), false, 1, channelOffsets[0], 1, 0);  // Devices for TX
-     lrWpanHelper.AddGtsInCfp(lrwpanDevices.Get(1)->GetObject<LrWpanNetDevice>(), true, 1, channelOffsets[0], 1, 0);  // Coord for RX
+     for(unsigned int i = 0; i < 7; i++)
+     {
+        lrWpanHelper.AddGtsInCfp(lrwpanDevices.Get(3)->GetObject<LrWpanNetDevice>(), false, 1, channelOffsets[i], 1, i);  // Devices for TX
+        lrWpanHelper.AddGtsInCfp(lrwpanDevices.Get(1)->GetObject<LrWpanNetDevice>(), true, 1, channelOffsets[i], 1, i);  // Coord for RX
+     }
     
      // MAC addresses
      Ptr<NetDevice> dev0 = sixlowDevices.Get(3); // sender
@@ -292,15 +282,42 @@
  
      Mac48Address dstMac = Mac48Address::ConvertFrom(dev1->GetAddress());
 
-     Simulator::Schedule(Seconds(1.175), &SendIPv6PacketinCAP, dev0, dstMac);
-     Simulator::Schedule(Seconds(1.175), &SendIPv6PacketinCAP, dev0, dstMac);
+     SendPacketArgs args = {dev0, dstMac, pktSize};
 
-     // Packet1 1.178943807s received
-     // Packet2 1.181311807s received
-     // delay = 1.181311807 - 1.175 = 0.006311807
+     // slot 0 使用 Enhanced GTS Forwarding
+     Simulator::Schedule(Seconds(1.175), &SendIPv6Packet, args);
+     Simulator::Schedule(Seconds(1.175), &SendIPv6Packet, args);
+     pktSent = 2;
+
+     double slot_1_packet1_StartTime = 1.182720000;
+     double slot_1_packet2_StartTime = 1.182730000;
+     double i = 0;
+
+     for(int slot = 1; slot < 7; slot++)
+     {
+        Simulator::Schedule(Seconds(slot_1_packet1_StartTime + i), &SendIPv6Packet, args);
+        Simulator::Schedule(Seconds(slot_1_packet2_StartTime + i), &SendIPv6Packet, args);
+
+        i += 0.00768;
+
+        // 其實應該要到 sixlowpan 裡面做 confirm，確定能送再 callback
+        pktSent += 2;
+     }
      
      Simulator::Stop(Seconds(1.474560000));
      Simulator::Run();
+
+     // pktSize 最大為 52 bytes，超過的話，第二個封包會無法在 DSME-GTS 內完成傳輸
+     // 此時 Enhanced GTS Forwarding 的效能會退化成 GTS Forwarding
+
+     std::cout << "pktSent: " << pktSent << std::endl;
+     std::cout << "pktRecv: " << pktRecv << std::endl;
+     std::cout << "Delivery ratio: " << pktRecv / pktSent << std::endl;
+     double totalSendSize = (double)(pktRecv * pktSize * 8);
+     double superframeDuration = (double)(960 * 8 / (double)62500);
+
+     std::cout << "Throughput: " << (double)(totalSendSize / (double)(superframeDuration) / (double)1000) << " (kbits/sec)" << std::endl;
+
      Simulator::Destroy();
  }
  

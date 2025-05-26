@@ -2889,14 +2889,17 @@ LrWpanMac::IfsWaitTimeout(Time ifsTime)
             ChangeMacState(MAC_GTS);
         }
 
-        if((m_incGtsEvent.IsRunning() || m_gtsEvent.IsRunning()) && m_enhancedGTSForwarding)
+        if((m_incGtsEvent.IsRunning() || m_gtsEvent.IsRunning()) && (m_lrWpanMacState == MAC_GTS))
         {
             // howard: 新增 Enhanced GTS forwarding
-            Ptr<TxQueueElement> txElem = m_txQueue.front();
-            m_txPkt = txElem->txQPkt;
-            ChangeMacState(MAC_GTS_SENDING);
-            m_phy->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_TX_ON);
-            m_enhancedGTSForwarding = false;
+            NS_LOG_DEBUG("Current TX queue size: " << m_txQueue.size());
+            if(m_enhancedGTSForwarding && !m_txQueue.empty())
+            {
+                Ptr<TxQueueElement> txElem = m_txQueue.front();
+                m_txPkt = txElem->txQPkt;
+                ChangeMacState(MAC_GTS_SENDING);
+                m_phy->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_TX_ON);
+            }
         }
 
     }
