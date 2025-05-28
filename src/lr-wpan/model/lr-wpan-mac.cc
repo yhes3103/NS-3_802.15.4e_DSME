@@ -2897,8 +2897,12 @@ LrWpanMac::IfsWaitTimeout(Time ifsTime)
             {
                 Ptr<TxQueueElement> txElem = m_txQueue.front();
                 m_txPkt = txElem->txQPkt;
-                ChangeMacState(MAC_GTS_SENDING);
-                m_phy->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_TX_ON);
+                // 52 (上層封包) + 5 bytes (Mesh Header) + 2 bytes (HC1) + 9 bytes (MAC Header) + 2 bytes (Footer)
+                if(m_txPkt->GetSize() <= 70)
+                {
+                    ChangeMacState(MAC_GTS_SENDING);
+                    m_phy->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_TX_ON);
+                }
             }
         }
 
