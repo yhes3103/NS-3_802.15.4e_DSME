@@ -1982,7 +1982,7 @@ class LrWpanMac : public Object
      *
      * \param c the callback
      */    
-    void SetMlmeDsmeInfoConfirmCallback(MlmeDsmeInfoConfirmCallback c);
+  void SetMlmeDsmeInfoConfirmCallback(MlmeDsmeInfoConfirmCallback c);
 
     /**
      * Set the callback for the indication of an incoming dsme link status report 
@@ -2001,7 +2001,27 @@ class LrWpanMac : public Object
      *
      * \param c the callback
      */    
-    void SetMlmeDsmeLinkStatusRptConfirmCallback(MlmeDsmeLinkStatusRptConfirmCallback c);    
+  void SetMlmeDsmeLinkStatusRptConfirmCallback(MlmeDsmeLinkStatusRptConfirmCallback c);    
+
+    /**
+     * Issue a DSME Beacon Allocation Notification during CAP to announce
+     * the chosen beacon SDIndex to 1-hop neighbors.
+     * Public MLME-style convenience wrapper.
+     */
+    void MlmeDsmeBeaconAllocNotify();
+
+    /**
+     * Return the current locally aggregated DSME beacon bitmap that this MAC
+     * maintains (merged from received Enhanced Beacons).
+     */
+    BeaconBitmap GetAggregatedBeaconBitmap() const;
+
+    /**
+     * Find a vacant beacon SDIndex from the aggregated bitmap.
+     * If randomPick=true, pick uniformly at random from the vacant set;
+     * otherwise pick the smallest available index. Returns 0xffff if none.
+     */
+    uint16_t FindVacantBeaconSlot(bool randomPick);
 
     // interfaces between MAC and PHY
 
@@ -3308,7 +3328,7 @@ class LrWpanMac : public Object
     /**
      * Called to send an DSME-Beacon allocation notification command.
      */
-    void SendDsmeBeaconAllocNotifyCommand();
+  void SendDsmeBeaconAllocNotifyCommand();
 
     /**
      * Called to send an DSME-Beacon collision notification command.

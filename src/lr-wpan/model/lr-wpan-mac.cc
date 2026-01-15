@@ -469,7 +469,7 @@ LrWpanMac::McpsDataRequest(McpsDataRequestParams params, Ptr<Packet> p)
     }
 
     if (b1 == TX_OPTION_GTS) {
-        NS_LOG_INFO("進來 CFP 傳資料");
+        // Reduced verbosity
 #if MCPS_DATA_SENDING_LOG
         NS_LOG_DEBUG("Sending a data packet during a GTS period.");
 #endif
@@ -487,11 +487,11 @@ LrWpanMac::McpsDataRequest(McpsDataRequestParams params, Ptr<Packet> p)
         }
 
         p->AddTrailer(macTrailer);
-        NS_LOG_INFO("MAC Header: " << macHdr.GetSerializedSize() << " bytes");
-        NS_LOG_INFO("MAC Footer: " << macTrailer.GetSerializedSize() << " bytes");
+        // NS_LOG_DEBUG("MAC Header: " << macHdr.GetSerializedSize() << " bytes");
+        // NS_LOG_DEBUG("MAC Footer: " << macTrailer.GetSerializedSize() << " bytes");
 
-        NS_LOG_INFO(m_incGtsEvent.IsRunning());
-        NS_LOG_INFO(m_gtsEvent.IsRunning());
+        // NS_LOG_DEBUG(m_incGtsEvent.IsRunning());
+        // NS_LOG_DEBUG(m_gtsEvent.IsRunning());
 
         if((m_incGtsEvent.IsRunning() || m_gtsEvent.IsRunning()) && m_lrWpanMacState == MAC_GTS)
         {
@@ -512,7 +512,7 @@ LrWpanMac::McpsDataRequest(McpsDataRequestParams params, Ptr<Packet> p)
     }
     else if (b3 == TX_OPTION_DIRECT)
     {
-        NS_LOG_INFO("進來 CAP 傳資料");
+        // Reduced verbosity
         // Direct Tx
         // From this point the packet will be pushed to a Tx queue and immediately
         // use a slotted (beacon-enabled) or unslotted (nonbeacon-enabled) version of CSMA/CA
@@ -520,7 +520,7 @@ LrWpanMac::McpsDataRequest(McpsDataRequestParams params, Ptr<Packet> p)
         // received a valid beacon or not.
 
         p->AddHeader(macHdr);
-        NS_LOG_INFO("MAC Header: " << macHdr.GetSerializedSize() << " bytes");
+        // NS_LOG_DEBUG("MAC Header: " << macHdr.GetSerializedSize() << " bytes");
 
         LrWpanMacTrailer macTrailer;
         // Calculate FCS if the global attribute ChecksumEnable is set.
@@ -530,7 +530,7 @@ LrWpanMac::McpsDataRequest(McpsDataRequestParams params, Ptr<Packet> p)
             macTrailer.SetFcs(p);
         }
         p->AddTrailer(macTrailer);
-        NS_LOG_INFO("MAC Footer: " << macTrailer.GetSerializedSize() << " bytes");
+        // NS_LOG_DEBUG("MAC Footer: " << macTrailer.GetSerializedSize() << " bytes");
 
         Ptr<TxQueueElement> txQElement = Create<TxQueueElement>();
         txQElement->txQMsduHandle = params.m_msduHandle;
@@ -1589,14 +1589,16 @@ void LrWpanMac::StartSuperframe()
         m_curSuperframeIDx++;
     }
     
-    NS_LOG_DEBUG("************************************ SuperframeIDx : " << GetSuperframeIDx() << " start ************************************");
+    // Reduced verbosity: superframe start banner suppressed
+    // NS_LOG_DEBUG("************************************ SuperframeIDx : " << GetSuperframeIDx() << " start ************************************");
 
     uint64_t symbolRate;
     symbolRate = (uint64_t)m_phy->GetDataOrSymbolRate(false); // symbols per second
 
     Time nextSuperframestartTime = Seconds((double) m_superframeDuration / symbolRate);
     Simulator::Schedule(nextSuperframestartTime, &LrWpanMac::StartSuperframe, this);
-    NS_LOG_INFO("下個 Superframe 會發生在: " << (Simulator::Now() + nextSuperframestartTime).As(Time::S));
+    // Reduced verbosity: suppress next superframe schedule prints
+    // NS_LOG_INFO("下個 Superframe 會發生在: " << (Simulator::Now() + nextSuperframestartTime).As(Time::S));
     m_isFirstSuperframe = false;
 }
 
@@ -1621,7 +1623,8 @@ void LrWpanMac::StartMultisuperframe(SuperframeType superframeType)
 
         if(Multisuperframe_count == 0)
         {
-            NS_LOG_INFO("初始化 Multi-Superframe");
+            // Reduced verbosity
+            // NS_LOG_INFO("初始化 Multi-Superframe");
             Multisuperframe_count++;
         }
 
@@ -1643,8 +1646,9 @@ void LrWpanMac::StartMultisuperframe(SuperframeType superframeType)
 
         if(Superframe_count == 0)
         {
-            NS_LOG_INFO("初始化 Superframe");
-            NS_LOG_INFO("第一個 Superframe 會發生在: " << nextSuperframestartTime.As(Time::S));
+            // Reduced verbosity
+            // NS_LOG_INFO("初始化 Superframe");
+            // NS_LOG_INFO("第一個 Superframe 會發生在: " << nextSuperframestartTime.As(Time::S));
             Superframe_count++;
         }
     }
@@ -3912,5 +3916,102 @@ void LrWpanMac::Set6lowpanDataNoACK(bool NoACK)
 {
     m_NoACK = NoACK;
 }
+
+// ---- Added: DSME Beacon allocation helpers (distributed slot selection) ----
+void
+LrWpanMac::MlmeDsmeBeaconAllocNotify()
+{
+    // Public wrapper to enqueue a DSME Beacon Allocation Notification command
+    SendDsmeBeaconAllocNotifyCommand();
+}
+
+BeaconBitmap
+LrWpanMac::GetAggregatedBeaconBitmap() const
+{
+    return m_macSDBitmap;
+}
+
+uint16_t
+LrWpanMac::FindVacantBeaconSlot(bool randomPick)
+{
+    // Infer total number of SD slots
+    uint16_t totalSlots = m_macSDBitmap.GetSDBitmapLength();
+    if (totalSlots == 0 && m_macBeaconOrder != 15 && m_macSuperframeOrder != 15 && m_macBeaconOrder >= m_macSuperframeOrder)
+    {
+        totalSlots = static_cast<uint16_t>(1u << (m_macBeaconOrder - m_macSuperframeOrder));
+    }
+    if (totalSlots == 0)
+    {
+        return 0xffff;
+    }
+
+    // Build vacancy list (exclude SDIndex 0 reserved for PAN-C)
+    std::vector<uint16_t> vacant;
+    const std::vector<uint16_t> bitmap = m_macSDBitmap.GetSDBitmap();
+    for (uint16_t s = 1; s < totalSlots; ++s)
+    {
+        uint16_t idx = s / 16;
+        uint16_t bit = static_cast<uint16_t>(1u << (s % 16));
+        bool occupied = (idx < bitmap.size()) && ((bitmap[idx] & bit) != 0);
+        if (!occupied)
+        {
+            vacant.push_back(s);
+        }
+    }
+    if (vacant.empty())
+    {
+        return 0xffff;
+    }
+    if (!randomPick)
+    {
+        return vacant.front();
+    }
+    Ptr<UniformRandomVariable> urv = CreateObject<UniformRandomVariable>();
+    uint32_t pick = urv->GetInteger(0, static_cast<int>(vacant.size()) - 1);
+    return vacant[pick];
+}
+
+void
+LrWpanMac::SendDsmeBeaconAllocNotifyCommand()
+{
+    NS_LOG_FUNCTION(this);
+    NS_LOG_DEBUG("Send Dsme Beacon Allocation Notification Command");
+
+    // Construct MAC command frame carrying chosen SDIndex (broadcast to PAN)
+    LrWpanMacHeader macHdr(LrWpanMacHeader::LRWPAN_MAC_COMMAND, m_macDsn.GetValue());
+    m_macDsn++;
+    LrWpanMacTrailer macTrailer;
+    Ptr<Packet> commandPacket = Create<Packet>();
+
+    macHdr.SetNoFrmPend();
+    macHdr.SetNoAckReq();
+    macHdr.SetPanIdComp();
+    macHdr.SetSecDisable();
+
+    macHdr.SetSrcAddrMode(LrWpanMacHeader::SHORTADDR);
+    macHdr.SetDstAddrMode(LrWpanMacHeader::SHORTADDR);
+
+    macHdr.SetSrcAddrFields(0xffff, GetShortAddress());
+    macHdr.SetDstAddrFields(GetPanId(), Mac16Address("ff:ff"));
+
+    CommandPayloadHeader macPayload(CommandPayloadHeader::DSME_BEACON_ALLOC_NOTIF);
+    macPayload.SetAllocationBcnSDIndex(m_choosedSDIndexToSendBcn);
+
+    commandPacket->AddHeader(macPayload);
+    commandPacket->AddHeader(macHdr);
+
+    if (Node::ChecksumEnabled())
+    {
+        macTrailer.EnableFcs(true);
+        macTrailer.SetFcs(commandPacket);
+    }
+    commandPacket->AddTrailer(macTrailer);
+
+    Ptr<TxQueueElement> txQElement = Create<TxQueueElement>();
+    txQElement->txQPkt = commandPacket;
+    EnqueueTxQElement(txQElement);
+    CheckQueue();
+}
+// ---- End added block ----
 
 } // namespace ns3

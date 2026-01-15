@@ -188,7 +188,19 @@ class LrWpanNetDevice : public NetDevice
 
     void SetAsCoordinator();
 
-    void TrackCoordinatorBeacon(MlmeSyncRequestParams params);
+  void TrackCoordinatorBeacon(MlmeSyncRequestParams params);
+
+  /**
+   * Return a vacant beacon SDIndex found from the MAC's aggregated bitmap.
+   * If randomPick=true, choose uniformly at random; else choose the lowest.
+   * Returns 0xffff if none.
+   */
+  uint16_t FindVacantBeaconSlot(bool randomPick);
+
+  /**
+   * Send DSME Beacon Allocation Notification (broadcast) during CAP.
+   */
+  void SendDsmeBeaconAllocNotify();
 
     void PassRecordKeyAndValue(std::pair<Address, Address> recordkey, unsigned int recordValueIdx);
 

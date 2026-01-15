@@ -681,4 +681,12 @@ void LrWpanNetDevice::PassRecordKeyAndValue(std::pair<Address, Address> recordke
     m_mac->ReceiveRecordKeyAndValueIdx(recordkey, recordValueIdx);
 }   
 
+uint16_t LrWpanNetDevice::FindVacantBeaconSlot(bool randomPick) {
+    return m_mac->FindVacantBeaconSlot(randomPick);
+}
+
+void LrWpanNetDevice::SendDsmeBeaconAllocNotify() {
+    m_mac->MlmeDsmeBeaconAllocNotify();
+}
+
 } // namespace ns3
