@@ -38,3 +38,10 @@ build_lib_example(
   LIBRARIES_TO_LINK ${liblr-wpan}
                     ${libnetanim}
 )
+
+build_lib_example(
+  NAME lr-wpan-dsme-eb
+  SOURCE_FILES lr-wpan-dsme-eb.cc
+  LIBRARIES_TO_LINK ${liblr-wpan}
+                    ${libnetanim}
+)

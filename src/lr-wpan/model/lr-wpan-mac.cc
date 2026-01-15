@@ -2048,6 +2048,10 @@ void LrWpanMac::PdDataIndication(uint32_t psduLength, Ptr<Packet> p, uint8_t lqi
     Ptr<Packet> originalPkt = p->Copy(); // because we will strip headers
     uint64_t symbolRate = (uint64_t)m_phy->GetDataOrSymbolRate(false); // symbols per second
 
+    // Feed packet capture and sniffer traces on RX as well
+    m_promiscSnifferTrace(originalPkt);
+    m_snifferTrace(originalPkt);
+
     LrWpanMacTrailer receivedMacTrailer;
     p->RemoveTrailer(receivedMacTrailer);
 
