@@ -13,6 +13,7 @@
 #include <sstream>
 #include <iomanip>
 #include <map>
+#include <cmath>
 #include <functional>
 
 using namespace ns3;
@@ -24,6 +25,10 @@ NS_LOG_COMPONENT_DEFINE("DsmeBeaconSlotSelectionRandomPick");
 #define MO 5
 
 #define NUM_COORD 5 // 1 PAN-C + 4 joining coordinators
+#define NUM_OBSERVERS 3 // 旁觀端裝置數量（只接收不成為協調器）
+
+// 幾何近似的覆蓋半徑（公尺），用於判斷觀察者是否同時位於多個衝突協調器的覆蓋範圍內
+static double g_coverageRadius = 80.0;
 
 static void LogPickedSlot(uint32_t nodeIdx, uint16_t sdIdx)
 {
@@ -32,6 +37,13 @@ static void LogPickedSlot(uint32_t nodeIdx, uint16_t sdIdx)
 
 // Record chosen SDIndex per node for final summary
 static std::map<uint32_t, uint16_t> g_chosen;
+static std::vector<uint32_t> g_observers; // 儲存旁觀端的 nodeId
+
+static double Dist(const Vector& a, const Vector& b)
+{
+  double dx = a.x - b.x, dy = a.y - b.y;
+  return std::sqrt(dx*dx + dy*dy);
+}
 
 static void PrintSummary(uint32_t numNodes)
 {
@@ -76,6 +88,32 @@ static void PrintSummary(uint32_t numNodes)
 
   NS_LOG_UNCOND("Collisions (nodes beyond unique per SD): " << collisionNodes);
   NS_LOG_UNCOND("Unassigned nodes: " << unassigned);
+
+  // 幾何近似的「觀察者可見碰撞」檢查：
+  // 若存在同一 SDIndex 的多個協調器，且某觀察者同時位於其中兩個以上的覆蓋範圍內，
+  // 則此觀察者被視為可能遭遇 beacon 碰撞。
+  uint32_t obsCollisions = 0;
+  for (uint32_t obsId : g_observers)
+  {
+    Ptr<Node> on = NodeList::GetNode(obsId);
+    Vector op = on->GetObject<MobilityModel>()->GetPosition();
+    bool hasCollision = false;
+    for (const auto& kv : groups)
+    {
+      if (kv.first == 0 || kv.second.size() < 2) continue;
+      uint32_t within = 0;
+      for (uint32_t coordId : kv.second)
+      {
+        Ptr<Node> cn = NodeList::GetNode(coordId);
+        Vector cp = cn->GetObject<MobilityModel>()->GetPosition();
+        if (Dist(op, cp) <= g_coverageRadius) within++;
+        if (within >= 2) { hasCollision = true; break; }
+      }
+      if (hasCollision) break;
+    }
+    if (hasCollision) obsCollisions++;
+  }
+  NS_LOG_UNCOND("Observers potentially experiencing beacon collision: " << obsCollisions << "/" << g_observers.size());
 }
 
 int main(int argc, char** argv)
@@ -83,7 +121,7 @@ int main(int argc, char** argv)
   bool verbose = true;
   bool promiscuousPcap = true;
   double simTime = 20.0; // 拉長預設模擬時間，讓各節點有餘裕完成挑選與公告
-  uint32_t seed = 3; // deterministic seed
+  uint32_t seed = 4; // deterministic seed
 
   CommandLine cmd(__FILE__);
   cmd.AddValue("verbose", "Enable component logs", verbose);
@@ -105,6 +143,10 @@ int main(int argc, char** argv)
   NodeContainer nodes;
   nodes.Create(NUM_COORD);
 
+  // 旁觀端裝置（只接收）
+  NodeContainer observers;
+  observers.Create(NUM_OBSERVERS);
+
   MobilityHelper mobility;
   Ptr<ListPositionAllocator> pos = CreateObject<ListPositionAllocator>();
   pos->Add(Vector(0.0, 100.0, 0.0));   // Node 0: PAN-C (00:01)
@@ -116,8 +158,19 @@ int main(int argc, char** argv)
   mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
   mobility.Install(nodes);
 
+  // 安排觀察者位置（選擇容易同時覆蓋的區域）
+  Ptr<ListPositionAllocator> posObs = CreateObject<ListPositionAllocator>();
+  posObs->Add(Vector(0.0, 60.0, 0.0));     // 介於 Node1/2/PAN 之間
+  posObs->Add(Vector(-35.0, 25.0, 0.0));   // 偏向 Node1/3
+  posObs->Add(Vector(35.0, 25.0, 0.0));    // 偏向 Node2/4
+  MobilityHelper mobilityObs;
+  mobilityObs.SetPositionAllocator(posObs);
+  mobilityObs.SetMobilityModel("ns3::ConstantPositionMobilityModel");
+  mobilityObs.Install(observers);
+
   LrWpanHelper lrWpanHelper(true);
   NetDeviceContainer devs = lrWpanHelper.Install(nodes);
+  NetDeviceContainer obsDevs = lrWpanHelper.Install(observers);
   lrWpanHelper.EnablePcapAll(std::string("dsme-beacon-slot-selection-random-pick"), promiscuousPcap);
 
   const uint16_t numChSupported = 6;
@@ -130,6 +183,23 @@ int main(int argc, char** argv)
     Ptr<LrWpanNetDevice> d = devs.Get(i)->GetObject<LrWpanNetDevice>();
     d->GetMac()->SetNumOfChannelSupported(numChSupported);
     d->GetMac()->SetCAPReduction(capReduction);
+  }
+
+  // 設定觀察者為同 PAN，只接收不成為協調器
+  for (uint32_t i = 0; i < obsDevs.GetN(); ++i)
+  {
+    Ptr<LrWpanNetDevice> d = obsDevs.Get(i)->GetObject<LrWpanNetDevice>();
+    // 指派不重複短址：從 0x20 起
+    uint8_t ab[2] = {0x00, static_cast<uint8_t>(0x20 + i)};
+    Mac16Address sa; sa.CopyFrom(ab);
+    d->GetMac()->SetShortAddress(sa);
+    d->GetMac()->SetPanId(panId);
+    d->GetMac()->SetAssociatedCoor(Mac16Address("00:01"));
+    MlmeSyncRequestParams sync;
+    sync.m_logCh = channelNum;
+    sync.m_trackBcn = true;
+    d->TrackCoordinatorBeacon(sync);
+    g_observers.push_back(d->GetNode()->GetId());
   }
 
   // PAN-C setup at SDIndex=0
@@ -289,6 +359,17 @@ int main(int argc, char** argv)
   anim.UpdateNodeColor(nodes.Get(2), 0, 200, 0);
   anim.UpdateNodeColor(nodes.Get(3), 200, 100, 0);
   anim.UpdateNodeColor(nodes.Get(4), 128, 0, 128);
+
+  // 標示觀察者
+  for (uint32_t i = 0; i < observers.GetN(); ++i)
+  {
+    Ptr<Node> on = observers.Get(i);
+    std::ostringstream lab;
+    lab << "Observer O" << i;
+    anim.UpdateNodeDescription(on, lab.str());
+    anim.UpdateNodeColor(on, 255, 215, 0); // 金色
+    anim.UpdateNodeSize(on->GetId(), 11.0, 11.0);
+  }
 
   Simulator::Stop(Seconds(simTime));
   // Print summary just before stop
