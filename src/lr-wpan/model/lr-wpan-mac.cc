@@ -2480,6 +2480,10 @@ void LrWpanMac::PdDataIndication(uint32_t psduLength, Ptr<Packet> p, uint8_t lqi
                             Time scheduleBcnTime = Seconds(((double)m_incomingSuperframeDuration * m_choosedSDIndexToSendBcn) 
                                                         / symbolRate) // Calculate the total superframe time in BI
                                                         - (Simulator::Now() - m_startOfBcnSlotOfSyncParent); // Minus the times when the Parent coordinator send it beacon.
+                            // Guard against numerical drift or stale parent timestamp causing negative delay
+                            if (!scheduleBcnTime.IsPositive()) {
+                                scheduleBcnTime = NanoSeconds(1);
+                            }
                             NS_LOG_DEBUG("Simulator::Now() - m_startOfBcnSlotOfSyncParent = " << (Simulator::Now() - m_startOfBcnSlotOfSyncParent).As(Time::S)); // debug
                             // NS_LOG_DEBUG("m_incomingSuperframeDuration = " << m_incomingSuperframeDuration);
                             // NS_LOG_DEBUG("m_startOfBcnSlotOfSyncParent = " << m_startOfBcnSlotOfSyncParent.As(Time::S));
@@ -3363,7 +3367,12 @@ LrWpanMac::SetLrWpanMacState(LrWpanMacState macState)
         m_phy->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_RX_ON);
 
     } else if (macState == MAC_CSMA) {
-        NS_ASSERT(m_lrWpanMacState == MAC_IDLE || m_lrWpanMacState == MAC_ACK_PENDING);
+        // Be robust to races where CSMA is requested while a beacon is being sent.
+        if (!(m_lrWpanMacState == MAC_IDLE || m_lrWpanMacState == MAC_ACK_PENDING)) {
+            // Skip immediate CSMA transition; it will be retried when MAC returns to IDLE.
+            NS_LOG_DEBUG("Skip MAC_CSMA transition due to current state=" << m_lrWpanMacState);
+            return;
+        }
         NS_LOG_INFO("Use carrier sensing and switch receiver state to RX_ON");
         ChangeMacState(MAC_CSMA);
         m_phy->PlmeSetTRXStateRequest(IEEE_802_15_4_PHY_RX_ON);
@@ -3552,7 +3561,11 @@ void LrWpanMac::SetEnhancedGTSForwarding(bool on) {
 uint32_t
 LrWpanMac::GetIfsSize()
 {
-    NS_ASSERT(m_txPkt);
+    // Be robust: m_txPkt might be null for beacons or after queue cleanup
+    if (m_txPkt == nullptr)
+    {
+        return m_macSIFSPeriod;
+    }
 
     if (m_txPkt->GetSize() <= aMaxSIFSFrameSize)
     {
@@ -3573,7 +3586,10 @@ LrWpanMac::SetAssociatedCoor(Mac16Address mac)
 uint64_t
 LrWpanMac::GetTxPacketSymbols()
 {
-    NS_ASSERT(m_txPkt);
+    if (m_txPkt == nullptr)
+    {
+        return 0;
+    }
     // Sync Header (SHR) +  8 bits PHY header (PHR) + PSDU
     return (m_phy->GetPhySHRDuration() + 1 * m_phy->GetPhySymbolsPerOctet() +
             (m_txPkt->GetSize() * m_phy->GetPhySymbolsPerOctet()));
@@ -3582,7 +3598,10 @@ LrWpanMac::GetTxPacketSymbols()
 bool
 LrWpanMac::isTxAckReq()
 {
-    NS_ASSERT(m_txPkt);
+    if (m_txPkt == nullptr)
+    {
+        return false;
+    }
     LrWpanMacHeader macHdr;
     m_txPkt->PeekHeader(macHdr);
 

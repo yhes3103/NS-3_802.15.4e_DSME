@@ -24,8 +24,8 @@ NS_LOG_COMPONENT_DEFINE("DsmeBeaconSlotSelectionRandomPick");
 #define SO 3
 #define MO 5
 
-#define NUM_COORD 5 // 1 PAN-C + 4 joining coordinators
-#define NUM_OBSERVERS 3 // 旁觀端裝置數量（只接收不成為協調器）
+#define NUM_COORD 10 // 1 PAN-C + 9 joining coordinators（增加協調器以提高碰撞機率）
+#define NUM_OBSERVERS 6 // 旁觀端裝置數量（只接收不成為協調器）
 
 // 幾何近似的覆蓋半徑（公尺），用於判斷觀察者是否同時位於多個衝突協調器的覆蓋範圍內
 static double g_coverageRadius = 80.0;
@@ -38,6 +38,7 @@ static void LogPickedSlot(uint32_t nodeIdx, uint16_t sdIdx)
 // Record chosen SDIndex per node for final summary
 static std::map<uint32_t, uint16_t> g_chosen;
 static std::vector<uint32_t> g_observers; // 儲存旁觀端的 nodeId
+static AnimationInterface* g_anim = nullptr; // 用於在總表階段更新顏色
 
 static double Dist(const Vector& a, const Vector& b)
 {
@@ -112,6 +113,12 @@ static void PrintSummary(uint32_t numNodes)
       if (hasCollision) break;
     }
     if (hasCollision) obsCollisions++;
+    // 觀察者顏色：發生碰撞者金色，否則黑色
+    if (g_anim)
+    {
+      if (hasCollision) { g_anim->UpdateNodeColor(on, 255, 215, 0); }
+      else { g_anim->UpdateNodeColor(on, 0, 0, 0); }
+    }
   }
   NS_LOG_UNCOND("Observers potentially experiencing beacon collision: " << obsCollisions << "/" << g_observers.size());
 }
@@ -154,6 +161,11 @@ int main(int argc, char** argv)
   pos->Add(Vector(70.0, 50.0, 0.0));   // Node 2: Coord2 (00:03)
   pos->Add(Vector(-100.0, 0.0, 0.0));  // Node 3: Coord3 (00:04)
   pos->Add(Vector(100.0, 0.0, 0.0));   // Node 4: Coord4 (00:05)
+  pos->Add(Vector(-40.0, -20.0, 0.0)); // Node 5: Coord5 (00:06)
+  pos->Add(Vector(40.0, -20.0, 0.0));  // Node 6: Coord6 (00:07)
+  pos->Add(Vector(-120.0, 30.0, 0.0)); // Node 7: Coord7 (00:08)
+  pos->Add(Vector(120.0, 30.0, 0.0));  // Node 8: Coord8 (00:09)
+  pos->Add(Vector(0.0, -60.0, 0.0));   // Node 9: Coord9 (00:0A)
   mobility.SetPositionAllocator(pos);
   mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
   mobility.Install(nodes);
@@ -163,6 +175,9 @@ int main(int argc, char** argv)
   posObs->Add(Vector(0.0, 60.0, 0.0));     // 介於 Node1/2/PAN 之間
   posObs->Add(Vector(-35.0, 25.0, 0.0));   // 偏向 Node1/3
   posObs->Add(Vector(35.0, 25.0, 0.0));    // 偏向 Node2/4
+  posObs->Add(Vector(-60.0, -10.0, 0.0));  // 偏向 Node5/7
+  posObs->Add(Vector(60.0, -10.0, 0.0));   // 偏向 Node6/8
+  posObs->Add(Vector(0.0, -40.0, 0.0));    // 偏向 Node5/6/9
   MobilityHelper mobilityObs;
   mobilityObs.SetPositionAllocator(posObs);
   mobilityObs.SetMobilityModel("ns3::ConstantPositionMobilityModel");
@@ -239,6 +254,11 @@ int main(int argc, char** argv)
     Mac16Address parent = Mac16Address("00:01");
     if (i == 3) parent = Mac16Address("00:02");
     if (i == 4) parent = Mac16Address("00:03");
+    if (i == 5) parent = Mac16Address("00:02");
+    if (i == 6) parent = Mac16Address("00:03");
+    if (i == 7) parent = Mac16Address("00:04");
+    if (i == 8) parent = Mac16Address("00:05");
+    if (i == 9) parent = Mac16Address("00:02");
 
     d->GetMac()->SetAssociatedCoor(parent);
 
@@ -273,6 +293,7 @@ int main(int argc, char** argv)
       }
 
       uint16_t sdIdx = d->FindVacantBeaconSlot(true);
+      // 保持純隨機選位（不強制重疊），以真實結果為準
       if (sdIdx == 0xffff) {
         if (*tries < maxTries) {
           Simulator::Schedule(Seconds(retryInterval), *self);
@@ -332,6 +353,7 @@ int main(int argc, char** argv)
 
   // NetAnim
   AnimationInterface anim("dsme-beacon-slot-selection-random-pick.xml");
+  g_anim = &anim;
   anim.SetMobilityPollInterval(Seconds(0.1));
   anim.EnablePacketMetadata(true);
 
@@ -355,19 +377,20 @@ int main(int argc, char** argv)
     anim.UpdateNodeDescription(nodes.Get(i), lab.str());
     anim.UpdateNodeSize(nodes.Get(i)->GetId(), 12.0, 12.0);
   }
-  anim.UpdateNodeColor(nodes.Get(1), 0, 128, 255);
-  anim.UpdateNodeColor(nodes.Get(2), 0, 200, 0);
-  anim.UpdateNodeColor(nodes.Get(3), 200, 100, 0);
-  anim.UpdateNodeColor(nodes.Get(4), 128, 0, 128);
+  // Coordinators 一律藍色
+  for (uint32_t i = 1; i < NUM_COORD; ++i)
+  {
+    anim.UpdateNodeColor(nodes.Get(i), 0, 0, 255);
+  }
 
-  // 標示觀察者
+  // 標示觀察者（預設黑色，如偵測碰撞則在總表階段改為金色）
   for (uint32_t i = 0; i < observers.GetN(); ++i)
   {
     Ptr<Node> on = observers.Get(i);
     std::ostringstream lab;
     lab << "Observer O" << i;
     anim.UpdateNodeDescription(on, lab.str());
-    anim.UpdateNodeColor(on, 255, 215, 0); // 金色
+    anim.UpdateNodeColor(on, 0, 0, 0); // 黑色（無碰撞）
     anim.UpdateNodeSize(on->GetId(), 11.0, 11.0);
   }
 
