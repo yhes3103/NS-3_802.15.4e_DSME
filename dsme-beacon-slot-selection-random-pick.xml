@@ -236,6 +236,12 @@
 <wpr uId="6" tId="9" fbRx="2.953856486" lbRx="0" />
 <wpr uId="6" tId="1" fbRx="2.953856518" lbRx="0" />
 <wpr uId="6" tId="13" fbRx="2.953856529" lbRx="0" />
+<nu p="c" t="3" id="10" r="0" g="0" b="0" />
+<nu p="c" t="3" id="11" r="0" g="0" b="0" />
+<nu p="c" t="3" id="12" r="0" g="0" b="0" />
+<nu p="c" t="3" id="13" r="0" g="0" b="0" />
+<nu p="c" t="3" id="14" r="0" g="0" b="0" />
+<nu p="c" t="3" id="15" r="0" g="0" b="0" />
 <pr uId="7" fId="1" fbTx="3.072192" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 150, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:02
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
@@ -265,6 +271,12 @@
 <wpr uId="7" tId="9" fbRx="3.072192435" lbRx="0" />
 <wpr uId="7" tId="2" fbRx="3.072192467" lbRx="0" />
 <wpr uId="7" tId="14" fbRx="3.072192478" lbRx="0" />
+<nu p="c" t="3.5" id="10" r="0" g="0" b="0" />
+<nu p="c" t="3.5" id="11" r="0" g="0" b="0" />
+<nu p="c" t="3.5" id="12" r="0" g="0" b="0" />
+<nu p="c" t="3.5" id="13" r="255" g="215" b="0" />
+<nu p="c" t="3.5" id="14" r="0" g="0" b="0" />
+<nu p="c" t="3.5" id="15" r="0" g="0" b="0" />
 <pr uId="8" fId="2" fbTx="3.686592" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 32, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:03
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
@@ -324,6 +336,12 @@
 <wpr uId="9" tId="15" fbRx="3.932352467" lbRx="0" />
 <wpr uId="9" tId="3" fbRx="3.932352472" lbRx="0" />
 <wpr uId="9" tId="4" fbRx="3.932352472" lbRx="0" />
+<nu p="c" t="4" id="10" r="0" g="0" b="0" />
+<nu p="c" t="4" id="11" r="0" g="0" b="0" />
+<nu p="c" t="4" id="12" r="0" g="0" b="0" />
+<nu p="c" t="4" id="13" r="255" g="215" b="0" />
+<nu p="c" t="4" id="14" r="255" g="215" b="0" />
+<nu p="c" t="4" id="15" r="0" g="0" b="0" />
 <pr uId="10" fId="1" fbTx="4.055232" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 151, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:02
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
@@ -555,6 +573,12 @@
 <wpr uId="20" tId="11" fbRx="4.310144454" lbRx="0" />
 <wpr uId="20" tId="0" fbRx="4.310144468" lbRx="0" />
 <wpr uId="20" tId="5" fbRx="4.310144468" lbRx="0" />
+<nu p="c" t="4.5" id="10" r="0" g="0" b="0" />
+<nu p="c" t="4.5" id="11" r="0" g="0" b="0" />
+<nu p="c" t="4.5" id="12" r="0" g="0" b="0" />
+<nu p="c" t="4.5" id="13" r="255" g="215" b="0" />
+<nu p="c" t="4.5" id="14" r="255" g="215" b="0" />
+<nu p="c" t="4.5" id="15" r="0" g="0" b="0" />
 <pr uId="21" fId="3" fbTx="4.546752" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 113, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:04
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
@@ -660,6 +684,12 @@
 <wpr uId="24" tId="15" fbRx="4.915392467" lbRx="0" />
 <wpr uId="24" tId="3" fbRx="4.915392472" lbRx="0" />
 <wpr uId="24" tId="4" fbRx="4.915392472" lbRx="0" />
+<nu p="c" t="5" id="10" r="0" g="0" b="0" />
+<nu p="c" t="5" id="11" r="0" g="0" b="0" />
+<nu p="c" t="5" id="12" r="0" g="0" b="0" />
+<nu p="c" t="5" id="13" r="255" g="215" b="0" />
+<nu p="c" t="5" id="14" r="255" g="215" b="0" />
+<nu p="c" t="5" id="15" r="0" g="0" b="0" />
 <pr uId="25" fId="1" fbTx="5.038272" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 152, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:02
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
@@ -833,6 +863,12 @@
 <wpr uId="31" tId="2" fbRx="5.291072389" lbRx="0" />
 <wpr uId="31" tId="7" fbRx="5.291072454" lbRx="0" />
 <wpr uId="31" tId="8" fbRx="5.291072454" lbRx="0" />
+<nu p="c" t="5.5" id="10" r="0" g="0" b="0" />
+<nu p="c" t="5.5" id="11" r="0" g="0" b="0" />
+<nu p="c" t="5.5" id="12" r="0" g="0" b="0" />
+<nu p="c" t="5.5" id="13" r="255" g="215" b="0" />
+<nu p="c" t="5.5" id="14" r="255" g="215" b="0" />
+<nu p="c" t="5.5" id="15" r="0" g="0" b="0" />
 <pr uId="32" fId="3" fbTx="5.529792" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 114, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:04
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
@@ -938,6 +974,12 @@
 <wpr uId="35" tId="15" fbRx="5.898432467" lbRx="0" />
 <wpr uId="35" tId="3" fbRx="5.898432472" lbRx="0" />
 <wpr uId="35" tId="4" fbRx="5.898432472" lbRx="0" />
+<nu p="c" t="6" id="10" r="0" g="0" b="0" />
+<nu p="c" t="6" id="11" r="0" g="0" b="0" />
+<nu p="c" t="6" id="12" r="0" g="0" b="0" />
+<nu p="c" t="6" id="13" r="255" g="215" b="0" />
+<nu p="c" t="6" id="14" r="255" g="215" b="0" />
+<nu p="c" t="6" id="15" r="0" g="0" b="0" />
 <pr uId="36" fId="1" fbTx="6.021312" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 153, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:02
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
@@ -1093,6 +1135,12 @@
 <wpr uId="41" tId="0" fbRx="6.271424575" lbRx="0" />
 <wpr uId="41" tId="15" fbRx="6.271424575" lbRx="0" />
 <wpr uId="41" tId="9" fbRx="6.271424612" lbRx="0" />
+<nu p="c" t="6.5" id="10" r="0" g="0" b="0" />
+<nu p="c" t="6.5" id="11" r="0" g="0" b="0" />
+<nu p="c" t="6.5" id="12" r="0" g="0" b="0" />
+<nu p="c" t="6.5" id="13" r="255" g="215" b="0" />
+<nu p="c" t="6.5" id="14" r="255" g="215" b="0" />
+<nu p="c" t="6.5" id="15" r="0" g="0" b="0" />
 <pr uId="42" fId="3" fbTx="6.512832" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 115, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:04
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
@@ -1198,6 +1246,12 @@
 <wpr uId="45" tId="15" fbRx="6.881472467" lbRx="0" />
 <wpr uId="45" tId="3" fbRx="6.881472472" lbRx="0" />
 <wpr uId="45" tId="4" fbRx="6.881472472" lbRx="0" />
+<nu p="c" t="7" id="10" r="0" g="0" b="0" />
+<nu p="c" t="7" id="11" r="0" g="0" b="0" />
+<nu p="c" t="7" id="12" r="0" g="0" b="0" />
+<nu p="c" t="7" id="13" r="255" g="215" b="0" />
+<nu p="c" t="7" id="14" r="255" g="215" b="0" />
+<nu p="c" t="7" id="15" r="0" g="0" b="0" />
 <pr uId="46" fId="1" fbTx="7.004352" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 154, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:02
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
@@ -1399,6 +1453,12 @@
 <wpr uId="52" tId="9" fbRx="7.495872389" lbRx="0" />
 <wpr uId="52" tId="10" fbRx="7.495872389" lbRx="0" />
 <wpr uId="52" tId="0" fbRx="7.495872472" lbRx="0" />
+<nu p="c" t="7.5" id="10" r="0" g="0" b="0" />
+<nu p="c" t="7.5" id="11" r="0" g="0" b="0" />
+<nu p="c" t="7.5" id="12" r="0" g="0" b="0" />
+<nu p="c" t="7.5" id="13" r="255" g="215" b="0" />
+<nu p="c" t="7.5" id="14" r="255" g="215" b="0" />
+<nu p="c" t="7.5" id="15" r="0" g="0" b="0" />
 <pr uId="54" fId="2" fbTx="7.618752" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 36, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:03
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
@@ -1512,6 +1572,12 @@
 <wpr uId="57" tId="0" fbRx="7.989568408" lbRx="0" />
 <wpr uId="57" tId="15" fbRx="7.989568408" lbRx="0" />
 <wpr uId="57" tId="9" fbRx="7.989568445" lbRx="0" />
+<nu p="c" t="8" id="10" r="0" g="0" b="0" />
+<nu p="c" t="8" id="11" r="0" g="0" b="0" />
+<nu p="c" t="8" id="12" r="0" g="0" b="0" />
+<nu p="c" t="8" id="13" r="255" g="215" b="0" />
+<nu p="c" t="8" id="14" r="255" g="215" b="0" />
+<nu p="c" t="8" id="15" r="0" g="0" b="0" />
 <pr uId="58" fId="5" fbTx="8.233152" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 190, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:06
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
@@ -1659,6 +1725,12 @@
 <wpr uId="62" tId="9" fbRx="8.478912389" lbRx="0" />
 <wpr uId="62" tId="10" fbRx="8.478912389" lbRx="0" />
 <wpr uId="62" tId="0" fbRx="8.478912472" lbRx="0" />
+<nu p="c" t="8.5" id="10" r="0" g="0" b="0" />
+<nu p="c" t="8.5" id="11" r="0" g="0" b="0" />
+<nu p="c" t="8.5" id="12" r="0" g="0" b="0" />
+<nu p="c" t="8.5" id="13" r="255" g="215" b="0" />
+<nu p="c" t="8.5" id="14" r="255" g="215" b="0" />
+<nu p="c" t="8.5" id="15" r="0" g="0" b="0" />
 <pr uId="64" fId="2" fbTx="8.601792" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 37, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:03
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
@@ -1772,6 +1844,12 @@
 <wpr uId="67" tId="0" fbRx="8.972608408" lbRx="0" />
 <wpr uId="67" tId="15" fbRx="8.972608408" lbRx="0" />
 <wpr uId="67" tId="9" fbRx="8.972608445" lbRx="0" />
+<nu p="c" t="9" id="10" r="0" g="0" b="0" />
+<nu p="c" t="9" id="11" r="0" g="0" b="0" />
+<nu p="c" t="9" id="12" r="0" g="0" b="0" />
+<nu p="c" t="9" id="13" r="255" g="215" b="0" />
+<nu p="c" t="9" id="14" r="255" g="215" b="0" />
+<nu p="c" t="9" id="15" r="0" g="0" b="0" />
 <pr uId="68" fId="5" fbTx="9.216192" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 191, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:06
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
@@ -1919,6 +1997,12 @@
 <wpr uId="72" tId="9" fbRx="9.461952389" lbRx="0" />
 <wpr uId="72" tId="10" fbRx="9.461952389" lbRx="0" />
 <wpr uId="72" tId="0" fbRx="9.461952472" lbRx="0" />
+<nu p="c" t="9.5" id="10" r="0" g="0" b="0" />
+<nu p="c" t="9.5" id="11" r="0" g="0" b="0" />
+<nu p="c" t="9.5" id="12" r="0" g="0" b="0" />
+<nu p="c" t="9.5" id="13" r="255" g="215" b="0" />
+<nu p="c" t="9.5" id="14" r="255" g="215" b="0" />
+<nu p="c" t="9.5" id="15" r="0" g="0" b="0" />
 <pr uId="74" fId="2" fbTx="9.584832" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 38, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:03
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
@@ -2032,6 +2116,12 @@
 <wpr uId="77" tId="0" fbRx="9.955648408" lbRx="0" />
 <wpr uId="77" tId="15" fbRx="9.955648408" lbRx="0" />
 <wpr uId="77" tId="9" fbRx="9.955648445" lbRx="0" />
+<nu p="c" t="10" id="10" r="0" g="0" b="0" />
+<nu p="c" t="10" id="11" r="0" g="0" b="0" />
+<nu p="c" t="10" id="12" r="0" g="0" b="0" />
+<nu p="c" t="10" id="13" r="255" g="215" b="0" />
+<nu p="c" t="10" id="14" r="255" g="215" b="0" />
+<nu p="c" t="10" id="15" r="0" g="0" b="0" />
 <pr uId="78" fId="5" fbTx="10.199232" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 192, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:06
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
@@ -2179,6 +2269,12 @@
 <wpr uId="82" tId="9" fbRx="10.44499239" lbRx="0" />
 <wpr uId="82" tId="10" fbRx="10.44499239" lbRx="0" />
 <wpr uId="82" tId="0" fbRx="10.44499247" lbRx="0" />
+<nu p="c" t="10.5" id="10" r="0" g="0" b="0" />
+<nu p="c" t="10.5" id="11" r="0" g="0" b="0" />
+<nu p="c" t="10.5" id="12" r="0" g="0" b="0" />
+<nu p="c" t="10.5" id="13" r="255" g="215" b="0" />
+<nu p="c" t="10.5" id="14" r="255" g="215" b="0" />
+<nu p="c" t="10.5" id="15" r="0" g="0" b="0" />
 <pr uId="84" fId="2" fbTx="10.567872" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 39, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:03
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
@@ -2292,6 +2388,12 @@
 <wpr uId="87" tId="0" fbRx="10.93868841" lbRx="0" />
 <wpr uId="87" tId="15" fbRx="10.93868841" lbRx="0" />
 <wpr uId="87" tId="9" fbRx="10.93868845" lbRx="0" />
+<nu p="c" t="11" id="10" r="0" g="0" b="0" />
+<nu p="c" t="11" id="11" r="0" g="0" b="0" />
+<nu p="c" t="11" id="12" r="0" g="0" b="0" />
+<nu p="c" t="11" id="13" r="255" g="215" b="0" />
+<nu p="c" t="11" id="14" r="255" g="215" b="0" />
+<nu p="c" t="11" id="15" r="0" g="0" b="0" />
 <pr uId="88" fId="5" fbTx="11.182272" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 193, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:06
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
@@ -2439,6 +2541,12 @@
 <wpr uId="92" tId="9" fbRx="11.42803239" lbRx="0" />
 <wpr uId="92" tId="10" fbRx="11.42803239" lbRx="0" />
 <wpr uId="92" tId="0" fbRx="11.42803247" lbRx="0" />
+<nu p="c" t="11.5" id="10" r="0" g="0" b="0" />
+<nu p="c" t="11.5" id="11" r="0" g="0" b="0" />
+<nu p="c" t="11.5" id="12" r="0" g="0" b="0" />
+<nu p="c" t="11.5" id="13" r="255" g="215" b="0" />
+<nu p="c" t="11.5" id="14" r="255" g="215" b="0" />
+<nu p="c" t="11.5" id="15" r="0" g="0" b="0" />
 <pr uId="94" fId="2" fbTx="11.550912" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 40, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:03
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
@@ -2552,6 +2660,12 @@
 <wpr uId="97" tId="0" fbRx="11.92172841" lbRx="0" />
 <wpr uId="97" tId="15" fbRx="11.92172841" lbRx="0" />
 <wpr uId="97" tId="9" fbRx="11.92172844" lbRx="0" />
+<nu p="c" t="12" id="10" r="0" g="0" b="0" />
+<nu p="c" t="12" id="11" r="0" g="0" b="0" />
+<nu p="c" t="12" id="12" r="0" g="0" b="0" />
+<nu p="c" t="12" id="13" r="255" g="215" b="0" />
+<nu p="c" t="12" id="14" r="255" g="215" b="0" />
+<nu p="c" t="12" id="15" r="0" g="0" b="0" />
 <pr uId="98" fId="5" fbTx="12.165312" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 194, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:06
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
@@ -2699,6 +2813,12 @@
 <wpr uId="102" tId="9" fbRx="12.41107239" lbRx="0" />
 <wpr uId="102" tId="10" fbRx="12.41107239" lbRx="0" />
 <wpr uId="102" tId="0" fbRx="12.41107247" lbRx="0" />
+<nu p="c" t="12.5" id="10" r="0" g="0" b="0" />
+<nu p="c" t="12.5" id="11" r="0" g="0" b="0" />
+<nu p="c" t="12.5" id="12" r="0" g="0" b="0" />
+<nu p="c" t="12.5" id="13" r="255" g="215" b="0" />
+<nu p="c" t="12.5" id="14" r="255" g="215" b="0" />
+<nu p="c" t="12.5" id="15" r="0" g="0" b="0" />
 <pr uId="104" fId="2" fbTx="12.533952" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 41, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:03
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
@@ -2812,6 +2932,12 @@
 <wpr uId="107" tId="0" fbRx="12.90476841" lbRx="0" />
 <wpr uId="107" tId="15" fbRx="12.90476841" lbRx="0" />
 <wpr uId="107" tId="9" fbRx="12.90476845" lbRx="0" />
+<nu p="c" t="13" id="10" r="0" g="0" b="0" />
+<nu p="c" t="13" id="11" r="0" g="0" b="0" />
+<nu p="c" t="13" id="12" r="0" g="0" b="0" />
+<nu p="c" t="13" id="13" r="255" g="215" b="0" />
+<nu p="c" t="13" id="14" r="255" g="215" b="0" />
+<nu p="c" t="13" id="15" r="0" g="0" b="0" />
 <pr uId="108" fId="5" fbTx="13.148352" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 195, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:06
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
@@ -2959,6 +3085,12 @@
 <wpr uId="112" tId="9" fbRx="13.39411239" lbRx="0" />
 <wpr uId="112" tId="10" fbRx="13.39411239" lbRx="0" />
 <wpr uId="112" tId="0" fbRx="13.39411247" lbRx="0" />
+<nu p="c" t="13.5" id="10" r="0" g="0" b="0" />
+<nu p="c" t="13.5" id="11" r="0" g="0" b="0" />
+<nu p="c" t="13.5" id="12" r="0" g="0" b="0" />
+<nu p="c" t="13.5" id="13" r="255" g="215" b="0" />
+<nu p="c" t="13.5" id="14" r="255" g="215" b="0" />
+<nu p="c" t="13.5" id="15" r="0" g="0" b="0" />
 <pr uId="114" fId="2" fbTx="13.516992" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 42, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:03
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
@@ -3072,6 +3204,12 @@
 <wpr uId="117" tId="0" fbRx="13.88780841" lbRx="0" />
 <wpr uId="117" tId="15" fbRx="13.88780841" lbRx="0" />
 <wpr uId="117" tId="9" fbRx="13.88780844" lbRx="0" />
+<nu p="c" t="14" id="10" r="0" g="0" b="0" />
+<nu p="c" t="14" id="11" r="0" g="0" b="0" />
+<nu p="c" t="14" id="12" r="0" g="0" b="0" />
+<nu p="c" t="14" id="13" r="255" g="215" b="0" />
+<nu p="c" t="14" id="14" r="255" g="215" b="0" />
+<nu p="c" t="14" id="15" r="0" g="0" b="0" />
 <pr uId="118" fId="5" fbTx="14.131392" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 196, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:06
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
@@ -3219,6 +3357,12 @@
 <wpr uId="122" tId="9" fbRx="14.37715239" lbRx="0" />
 <wpr uId="122" tId="10" fbRx="14.37715239" lbRx="0" />
 <wpr uId="122" tId="0" fbRx="14.37715247" lbRx="0" />
+<nu p="c" t="14.5" id="10" r="0" g="0" b="0" />
+<nu p="c" t="14.5" id="11" r="0" g="0" b="0" />
+<nu p="c" t="14.5" id="12" r="0" g="0" b="0" />
+<nu p="c" t="14.5" id="13" r="255" g="215" b="0" />
+<nu p="c" t="14.5" id="14" r="255" g="215" b="0" />
+<nu p="c" t="14.5" id="15" r="0" g="0" b="0" />
 <pr uId="124" fId="2" fbTx="14.500032" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 43, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:03
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
@@ -3332,6 +3476,12 @@
 <wpr uId="127" tId="0" fbRx="14.87084841" lbRx="0" />
 <wpr uId="127" tId="15" fbRx="14.87084841" lbRx="0" />
 <wpr uId="127" tId="9" fbRx="14.87084845" lbRx="0" />
+<nu p="c" t="15" id="10" r="0" g="0" b="0" />
+<nu p="c" t="15" id="11" r="0" g="0" b="0" />
+<nu p="c" t="15" id="12" r="0" g="0" b="0" />
+<nu p="c" t="15" id="13" r="255" g="215" b="0" />
+<nu p="c" t="15" id="14" r="255" g="215" b="0" />
+<nu p="c" t="15" id="15" r="0" g="0" b="0" />
 <pr uId="128" fId="5" fbTx="15.114432" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 197, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:06
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
@@ -3508,6 +3658,12 @@
 <wpr uId="134" tId="9" fbRx="15.48307244" lbRx="0" />
 <wpr uId="134" tId="1" fbRx="15.48307247" lbRx="0" />
 <wpr uId="134" tId="13" fbRx="15.48307248" lbRx="0" />
+<nu p="c" t="15.5" id="10" r="0" g="0" b="0" />
+<nu p="c" t="15.5" id="11" r="0" g="0" b="0" />
+<nu p="c" t="15.5" id="12" r="0" g="0" b="0" />
+<nu p="c" t="15.5" id="13" r="255" g="215" b="0" />
+<nu p="c" t="15.5" id="14" r="255" g="215" b="0" />
+<nu p="c" t="15.5" id="15" r="0" g="0" b="0" />
 <pr uId="135" fId="0" fbTx="15.728832" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 16, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:01
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 1, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
@@ -3592,6 +3748,12 @@
 <wpr uId="137" tId="0" fbRx="15.85388841" lbRx="0" />
 <wpr uId="137" tId="15" fbRx="15.85388841" lbRx="0" />
 <wpr uId="137" tId="9" fbRx="15.85388845" lbRx="0" />
+<nu p="c" t="16" id="10" r="0" g="0" b="0" />
+<nu p="c" t="16" id="11" r="0" g="0" b="0" />
+<nu p="c" t="16" id="12" r="0" g="0" b="0" />
+<nu p="c" t="16" id="13" r="255" g="215" b="0" />
+<nu p="c" t="16" id="14" r="255" g="215" b="0" />
+<nu p="c" t="16" id="15" r="0" g="0" b="0" />
 <pr uId="138" fId="5" fbTx="16.097472" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 198, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:06
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
@@ -3768,6 +3930,12 @@
 <wpr uId="144" tId="9" fbRx="16.46611243" lbRx="0" />
 <wpr uId="144" tId="1" fbRx="16.46611247" lbRx="0" />
 <wpr uId="144" tId="13" fbRx="16.46611248" lbRx="0" />
+<nu p="c" t="16.5" id="10" r="0" g="0" b="0" />
+<nu p="c" t="16.5" id="11" r="0" g="0" b="0" />
+<nu p="c" t="16.5" id="12" r="0" g="0" b="0" />
+<nu p="c" t="16.5" id="13" r="255" g="215" b="0" />
+<nu p="c" t="16.5" id="14" r="255" g="215" b="0" />
+<nu p="c" t="16.5" id="15" r="0" g="0" b="0" />
 <pr uId="145" fId="0" fbTx="16.711872" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 17, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:01
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 1, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
@@ -3852,6 +4020,12 @@
 <wpr uId="147" tId="0" fbRx="16.83692841" lbRx="0" />
 <wpr uId="147" tId="15" fbRx="16.83692841" lbRx="0" />
 <wpr uId="147" tId="9" fbRx="16.83692845" lbRx="0" />
+<nu p="c" t="17" id="10" r="0" g="0" b="0" />
+<nu p="c" t="17" id="11" r="0" g="0" b="0" />
+<nu p="c" t="17" id="12" r="0" g="0" b="0" />
+<nu p="c" t="17" id="13" r="255" g="215" b="0" />
+<nu p="c" t="17" id="14" r="255" g="215" b="0" />
+<nu p="c" t="17" id="15" r="0" g="0" b="0" />
 <pr uId="148" fId="5" fbTx="17.080512" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 199, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:06
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
@@ -4028,6 +4202,12 @@
 <wpr uId="154" tId="9" fbRx="17.44915243" lbRx="0" />
 <wpr uId="154" tId="1" fbRx="17.44915247" lbRx="0" />
 <wpr uId="154" tId="13" fbRx="17.44915248" lbRx="0" />
+<nu p="c" t="17.5" id="10" r="0" g="0" b="0" />
+<nu p="c" t="17.5" id="11" r="0" g="0" b="0" />
+<nu p="c" t="17.5" id="12" r="0" g="0" b="0" />
+<nu p="c" t="17.5" id="13" r="255" g="215" b="0" />
+<nu p="c" t="17.5" id="14" r="255" g="215" b="0" />
+<nu p="c" t="17.5" id="15" r="0" g="0" b="0" />
 <pr uId="155" fId="0" fbTx="17.694912" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 18, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:01
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 1, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
@@ -4112,6 +4292,12 @@
 <wpr uId="157" tId="0" fbRx="17.81996841" lbRx="0" />
 <wpr uId="157" tId="15" fbRx="17.81996841" lbRx="0" />
 <wpr uId="157" tId="9" fbRx="17.81996845" lbRx="0" />
+<nu p="c" t="18" id="10" r="0" g="0" b="0" />
+<nu p="c" t="18" id="11" r="0" g="0" b="0" />
+<nu p="c" t="18" id="12" r="0" g="0" b="0" />
+<nu p="c" t="18" id="13" r="255" g="215" b="0" />
+<nu p="c" t="18" id="14" r="255" g="215" b="0" />
+<nu p="c" t="18" id="15" r="0" g="0" b="0" />
 <pr uId="158" fId="5" fbTx="18.063552" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 200, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:06
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
@@ -4288,6 +4474,12 @@
 <wpr uId="164" tId="9" fbRx="18.43219244" lbRx="0" />
 <wpr uId="164" tId="1" fbRx="18.43219247" lbRx="0" />
 <wpr uId="164" tId="13" fbRx="18.43219248" lbRx="0" />
+<nu p="c" t="18.5" id="10" r="0" g="0" b="0" />
+<nu p="c" t="18.5" id="11" r="0" g="0" b="0" />
+<nu p="c" t="18.5" id="12" r="0" g="0" b="0" />
+<nu p="c" t="18.5" id="13" r="255" g="215" b="0" />
+<nu p="c" t="18.5" id="14" r="255" g="215" b="0" />
+<nu p="c" t="18.5" id="15" r="0" g="0" b="0" />
 <pr uId="165" fId="0" fbTx="18.677952" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 19, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:01
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 1, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
@@ -4372,6 +4564,12 @@
 <wpr uId="167" tId="0" fbRx="18.80300841" lbRx="0" />
 <wpr uId="167" tId="15" fbRx="18.80300841" lbRx="0" />
 <wpr uId="167" tId="9" fbRx="18.80300844" lbRx="0" />
+<nu p="c" t="19" id="10" r="0" g="0" b="0" />
+<nu p="c" t="19" id="11" r="0" g="0" b="0" />
+<nu p="c" t="19" id="12" r="0" g="0" b="0" />
+<nu p="c" t="19" id="13" r="255" g="215" b="0" />
+<nu p="c" t="19" id="14" r="255" g="215" b="0" />
+<nu p="c" t="19" id="15" r="0" g="0" b="0" />
 <pr uId="168" fId="5" fbTx="19.046592" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 201, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:06
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
@@ -4548,6 +4746,12 @@
 <wpr uId="174" tId="9" fbRx="19.41523244" lbRx="0" />
 <wpr uId="174" tId="1" fbRx="19.41523247" lbRx="0" />
 <wpr uId="174" tId="13" fbRx="19.41523248" lbRx="0" />
+<nu p="c" t="19.5" id="10" r="0" g="0" b="0" />
+<nu p="c" t="19.5" id="11" r="0" g="0" b="0" />
+<nu p="c" t="19.5" id="12" r="0" g="0" b="0" />
+<nu p="c" t="19.5" id="13" r="255" g="215" b="0" />
+<nu p="c" t="19.5" id="14" r="255" g="215" b="0" />
+<nu p="c" t="19.5" id="15" r="0" g="0" b="0" />
 <pr uId="175" fId="0" fbTx="19.660992" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 20, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:01
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 1, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
@@ -4597,4 +4801,38 @@
 <wpr uId="176" tId="11" fbRx="19.78387214" lbRx="0" />
 <wpr uId="176" tId="7" fbRx="19.78387218" lbRx="0" />
 <wpr uId="176" tId="3" fbRx="19.78387219" lbRx="0" />
-<wpr uId="176" tId="13" fbRx="19.7838722" lbRx="0
+<wpr uId="176" tId="13" fbRx="19.7838722" lbRx="0" />
+<wpr uId="176" tId="10" fbRx="19.78387224" lbRx="0" />
+<wpr uId="176" tId="5" fbRx="19.78387225" lbRx="0" />
+<wpr uId="176" tId="0" fbRx="19.78387229" lbRx="0" />
+<wpr uId="176" tId="12" fbRx="19.78387236" lbRx="0" />
+<wpr uId="176" tId="15" fbRx="19.78387238" lbRx="0" />
+<wpr uId="176" tId="6" fbRx="19.78387243" lbRx="0" />
+<wpr uId="176" tId="9" fbRx="19.78387243" lbRx="0" />
+<wpr uId="176" tId="2" fbRx="19.78387247" lbRx="0" />
+<wpr uId="176" tId="14" fbRx="19.78387248" lbRx="0" />
+<pr uId="177" fId="7" fbTx="19.78604794" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 7, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:08
+) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
+| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
+| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2605986761, Time Synchronization Beacon Offset Timestamp = 0
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110110
+
+| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 255, Channel Offset = 2, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000100
+
+) ns3::HeaderIETermination (| Length Field | = 0
+| Element ID Field | = 7e
+| Type Field| = 0
+) ns3::PayloadIETermination (| Length Field | = 0
+| Group ID Field | = f
+| Type Field| =1
+) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
+<wpr uId="177" tId="3" fbRx="19.78604806" lbRx="0" />
+<wpr uId="177" tId="1" fbRx="19.78604813" lbRx="0" />
+<wpr uId="177" tId="13" fbRx="19.78604819" lbRx="0" />
+<wpr uId="177" tId="11" fbRx="19.78604823" lbRx="0" />
+<wpr uId="177" tId="5" fbRx="19.78604826" lbRx="0" />
+<wpr uId="177" tId="10" fbRx="19.78604836" lbRx="0" />
+<wpr uId="177" tId="0" fbRx="19.78604841" lbRx="0" />
+<wpr uId="177" tId="15" fbRx="19.78604841" lbRx="0" />
+<wpr uId="177" 

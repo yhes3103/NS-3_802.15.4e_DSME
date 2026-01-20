@@ -123,6 +123,57 @@ static void PrintSummary(uint32_t numNodes)
   NS_LOG_UNCOND("Observers potentially experiencing beacon collision: " << obsCollisions << "/" << g_observers.size());
 }
 
+// 於模擬進行中依現有 g_chosen 週期性更新觀察者顏色，
+// 讓可能的碰撞更早在 NetAnim 呈現（金色=可能觀察到碰撞，黑色=否）。
+static void UpdateObserverCollisionColors()
+{
+  if (!g_anim)
+  {
+    return;
+  }
+
+  // 依當前挑選結果建立 SDIndex 群組（忽略未分配 0xffff）
+  std::map<uint16_t, std::vector<uint32_t>> groups;
+  for (const auto& kv : g_chosen)
+  {
+    if (kv.second != 0xffff)
+    {
+      groups[kv.second].push_back(kv.first);
+    }
+  }
+
+  // 對每個觀察者，檢查是否同時落在同一 SDIndex 的兩個以上協調器覆蓋範圍
+  for (uint32_t obsId : g_observers)
+  {
+    Ptr<Node> on = NodeList::GetNode(obsId);
+    Vector op = on->GetObject<MobilityModel>()->GetPosition();
+    bool hasCollision = false;
+
+    for (const auto& kv : groups)
+    {
+      if (kv.first == 0 || kv.second.size() < 2) continue;
+      uint32_t within = 0;
+      for (uint32_t coordId : kv.second)
+      {
+        Ptr<Node> cn = NodeList::GetNode(coordId);
+        Vector cp = cn->GetObject<MobilityModel>()->GetPosition();
+        if (Dist(op, cp) <= g_coverageRadius) within++;
+        if (within >= 2) { hasCollision = true; break; }
+      }
+      if (hasCollision) break;
+    }
+
+    if (hasCollision)
+    {
+      g_anim->UpdateNodeColor(on, 255, 215, 0); // 金色
+    }
+    else
+    {
+      g_anim->UpdateNodeColor(on, 0, 0, 0); // 黑色
+    }
+  }
+}
+
 int main(int argc, char** argv)
 {
   bool verbose = true;
@@ -393,6 +444,22 @@ int main(int argc, char** argv)
     anim.UpdateNodeColor(on, 0, 0, 0); // 黑色（無碰撞）
     anim.UpdateNodeSize(on->GetId(), 11.0, 11.0);
   }
+
+  // 週期性提前刷新觀察者顏色（從 3 秒開始，每 0.5 秒，直到結束前 0.5 秒）
+  const double refreshInterval = 0.5;
+  double refreshStart = 3.0; // 略晚於第一批協調器選位時間
+  double refreshEnd = simTime - 0.5;
+  if (refreshEnd < 0.0) refreshEnd = 0.0;
+
+  auto refresher = std::make_shared<std::function<void()>>();
+  *refresher = [refresher, refreshInterval, refreshEnd]() {
+    UpdateObserverCollisionColors();
+    if (Simulator::Now().GetSeconds() + refreshInterval <= refreshEnd)
+    {
+      Simulator::Schedule(Seconds(refreshInterval), *refresher);
+    }
+  };
+  Simulator::Schedule(Seconds(refreshStart), *refresher);
 
   Simulator::Stop(Seconds(simTime));
   // Print summary just before stop
