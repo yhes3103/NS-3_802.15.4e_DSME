@@ -24,8 +24,8 @@ NS_LOG_COMPONENT_DEFINE("DsmeBeaconSlotSelectionRandomPick");
 #define SO 3
 #define MO 5
 
-#define NUM_COORD 10 // 1 PAN-C + 9 joining coordinators（增加協調器以提高碰撞機率）
-#define NUM_OBSERVERS 6 // 旁觀端裝置數量（只接收不成為協調器）
+#define NUM_COORD 16 // 1 PAN-C + 15 joining coordinators（增加協調器以提高碰撞機率）
+#define NUM_OBSERVERS 8 // 觀察者改為 8 個，形成 3x3 格（PAN-C 在中心）
 
 // 幾何近似的覆蓋半徑（公尺），用於判斷觀察者是否同時位於多個衝突協調器的覆蓋範圍內
 static double g_coverageRadius = 80.0;
@@ -87,7 +87,6 @@ static void PrintSummary(uint32_t numNodes)
       ++unassigned;
   }
 
-  NS_LOG_UNCOND("Collisions (nodes beyond unique per SD): " << collisionNodes);
   NS_LOG_UNCOND("Unassigned nodes: " << unassigned);
 
   // 幾何近似的「觀察者可見碰撞」檢查：
@@ -172,13 +171,39 @@ static void UpdateObserverCollisionColors()
       g_anim->UpdateNodeColor(on, 0, 0, 0); // 黑色
     }
   }
+
+  // 依加入結果把「未加入/未分配」的協調器標示為紅色，其餘協調器維持藍色
+  for (uint32_t i = 1; i < NUM_COORD; ++i)
+  {
+    auto it = g_chosen.find(i);
+    Ptr<Node> cn = NodeList::GetNode(i);
+    // 更新協調器的簡潔描述：只顯示序號與 SDIndex
+    std::string sdLab = "?";
+    if (it != g_chosen.end())
+    {
+      if (it->second == 0xffff) sdLab = "NA"; else sdLab = std::to_string(it->second);
+    }
+    {
+      std::ostringstream lab;
+      lab << "Coord" << i << " SD=" << sdLab;
+      g_anim->UpdateNodeDescription(cn, lab.str());
+    }
+    if (it != g_chosen.end() && it->second == 0xffff)
+    {
+      g_anim->UpdateNodeColor(cn, 255, 0, 0); // 紅色：未加入
+    }
+    else
+    {
+      g_anim->UpdateNodeColor(cn, 0, 0, 255); // 藍色：已加入（即使可能碰撞）
+    }
+  }
 }
 
 int main(int argc, char** argv)
 {
   bool verbose = true;
   bool promiscuousPcap = true;
-  double simTime = 20.0; // 拉長預設模擬時間，讓各節點有餘裕完成挑選與公告
+  double simTime = 8.0; // 拉長預設模擬時間，讓各節點有餘裕完成挑選與公告
   uint32_t seed = 4; // deterministic seed
 
   CommandLine cmd(__FILE__);
@@ -207,28 +232,37 @@ int main(int argc, char** argv)
 
   MobilityHelper mobility;
   Ptr<ListPositionAllocator> pos = CreateObject<ListPositionAllocator>();
-  pos->Add(Vector(0.0, 100.0, 0.0));   // Node 0: PAN-C (00:01)
-  pos->Add(Vector(-70.0, 50.0, 0.0));  // Node 1: Coord1 (00:02)
-  pos->Add(Vector(70.0, 50.0, 0.0));   // Node 2: Coord2 (00:03)
-  pos->Add(Vector(-100.0, 0.0, 0.0));  // Node 3: Coord3 (00:04)
-  pos->Add(Vector(100.0, 0.0, 0.0));   // Node 4: Coord4 (00:05)
-  pos->Add(Vector(-40.0, -20.0, 0.0)); // Node 5: Coord5 (00:06)
-  pos->Add(Vector(40.0, -20.0, 0.0));  // Node 6: Coord6 (00:07)
-  pos->Add(Vector(-120.0, 30.0, 0.0)); // Node 7: Coord7 (00:08)
-  pos->Add(Vector(120.0, 30.0, 0.0));  // Node 8: Coord8 (00:09)
-  pos->Add(Vector(0.0, -60.0, 0.0));   // Node 9: Coord9 (00:0A)
+  // PAN-C 放在正中央 (0,0)
+  pos->Add(Vector(0.0, 0.0, 0.0));
+  // 其餘協調器隨機擺放於正方區域內（可透過 seed 重現）
+  double R = 150.0; // 區域半邊長（座標範圍為 [-R, R]）
+  Ptr<UniformRandomVariable> urvX = CreateObject<UniformRandomVariable>();
+  Ptr<UniformRandomVariable> urvY = CreateObject<UniformRandomVariable>();
+  urvX->SetAttribute("Min", DoubleValue(-R));
+  urvX->SetAttribute("Max", DoubleValue(R));
+  urvY->SetAttribute("Min", DoubleValue(-R));
+  urvY->SetAttribute("Max", DoubleValue(R));
+  for (uint32_t i = 1; i < NUM_COORD; ++i) {
+    double x = urvX->GetValue();
+    double y = urvY->GetValue();
+    pos->Add(Vector(x, y, 0.0));
+  }
   mobility.SetPositionAllocator(pos);
   mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
   mobility.Install(nodes);
 
   // 安排觀察者位置（選擇容易同時覆蓋的區域）
   Ptr<ListPositionAllocator> posObs = CreateObject<ListPositionAllocator>();
-  posObs->Add(Vector(0.0, 60.0, 0.0));     // 介於 Node1/2/PAN 之間
-  posObs->Add(Vector(-35.0, 25.0, 0.0));   // 偏向 Node1/3
-  posObs->Add(Vector(35.0, 25.0, 0.0));    // 偏向 Node2/4
-  posObs->Add(Vector(-60.0, -10.0, 0.0));  // 偏向 Node5/7
-  posObs->Add(Vector(60.0, -10.0, 0.0));   // 偏向 Node6/8
-  posObs->Add(Vector(0.0, -40.0, 0.0));    // 偏向 Node5/6/9
+  // 以 PAN-C 為中心的 3x3 格子，觀察者取外圈 8 個點
+  double d = 80.0; // 格距
+  std::vector<Vector> grid = {
+    Vector(-d, -d, 0.0), Vector(0.0, -d, 0.0), Vector(d, -d, 0.0),
+    Vector(-d,  0.0, 0.0),                   /* center (0,0) 給 PAN-C */ Vector(d,  0.0, 0.0),
+    Vector(-d,  d, 0.0),  Vector(0.0,  d, 0.0),  Vector(d,  d, 0.0)
+  };
+  for (uint32_t i = 0; i < NUM_OBSERVERS && i < grid.size(); ++i) {
+    posObs->Add(grid[i]);
+  }
   MobilityHelper mobilityObs;
   mobilityObs.SetPositionAllocator(posObs);
   mobilityObs.SetMobilityModel("ns3::ConstantPositionMobilityModel");
@@ -301,15 +335,8 @@ int main(int argc, char** argv)
   {
     Ptr<LrWpanNetDevice> d = devs.Get(i)->GetObject<LrWpanNetDevice>();
 
-    // Choose a parent based on layout for reliable sync
+    // 隨機拓樸下，統一由 PAN-C 作為 parent 以利同步
     Mac16Address parent = Mac16Address("00:01");
-    if (i == 3) parent = Mac16Address("00:02");
-    if (i == 4) parent = Mac16Address("00:03");
-    if (i == 5) parent = Mac16Address("00:02");
-    if (i == 6) parent = Mac16Address("00:03");
-    if (i == 7) parent = Mac16Address("00:04");
-    if (i == 8) parent = Mac16Address("00:05");
-    if (i == 9) parent = Mac16Address("00:02");
 
     d->GetMac()->SetAssociatedCoor(parent);
 
@@ -396,6 +423,13 @@ int main(int argc, char** argv)
         d->SendDsmeBeaconAllocNotify();
         LogPickedSlot(d->GetNode()->GetId(), sdIdx);
         g_chosen[d->GetNode()->GetId()] = sdIdx;
+        // 立即更新該協調器在 NetAnim 的簡潔描述
+        if (g_anim)
+        {
+          std::ostringstream lab;
+          lab << "Coord" << d->GetNode()->GetId() << " SD=" << sdIdx;
+          g_anim->UpdateNodeDescription(d->GetNode(), lab.str());
+        }
       });
     };
 
@@ -408,23 +442,14 @@ int main(int argc, char** argv)
   anim.SetMobilityPollInterval(Seconds(0.1));
   anim.EnablePacketMetadata(true);
 
-  anim.UpdateNodeDescription(nodes.Get(0), "PAN-C [00:01] SD=0");
-  anim.UpdateNodeColor(nodes.Get(0), 255, 0, 0);
+  anim.UpdateNodeDescription(nodes.Get(0), "PAN-C SD=0");
+  anim.UpdateNodeColor(nodes.Get(0), 0, 0, 0); // 改為黑色
   anim.UpdateNodeSize(nodes.Get(0)->GetId(), 14.0, 14.0);
 
   for (uint32_t i = 1; i < NUM_COORD; ++i)
   {
-    Mac16Address parent = Mac16Address("00:01");
-    if (i == 3) parent = Mac16Address("00:02");
-    if (i == 4) parent = Mac16Address("00:03");
-
     std::ostringstream lab;
-    lab << "Coord" << i << " [00:" << std::setfill('0') << std::setw(2) << (i + 1)
-        << "] SD=chosen-in-sim P=";
-    uint8_t buf[2];
-    parent.CopyTo(buf);
-    lab << std::setfill('0') << std::setw(2) << unsigned(buf[0])
-        << ":" << std::setfill('0') << std::setw(2) << unsigned(buf[1]);
+    lab << "Coord" << i << " SD=?";
     anim.UpdateNodeDescription(nodes.Get(i), lab.str());
     anim.UpdateNodeSize(nodes.Get(i)->GetId(), 12.0, 12.0);
   }
@@ -439,7 +464,7 @@ int main(int argc, char** argv)
   {
     Ptr<Node> on = observers.Get(i);
     std::ostringstream lab;
-    lab << "Observer O" << i;
+    lab << "O" << i;
     anim.UpdateNodeDescription(on, lab.str());
     anim.UpdateNodeColor(on, 0, 0, 0); // 黑色（無碰撞）
     anim.UpdateNodeSize(on->GetId(), 11.0, 11.0);
@@ -447,7 +472,7 @@ int main(int argc, char** argv)
 
   // 週期性提前刷新觀察者顏色（從 3 秒開始，每 0.5 秒，直到結束前 0.5 秒）
   const double refreshInterval = 0.5;
-  double refreshStart = 3.0; // 略晚於第一批協調器選位時間
+  double refreshStart = 0.5; // 更早開始刷新，盡快反映紅色/金色
   double refreshEnd = simTime - 0.5;
   if (refreshEnd < 0.0) refreshEnd = 0.0;
 
