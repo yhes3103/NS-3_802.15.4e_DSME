@@ -9,6 +9,7 @@
 #include "ns3/lr-wpan-module.h"
 #include "ns3/mobility-module.h"
 #include "ns3/netanim-module.h"
+#include "ns3/propagation-loss-model.h"
 #include <vector>
 #include <sstream>
 #include <iomanip>
@@ -30,6 +31,14 @@ NS_LOG_COMPONENT_DEFINE("DsmeBeaconSlotSelectionRandomPick");
 // 幾何近似的覆蓋半徑（公尺），用於判斷觀察者是否同時位於多個衝突協調器的覆蓋範圍內
 static double g_coverageRadius = 80.0;
 
+// RSSI-based collision model parameters (for scheme B)
+static Ptr<LogDistancePropagationLossModel> g_pl = nullptr;
+static double g_rxSensDbm = -95.0;   // receiver sensitivity threshold (dBm)
+static double g_plExponent = 3.0;    // path loss exponent
+static double g_refDist = 1.0;       // reference distance (m)
+static double g_refLossDb = 40.05;   // reference loss @ refDist (dB) ~ 2.4GHz FSPL at 1m
+static double g_assumedTxDbm = 0.0;  // assumed TX power for coordinators (dBm)
+
 static void LogPickedSlot(uint32_t nodeIdx, uint16_t sdIdx)
 {
   NS_LOG_UNCOND("Node " << nodeIdx << " picked Beacon SDIndex=" << sdIdx);
@@ -44,6 +53,23 @@ static double Dist(const Vector& a, const Vector& b)
 {
   double dx = a.x - b.x, dy = a.y - b.y;
   return std::sqrt(dx*dx + dy*dy);
+}
+
+// Derive this source file's stem (filename without extension)
+static std::string SelfStem()
+{
+  std::string f = __FILE__;
+  size_t slash = f.find_last_of("/\\");
+  if (slash != std::string::npos)
+  {
+    f = f.substr(slash + 1);
+  }
+  size_t dot = f.rfind('.');
+  if (dot != std::string::npos)
+  {
+    f = f.substr(0, dot);
+  }
+  return f;
 }
 
 static void PrintSummary(uint32_t numNodes)
@@ -90,24 +116,28 @@ static void PrintSummary(uint32_t numNodes)
   NS_LOG_UNCOND("Unassigned nodes: " << unassigned);
 
   // 幾何近似的「觀察者可見碰撞」檢查：
-  // 若存在同一 SDIndex 的多個協調器，且某觀察者同時位於其中兩個以上的覆蓋範圍內，
-  // 則此觀察者被視為可能遭遇 beacon 碰撞。
+  // 改為 RSSI 近似：對每個觀察者、每個 SDIndex 群組，
+  // 計算以 LogDistance 模型預估之接收功率 Pr(dBm)；若可見 (Pr>=g_rxSensDbm) 的發送者數量 >=2，
+  // 則視為該觀察者在該 SDIndex 可能遭遇 beacon 碰撞。
   uint32_t obsCollisions = 0;
   for (uint32_t obsId : g_observers)
   {
     Ptr<Node> on = NodeList::GetNode(obsId);
-    Vector op = on->GetObject<MobilityModel>()->GetPosition();
+    // RSSI-based: position fetched inside model; no direct use here
     bool hasCollision = false;
     for (const auto& kv : groups)
     {
       if (kv.first == 0 || kv.second.size() < 2) continue;
-      uint32_t within = 0;
+      uint32_t visible = 0;
+      Ptr<MobilityModel> rx = on->GetObject<MobilityModel>();
       for (uint32_t coordId : kv.second)
       {
         Ptr<Node> cn = NodeList::GetNode(coordId);
-        Vector cp = cn->GetObject<MobilityModel>()->GetPosition();
-        if (Dist(op, cp) <= g_coverageRadius) within++;
-        if (within >= 2) { hasCollision = true; break; }
+        Ptr<MobilityModel> tx = cn->GetObject<MobilityModel>();
+        double prDbm = g_pl ? g_pl->CalcRxPower(g_assumedTxDbm, tx, rx)
+                            : -1e9; // if not initialized, treat as not visible
+        if (prDbm >= g_rxSensDbm) visible++;
+        if (visible >= 2) { hasCollision = true; break; }
       }
       if (hasCollision) break;
     }
@@ -141,23 +171,26 @@ static void UpdateObserverCollisionColors()
     }
   }
 
-  // 對每個觀察者，檢查是否同時落在同一 SDIndex 的兩個以上協調器覆蓋範圍
+  // 對每個觀察者，依 RSSI 推估可見的同 SDIndex 發送者數是否 >= 2
   for (uint32_t obsId : g_observers)
   {
     Ptr<Node> on = NodeList::GetNode(obsId);
-    Vector op = on->GetObject<MobilityModel>()->GetPosition();
+    // RSSI-based: position fetched inside model; no direct use here
     bool hasCollision = false;
 
     for (const auto& kv : groups)
     {
       if (kv.first == 0 || kv.second.size() < 2) continue;
-      uint32_t within = 0;
+      uint32_t visible = 0;
+      Ptr<MobilityModel> rx = on->GetObject<MobilityModel>();
       for (uint32_t coordId : kv.second)
       {
         Ptr<Node> cn = NodeList::GetNode(coordId);
-        Vector cp = cn->GetObject<MobilityModel>()->GetPosition();
-        if (Dist(op, cp) <= g_coverageRadius) within++;
-        if (within >= 2) { hasCollision = true; break; }
+        Ptr<MobilityModel> tx = cn->GetObject<MobilityModel>();
+        double prDbm = g_pl ? g_pl->CalcRxPower(g_assumedTxDbm, tx, rx)
+                            : -1e9;
+        if (prDbm >= g_rxSensDbm) visible++;
+        if (visible >= 2) { hasCollision = true; break; }
       }
       if (hasCollision) break;
     }
@@ -211,6 +244,12 @@ int main(int argc, char** argv)
   cmd.AddValue("promisc", "Enable promiscuous PCAP", promiscuousPcap);
   cmd.AddValue("simTime", "Simulation time (s)", simTime);
   cmd.AddValue("seed", "RNG seed for RngSeedManager", seed);
+  // RSSI-based collision knobs
+  cmd.AddValue("rxSensDbm", "Receiver sensitivity for collision check (dBm)", g_rxSensDbm);
+  cmd.AddValue("plExp", "Path loss exponent", g_plExponent);
+  cmd.AddValue("refDist", "Reference distance (m)", g_refDist);
+  cmd.AddValue("refLossDb", "Reference loss at refDist (dB)", g_refLossDb);
+  cmd.AddValue("assumedTxDbm", "Assumed coordinator TX power (dBm)", g_assumedTxDbm);
   cmd.Parse(argc, argv);
 
   if (verbose)
@@ -268,10 +307,17 @@ int main(int argc, char** argv)
   mobilityObs.SetMobilityModel("ns3::ConstantPositionMobilityModel");
   mobilityObs.Install(observers);
 
+  // Initialize path loss model for RSSI-based collision checks
+  g_pl = CreateObject<LogDistancePropagationLossModel>();
+  g_pl->SetPathLossExponent(g_plExponent);
+  g_pl->SetReference(g_refDist, g_refLossDb);
+
   LrWpanHelper lrWpanHelper(true);
   NetDeviceContainer devs = lrWpanHelper.Install(nodes);
   NetDeviceContainer obsDevs = lrWpanHelper.Install(observers);
-  lrWpanHelper.EnablePcapAll(std::string("dsme-beacon-slot-selection-random-pick"), promiscuousPcap);
+  // Use source filename stem for PCAP prefix
+  std::string fileStem = SelfStem();
+  lrWpanHelper.EnablePcapAll(fileStem, promiscuousPcap);
 
   const uint16_t numChSupported = 6;
   const bool capReduction = false;
@@ -437,7 +483,7 @@ int main(int argc, char** argv)
   }
 
   // NetAnim
-  AnimationInterface anim("dsme-beacon-slot-selection-random-pick.xml");
+  AnimationInterface anim(fileStem + ".xml");
   g_anim = &anim;
   anim.SetMobilityPollInterval(Seconds(0.1));
   anim.EnablePacketMetadata(true);

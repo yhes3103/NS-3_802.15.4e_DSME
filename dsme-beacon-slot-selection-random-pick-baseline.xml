@@ -148,7 +148,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 1, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 0, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 0, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000000000000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 0, Channel Offset = 0, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000001
@@ -202,7 +202,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 1, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 983040000, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 983040000, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000000000000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 1, Channel Offset = 0, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000001
@@ -315,7 +315,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 1, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1966080000, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1966080000, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000000000000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 2, Channel Offset = 0, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000001
@@ -431,7 +431,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 1, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2949120000, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2949120000, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000000000000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 3, Channel Offset = 0, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000001
@@ -600,7 +600,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3686400000, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3686400000, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000001000000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 2, Channel Offset = 6, Channel Offset Length = 16, Channel Offset Bitmap =  0000000001000000
@@ -616,7 +616,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3686400000, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3686400000, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000001000000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 2, Channel Offset = 6, Channel Offset Length = 16, Channel Offset Bitmap =  0000000001000000
@@ -653,7 +653,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3688575821, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3688575821, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000001000100
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 2, Channel Offset = 2, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000100
@@ -671,7 +671,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3688576020, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3688576020, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000001000100
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 2, Channel Offset = 2, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000100
@@ -741,7 +741,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3809280000, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3809280000, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000010000000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 2, Channel Offset = 7, Channel Offset Length = 16, Channel Offset Bitmap =  0000000010000000
@@ -769,7 +769,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3811456022, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3811456022, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000010001000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 2, Channel Offset = 3, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000001000
@@ -819,7 +819,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 1, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3932160000, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3932160000, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011001100
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 4, Channel Offset = 0, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000001
@@ -912,7 +912,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 4177920000, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 4177920000, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011001100
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 3, Channel Offset = 2, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000100
@@ -980,7 +980,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 374472704, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 374472704, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011001100
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 3, Channel Offset = 6, Channel Offset Length = 16, Channel Offset Bitmap =  0000000001000000
@@ -996,7 +996,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 374472704, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 374472704, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011001000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 2, Channel Offset = 6, Channel Offset Length = 16, Channel Offset Bitmap =  0000000001000000
@@ -1033,7 +1033,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 376648525, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 376648525, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011001100
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 3, Channel Offset = 2, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000100
@@ -1049,7 +1049,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 376648654, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 376648654, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011100
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 3, Channel Offset = 4, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000010000
@@ -1067,7 +1067,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 376648724, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 376648724, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011001100
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 2, Channel Offset = 2, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000100
@@ -1084,7 +1084,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 376648746, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 376648746, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011001100
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 255, Channel Offset = 2, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000100
@@ -1115,7 +1115,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 378824646, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 378824646, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011101100
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 255, Channel Offset = 5, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000100000
@@ -1152,7 +1152,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 381000687, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 381000687, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011101100
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 255, Channel Offset = 5, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000100000
@@ -1215,7 +1215,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 497352704, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 497352704, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011001100
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 3, Channel Offset = 7, Channel Offset Length = 16, Channel Offset Bitmap =  0000000010000000
@@ -1243,7 +1243,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 499528632, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 499528632, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011100
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 255, Channel Offset = 4, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000010000
@@ -1259,7 +1259,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 499528687, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 499528687, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011001100
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 255, Channel Offset = 3, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000001000
@@ -1275,7 +1275,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 499528726, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 499528726, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011001100
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 3, Channel Offset = 3, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000001000
@@ -1332,7 +1332,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 1, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 620232704, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 620232704, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011001100
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 5, Channel Offset = 0, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000001
@@ -1426,7 +1426,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 743112704, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 743112704, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011001110
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 4, Channel Offset = 1, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000010
@@ -1458,7 +1458,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 865992704, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 865992704, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011101100
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 4, Channel Offset = 2, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000100
@@ -1502,7 +1502,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1111752704, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1111752704, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011111100
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 4, Channel Offset = 4, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000010000
@@ -1568,7 +1568,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1357512704, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1357512704, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011001100
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 4, Channel Offset = 6, Channel Offset Length = 16, Channel Offset Bitmap =  0000000001000000
@@ -1584,7 +1584,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1357512704, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1357512704, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011001110
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 4, Channel Offset = 6, Channel Offset Length = 16, Channel Offset Bitmap =  0000000001000000
@@ -1621,7 +1621,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1359688525, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1359688525, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011111100
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 4, Channel Offset = 2, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000100
@@ -1637,7 +1637,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1359688654, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1359688654, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011100
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 4, Channel Offset = 4, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000010000
@@ -1655,7 +1655,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1359688724, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1359688724, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011101100
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 2, Channel Offset = 2, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000100
@@ -1672,7 +1672,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1359688746, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1359688746, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011001110
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 255, Channel Offset = 2, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000100
@@ -1703,7 +1703,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1361864646, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1361864646, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011111100
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 255, Channel Offset = 5, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000100000
@@ -1730,7 +1730,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1364040687, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1364040687, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011111100
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 255, Channel Offset = 5, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000100000
@@ -1754,7 +1754,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1480392704, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1480392704, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011100
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 4, Channel Offset = 7, Channel Offset Length = 16, Channel Offset Bitmap =  0000000010000000
@@ -1782,7 +1782,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1482568632, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1482568632, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011110
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 255, Channel Offset = 4, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000010000
@@ -1798,7 +1798,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1482568687, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1482568687, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011100
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 255, Channel Offset = 3, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000001000
@@ -1814,7 +1814,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1482568726, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1482568726, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011110
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 4, Channel Offset = 3, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000001000
@@ -1843,7 +1843,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 1, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1603272704, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1603272704, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011111110
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 6, Channel Offset = 0, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000001
@@ -1918,7 +1918,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1726152704, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1726152704, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011111110
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 5, Channel Offset = 1, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000010
@@ -1949,7 +1949,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1849032704, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1849032704, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011111100
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 4, Channel Offset = 2, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000100
@@ -1977,7 +1977,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2094792704, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2094792704, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011111110
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 5, Channel Offset = 4, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000010000
@@ -2043,7 +2043,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2340552704, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2340552704, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011111110
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 5, Channel Offset = 6, Channel Offset Length = 16, Channel Offset Bitmap =  0000000001000000
@@ -2059,7 +2059,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2340552704, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2340552704, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011111110
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 4, Channel Offset = 6, Channel Offset Length = 16, Channel Offset Bitmap =  0000000001000000
@@ -2096,7 +2096,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2342728525, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2342728525, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011111110
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 5, Channel Offset = 2, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000100
@@ -2112,7 +2112,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2342728654, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2342728654, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011111110
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 5, Channel Offset = 4, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000010000
@@ -2130,7 +2130,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2342728724, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2342728724, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011111110
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 2, Channel Offset = 2, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000100
@@ -2147,7 +2147,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2342728746, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2342728746, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011111110
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 255, Channel Offset = 2, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000100
@@ -2178,7 +2178,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2344904646, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2344904646, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011111110
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 255, Channel Offset = 5, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000100000
@@ -2205,7 +2205,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2347080687, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2347080687, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011111110
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 255, Channel Offset = 5, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000100000
@@ -2229,7 +2229,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2463432704, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2463432704, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011111110
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 5, Channel Offset = 7, Channel Offset Length = 16, Channel Offset Bitmap =  0000000010000000
@@ -2257,7 +2257,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2465608632, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2465608632, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011111110
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 255, Channel Offset = 4, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000010000
@@ -2273,7 +2273,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2465608687, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2465608687, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011111110
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 255, Channel Offset = 3, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000001000
@@ -2289,7 +2289,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2465608726, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2465608726, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011111110
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 5, Channel Offset = 3, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000001000
@@ -2318,7 +2318,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 1, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2586312704, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2586312704, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011111110
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 7, Channel Offset = 0, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000001
@@ -2393,7 +2393,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2709192704, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2709192704, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011111110
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 6, Channel Offset = 1, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000010
@@ -2424,7 +2424,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2832072704, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2832072704, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011111110
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 6, Channel Offset = 2, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000100
@@ -2452,7 +2452,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3077832704, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3077832704, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011111110
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 6, Channel Offset = 4, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000010000
@@ -2518,7 +2518,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3323592704, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3323592704, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011111110
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 6, Channel Offset = 6, Channel Offset Length = 16, Channel Offset Bitmap =  0000000001000000
@@ -2534,7 +2534,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3323592704, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3323592704, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011111110
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 6, Channel Offset = 6, Channel Offset Length = 16, Channel Offset Bitmap =  0000000001000000
@@ -2571,7 +2571,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3325768525, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3325768525, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011111110
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 6, Channel Offset = 2, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000100
@@ -2587,7 +2587,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3325768654, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3325768654, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011111110
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 6, Channel Offset = 4, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000010000
@@ -2605,7 +2605,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3325768724, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3325768724, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011111110
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 2, Channel Offset = 2, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000100
@@ -2622,7 +2622,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3325768746, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3325768746, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011111110
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 255, Channel Offset = 2, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000100
@@ -2653,7 +2653,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3327944646, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3327944646, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011111110
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 255, Channel Offset = 5, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000100000
@@ -2680,7 +2680,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3330120687, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3330120687, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011111110
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 255, Channel Offset = 5, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000100000
@@ -2704,7 +2704,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3446472704, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3446472704, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011111110
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 6, Channel Offset = 7, Channel Offset Length = 16, Channel Offset Bitmap =  0000000010000000
@@ -2732,7 +2732,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3448648632, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3448648632, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011111110
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 255, Channel Offset = 4, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000010000
@@ -2748,7 +2748,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3448648687, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3448648687, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011111110
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 255, Channel Offset = 3, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000001000
@@ -2764,7 +2764,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3448648726, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3448648726, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011111110
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 6, Channel Offset = 3, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000001000
@@ -2793,7 +2793,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 1, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3569352704, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3569352704, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011111110
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, Channel Offset = 0, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000001
@@ -2830,7 +2830,7 @@
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3692232704, Time Synchronization Beacon Offset Timestamp = 38272
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3692232704, Time Synchronization Beacon Offset Timestamp = 50592
 | Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011111110
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 7, Channel Offset = 1, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000010
