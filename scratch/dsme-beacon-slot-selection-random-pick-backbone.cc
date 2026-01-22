@@ -10,12 +10,16 @@
 #include "ns3/mobility-module.h"
 #include "ns3/netanim-module.h"
 #include "ns3/propagation-loss-model.h"
+#include "ns3/network-module.h"
+#include "ns3/packet.h"
+#include "ns3/lr-wpan-mac-pl-headers.h"
 #include <vector>
 #include <sstream>
 #include <iomanip>
 #include <map>
 #include <cmath>
 #include <functional>
+#include <set>
 
 using namespace ns3;
 
@@ -25,7 +29,6 @@ NS_LOG_COMPONENT_DEFINE("DsmeBeaconSlotSelectionRandomPick");
 #define SO 3
 #define MO 5
 
-#define NUM_COORD 16 // 1 PAN-C + 8 backbone coordinators + 7 random joining coordinators
 #define NUM_BACKBONE 8 // 以原本觀察者位置改為已入網 backbone 協調器
 
 // 幾何近似的覆蓋半徑（公尺），用於判斷觀察者是否同時位於多個衝突協調器的覆蓋範圍內
@@ -38,6 +41,7 @@ static double g_plExponent = 3.0;    // path loss exponent
 static double g_refDist = 1.0;       // reference distance (m)
 static double g_refLossDb = 40.05;   // reference loss @ refDist (dB) ~ 2.4GHz FSPL at 1m
 static double g_assumedTxDbm = 0.0;  // assumed TX power for coordinators (dBm)
+static uint8_t g_channelNum = 11;    // logical channel for EB tracking (for parent switch)
 
 static void LogPickedSlot(uint32_t nodeIdx, uint16_t sdIdx)
 {
@@ -48,6 +52,24 @@ static void LogPickedSlot(uint32_t nodeIdx, uint16_t sdIdx)
 static std::map<uint32_t, uint16_t> g_chosen;
 static std::vector<uint32_t> g_observers; // 用於RSSI檢查的觀察者：這裡改為所有協調器自身
 static AnimationInterface* g_anim = nullptr; // 用於在總表階段更新顏色
+// 本地（每個接收者）實際收到的 DBAN 宣告之已用 SDIndex，key=NodeId
+static std::map<uint32_t, std::set<uint16_t>> g_localUsedByNode;
+// 每個節點實際收到的（增強）Beacon 次數，用作「先聽到 EB 才允許挑槽」之條件
+static std::map<uint32_t, uint32_t> g_ebCountByNode;
+// 至少需要收到幾個 EB 才允許開始挑槽（可由指令列調整）
+static uint32_t g_minEbBeforePick = 1;
+// 16-bit短位址 -> NodeId 映射（用於從 EB 來源推回哪個節點送的）
+static std::map<std::string, uint32_t> g_shortToNodeId;
+// 以 RSSI 近似挑選的「目前最佳父節點」，及其估測接收功率（dBm）
+static std::map<uint32_t, std::pair<uint32_t, double>> g_bestParentByNode; // key=rxNodeId -> {txNodeId, prDbm}
+// 實際已設定於 MAC 的父節點（避免重複設定）
+static std::map<uint32_t, uint32_t> g_currentParentByNode; // key=rxNodeId -> txNodeId
+// 已加入（啟動為協調器）後鎖定 parent 的節點集合
+static std::set<uint32_t> g_parentLocked;
+// 最近一次於觀察窗內收到 EB 的時間戳（秒）：rx -> sd -> (tx -> lastSeenSec)
+static std::map<uint32_t, std::map<uint16_t, std::map<uint32_t, double>>> g_seenEbLastTime;
+// 總節點數（包含：1 PAN-C、NUM_BACKBONE骨幹、其餘為隨機加入）
+static uint32_t g_numCoord = 16;
 
 static double Dist(const Vector& a, const Vector& b)
 {
@@ -62,6 +84,18 @@ static Mac16Address ShortFromNodeIndex(uint32_t nodeIdx)
   uint8_t ab[2] = {static_cast<uint8_t>((shortVal >> 8) & 0xff), static_cast<uint8_t>(shortVal & 0xff)};
   Mac16Address sa; sa.CopyFrom(ab);
   return sa;
+}
+
+// Convert Mac16Address to canonical hex string (e.g., "00:01")
+static std::string ShortToString(const Mac16Address& addr)
+{
+  uint8_t ab[2] = {0, 0};
+  addr.CopyTo(ab);
+  std::ostringstream os;
+  os << std::hex << std::setfill('0')
+     << std::setw(2) << static_cast<unsigned>(ab[0]) << ":"
+     << std::setw(2) << static_cast<unsigned>(ab[1]);
+  return os.str();
 }
 
 // Derive this source file's stem (filename without extension)
@@ -79,6 +113,139 @@ static std::string SelfStem()
     f = f.substr(0, dot);
   }
   return f;
+}
+
+// 解析 MacRx trace context 中的 NodeId（格式近似 /NodeList/<id>/...）
+static bool ParseNodeIdFromContext(const std::string& ctx, uint32_t& outNodeId)
+{
+  const std::string key = "/NodeList/";
+  auto pos = ctx.find(key);
+  if (pos == std::string::npos) return false;
+  pos += key.size();
+  uint32_t val = 0;
+  bool ok = false;
+  while (pos < ctx.size() && isdigit(static_cast<unsigned char>(ctx[pos])))
+  {
+    ok = true;
+    val = val * 10 + (ctx[pos] - '0');
+    ++pos;
+  }
+  if (!ok) return false;
+  outNodeId = val;
+  return true;
+}
+
+// MacRx trace sink：收到 DSME Beacon Allocation Notification 時，記錄該接收者觀測到的 SDIndex 已被使用
+static void OnMacRxWithContext(std::string context, Ptr<const Packet> p)
+{
+  uint32_t rxNodeId = 0;
+  if (!ParseNodeIdFromContext(context, rxNodeId))
+  {
+    return;
+  }
+  Ptr<Packet> copy = p->Copy();
+  LrWpanMacHeader mh;
+  if (!copy->RemoveHeader(mh))
+  {
+    return;
+  }
+  if (mh.GetType() == LrWpanMacHeader::LRWPAN_MAC_BEACON)
+  {
+    // 收到（增強）Beacon：紀錄次數，供挑槽前的門檻判斷使用
+    g_ebCountByNode[rxNodeId]++;
+    // 若該節點已加入並鎖定 parent，則不再根據 EB 切換 parent
+    if (g_parentLocked.find(rxNodeId) != g_parentLocked.end())
+    {
+      // 仍然記錄 EB 以便碰撞統計
+      Mac16Address srcShort = mh.GetShortSrcAddr();
+      std::string key = ShortToString(srcShort);
+      auto itTx = g_shortToNodeId.find(key);
+      if (itTx != g_shortToNodeId.end())
+      {
+        uint32_t txNodeId = itTx->second;
+        // 取得來源目前的 Beacon SDIndex（先用 g_chosen，沒有則詢問 MAC）
+        uint16_t sdIdx = 0xffff;
+        auto itChosen = g_chosen.find(txNodeId);
+        if (itChosen != g_chosen.end()) { sdIdx = itChosen->second; }
+        if (sdIdx == 0xffff) {
+          Ptr<Node> txNode = NodeList::GetNode(txNodeId);
+          Ptr<LrWpanNetDevice> txDev = txNode->GetDevice(0)->GetObject<LrWpanNetDevice>();
+          sdIdx = txDev->GetMac()->GetTimeSlotToSendBcn();
+        }
+        if (sdIdx != 0xffff && sdIdx != 0) {
+          g_seenEbLastTime[rxNodeId][sdIdx][txNodeId] = Simulator::Now().GetSeconds();
+        }
+      }
+      return;
+    }
+    // 以 RSSI 近似更新「最佳父節點」：取本次 EB 的來源，估測接收功率，若較佳則替換 parent
+    Mac16Address srcShort = mh.GetShortSrcAddr();
+    std::string key = ShortToString(srcShort);
+    auto itTx = g_shortToNodeId.find(key);
+    if (itTx != g_shortToNodeId.end() && g_pl)
+    {
+      uint32_t txNodeId = itTx->second;
+      Ptr<Node> rxNode = NodeList::GetNode(rxNodeId);
+      Ptr<Node> txNode = NodeList::GetNode(txNodeId);
+      Ptr<MobilityModel> rx = rxNode->GetObject<MobilityModel>();
+      Ptr<MobilityModel> tx = txNode->GetObject<MobilityModel>();
+      if (rx && tx)
+      {
+        double prDbm = g_pl->CalcRxPower(g_assumedTxDbm, tx, rx);
+        auto itBest = g_bestParentByNode.find(rxNodeId);
+        bool better = (itBest == g_bestParentByNode.end()) || (prDbm > itBest->second.second + 1e-9);
+        if (better)
+        {
+          g_bestParentByNode[rxNodeId] = {txNodeId, prDbm};
+          // 若實際 MAC 上尚未設定或不同，更新 parent 並追蹤其 beacon
+          auto itCur = g_currentParentByNode.find(rxNodeId);
+          bool needSet = (itCur == g_currentParentByNode.end()) || (itCur->second != txNodeId);
+          if (needSet)
+          {
+            Ptr<LrWpanNetDevice> d = rxNode->GetDevice(0)->GetObject<LrWpanNetDevice>();
+            d->GetMac()->SetAssociatedCoor(srcShort);
+            MlmeSyncRequestParams sync;
+            sync.m_logCh = g_channelNum; // 與本案例一致的 channel；由主流程設定
+            sync.m_logChPage = 0;
+            sync.m_trackBcn = true;
+            d->TrackCoordinatorBeacon(sync);
+            g_currentParentByNode[rxNodeId] = txNodeId;
+          }
+        }
+      }
+    }
+    // 記錄此 EB 於碰撞視窗內的最後見時間
+    if (itTx != g_shortToNodeId.end())
+    {
+      uint32_t txNodeId = itTx->second;
+      uint16_t sdIdx = 0xffff;
+      auto itChosen = g_chosen.find(txNodeId);
+      if (itChosen != g_chosen.end()) { sdIdx = itChosen->second; }
+      if (sdIdx == 0xffff) {
+        Ptr<Node> txNode = NodeList::GetNode(txNodeId);
+        Ptr<LrWpanNetDevice> txDev = txNode->GetDevice(0)->GetObject<LrWpanNetDevice>();
+        sdIdx = txDev->GetMac()->GetTimeSlotToSendBcn();
+      }
+      if (sdIdx != 0xffff && sdIdx != 0) {
+        g_seenEbLastTime[rxNodeId][sdIdx][txNodeId] = Simulator::Now().GetSeconds();
+      }
+    }
+    return;
+  }
+  if (mh.GetType() != LrWpanMacHeader::LRWPAN_MAC_COMMAND)
+  {
+    return; // 其他型別先略過
+  }
+  CommandPayloadHeader cmd;
+  if (!copy->RemoveHeader(cmd))
+  {
+    return;
+  }
+  if (cmd.GetCommandFrameType() == CommandPayloadHeader::DSME_BEACON_ALLOC_NOTIF)
+  {
+    uint16_t sd = cmd.GetAllocationBcnSDIndex();
+    g_localUsedByNode[rxNodeId].insert(sd);
+  }
 }
 
 static void PrintSummary(uint32_t numNodes)
@@ -151,7 +318,7 @@ static void PrintSummary(uint32_t numNodes)
       if (hasCollision) break;
     }
     if (hasCollision) obsCollisions++;
-    // 觀察者顏色：發生碰撞者金色，否則黑色
+    // 觀察者顏色：發生碰撞則金色，否則黑色（骨幹亦會高亮）
     if (g_anim)
     {
       if (hasCollision) { g_anim->UpdateNodeColor(on, 255, 215, 0); }
@@ -159,6 +326,39 @@ static void PrintSummary(uint32_t numNodes)
     }
   }
   NS_LOG_UNCOND("Observers potentially experiencing beacon collision: " << obsCollisions << "/" << g_observers.size());
+
+  // 幾何可見的碰撞機率：總碰撞次數 / (節點數 * slot數)
+  // 其中：對每個觀察者、每個 SDIndex，碰撞次數 = max(0, 可見發送者數-1)
+  uint64_t totalCollisionCount = 0;
+  const uint16_t slotsCount = static_cast<uint16_t>(1u << (BO - SO));
+  const uint16_t nonPanSlots = (slotsCount > 0) ? (slotsCount - 1) : 0; // 排除 SDIndex 0 (PAN-C)
+  for (uint32_t obsId : g_observers)
+  {
+    Ptr<Node> on = NodeList::GetNode(obsId);
+    Ptr<MobilityModel> rx = on->GetObject<MobilityModel>();
+    for (const auto& kv : groups)
+    {
+      uint16_t sd = kv.first;
+      if (sd == 0) continue;
+      uint32_t visible = 0;
+      for (uint32_t coordId : kv.second)
+      {
+        Ptr<Node> cn = NodeList::GetNode(coordId);
+        Ptr<MobilityModel> tx = cn->GetObject<MobilityModel>();
+        double prDbm = g_pl ? g_pl->CalcRxPower(g_assumedTxDbm, tx, rx) : -1e9;
+        if (prDbm >= g_rxSensDbm) visible++;
+      }
+      if (visible > 1) { totalCollisionCount += (visible - 1); }
+    }
+  }
+  if (nonPanSlots > 0 && numNodes > 0)
+  {
+    double denom = static_cast<double>(numNodes) * static_cast<double>(nonPanSlots);
+    double prob = static_cast<double>(totalCollisionCount) / denom;
+    NS_LOG_UNCOND("Collision summary (geometric): total=" << totalCollisionCount
+                   << ", denom=nodes*slots=" << numNodes << "*" << nonPanSlots
+                   << ", probability=" << prob);
+  }
 }
 
 // 於模擬進行中依現有 g_chosen 週期性更新觀察者顏色，
@@ -180,13 +380,11 @@ static void UpdateObserverCollisionColors()
     }
   }
 
-  // 對每個觀察者（此處即所有協調器），依 RSSI 推估可見的同 SDIndex 發送者數是否 >= 2
+  // 幾何可見：若同一 SDIndex 的可見發送者數量 >=2，則視為該觀察者可能遭遇 beacon 碰撞。
   for (uint32_t obsId : g_observers)
   {
     Ptr<Node> on = NodeList::GetNode(obsId);
-    // RSSI-based: position fetched inside model; no direct use here
     bool hasCollision = false;
-
     for (const auto& kv : groups)
     {
       if (kv.first == 0 || kv.second.size() < 2) continue;
@@ -196,20 +394,21 @@ static void UpdateObserverCollisionColors()
       {
         Ptr<Node> cn = NodeList::GetNode(coordId);
         Ptr<MobilityModel> tx = cn->GetObject<MobilityModel>();
-        double prDbm = g_pl ? g_pl->CalcRxPower(g_assumedTxDbm, tx, rx)
-                            : -1e9;
+        double prDbm = g_pl ? g_pl->CalcRxPower(g_assumedTxDbm, tx, rx) : -1e9;
         if (prDbm >= g_rxSensDbm) visible++;
         if (visible >= 2) { hasCollision = true; break; }
       }
       if (hasCollision) break;
     }
-
-    if (hasCollision) { g_anim->UpdateNodeColor(on, 255, 215, 0); } // 金色
-    // 若無碰撞則保持既有顏色（藍色或紅色），不強制改為黑色
+    if (hasCollision && g_anim)
+    {
+      g_anim->UpdateNodeColor(on, 255, 215, 0); // 金色（碰撞）
+    }
+    // 若無碰撞則保持既有顏色（骨幹黑、加入藍、未分配紅）
   }
 
   // 依加入結果把「未加入/未分配」的協調器標示為紅色；已加入者維持原色（避免覆蓋碰撞的金色）
-  for (uint32_t i = 1; i < NUM_COORD; ++i)
+  for (uint32_t i = 1; i < g_numCoord; ++i)
   {
     auto it = g_chosen.find(i);
     Ptr<Node> cn = NodeList::GetNode(i);
@@ -235,8 +434,9 @@ int main(int argc, char** argv)
 {
   bool verbose = true;
   bool promiscuousPcap = true;
-  double simTime = 29.0; // 拉長預設模擬時間，讓各節點有餘裕完成挑選與公告
+  double simTime = 15.0; // 拉長預設模擬時間，讓各節點有餘裕完成挑選與公告
   uint32_t seed = 4; // deterministic seed
+  // 可調整的總節點數（>= 1 + NUM_BACKBONE）。包含：1 PAN-C、NUM_BACKBONE 個骨幹、其餘為隨機加入協調器
 
   CommandLine cmd(__FILE__);
   cmd.AddValue("verbose", "Enable component logs", verbose);
@@ -249,7 +449,14 @@ int main(int argc, char** argv)
   cmd.AddValue("refDist", "Reference distance (m)", g_refDist);
   cmd.AddValue("refLossDb", "Reference loss at refDist (dB)", g_refLossDb);
   cmd.AddValue("assumedTxDbm", "Assumed coordinator TX power (dBm)", g_assumedTxDbm);
+  cmd.AddValue("minEbBeforePick", "Minimum EB receptions before attempting beacon slot selection", g_minEbBeforePick);
+  cmd.AddValue("numNodes", "Total node count (>= 1 + NUM_BACKBONE); includes 1 PAN-C, 8 backbone, rest random joiners", g_numCoord);
   cmd.Parse(argc, argv);
+
+  if (g_numCoord < 1u + NUM_BACKBONE)
+  {
+    NS_FATAL_ERROR("numNodes must be >= " << (1 + NUM_BACKBONE));
+  }
 
   if (verbose)
   {
@@ -262,7 +469,7 @@ int main(int argc, char** argv)
   RngSeedManager::SetSeed(seed);
 
   NodeContainer nodes;
-  nodes.Create(NUM_COORD);
+  nodes.Create(g_numCoord);
 
   MobilityHelper mobility;
   Ptr<ListPositionAllocator> pos = CreateObject<ListPositionAllocator>();
@@ -286,7 +493,7 @@ int main(int argc, char** argv)
   urvX->SetAttribute("Max", DoubleValue(R));
   urvY->SetAttribute("Min", DoubleValue(-R));
   urvY->SetAttribute("Max", DoubleValue(R));
-  for (uint32_t i = 1 + NUM_BACKBONE; i < NUM_COORD; ++i)
+  for (uint32_t i = 1 + NUM_BACKBONE; i < g_numCoord; ++i)
   {
     double x = urvX->GetValue();
     double y = urvY->GetValue();
@@ -307,10 +514,19 @@ int main(int argc, char** argv)
   std::string fileStem = SelfStem();
   lrWpanHelper.EnablePcapAll(fileStem, promiscuousPcap);
 
+  // 建立短位址->NodeId 映射（用於從封包來源推回節點，再透過 g_pl 估測 RSSI）
+  g_shortToNodeId.clear();
+  for (uint32_t i = 0; i < devs.GetN(); ++i)
+  {
+    Ptr<LrWpanNetDevice> d = devs.Get(i)->GetObject<LrWpanNetDevice>();
+    g_shortToNodeId[ShortToString(d->GetMac()->GetShortAddress())] = d->GetNode()->GetId();
+  }
+
   const uint16_t numChSupported = 6;
   const bool capReduction = false;
   const uint8_t panId = 0x0007;
   const uint8_t channelNum = 11;
+  g_channelNum = channelNum; // 供在 OnMacRx 時切換父節點時使用
 
   for (uint32_t i = 0; i < devs.GetN(); ++i)
   {
@@ -407,37 +623,25 @@ int main(int argc, char** argv)
     }
   }
 
-  // 其餘隨機加入協調器（節點 1+NUM_BACKBONE .. NUM_COORD-1）
-  for (uint32_t i = 1 + NUM_BACKBONE; i < NUM_COORD; ++i)
+  // 其餘隨機加入協調器（節點 1+NUM_BACKBONE .. g_numCoord-1）
+  for (uint32_t i = 1 + NUM_BACKBONE; i < g_numCoord; ++i)
   {
     Ptr<LrWpanNetDevice> d = devs.Get(i)->GetObject<LrWpanNetDevice>();
-
-    // 不強制找 PAN-C；改為選擇「最鄰近」的 backbone 協調器作為 parent
-    // 這符合「聽到任一個 beacon 就能入網」的預期，便於建立本地 EB 位圖
-    uint32_t bestParentIdx = 1; // default to first backbone
-    double bestDist = 1e100;
-    Ptr<MobilityModel> mmSelf = nodes.Get(i)->GetObject<MobilityModel>();
-    Vector posSelf = mmSelf ? mmSelf->GetPosition() : Vector();
-    for (uint32_t bi = 0; bi < NUM_BACKBONE; ++bi)
-    {
-      uint32_t cand = 1 + bi;
-      Ptr<MobilityModel> mm = nodes.Get(cand)->GetObject<MobilityModel>();
-      if (!mm) continue;
-      double dxy = Dist(posSelf, mm->GetPosition());
-      if (dxy < bestDist)
-      {
-        bestDist = dxy;
-        bestParentIdx = cand;
-      }
-    }
-    Mac16Address parent = ShortFromNodeIndex(bestParentIdx);
-    d->GetMac()->SetAssociatedCoor(parent);
+    // 父節點改由「接收 RSSI 最大的 EB」來決定；
+    // 先以 PAN-C 當作暫時的追蹤目標，待收到更強 EB 時會在 OnMacRx 中自動切換。
+    d->GetMac()->SetAssociatedCoor(Mac16Address("00:01"));
 
     MlmeSyncRequestParams sync;
     sync.m_logCh = channelNum;
     sync.m_logChPage = 0;
     sync.m_trackBcn = true;
     d->TrackCoordinatorBeacon(sync);
+    // 掛 MacRx trace（帶 context）以蒐集本地實際收到的 DBAN 宣告
+    {
+      std::ostringstream ctx;
+      ctx << "/NodeList/" << nodes.Get(i)->GetId() << "/DeviceList/0/$ns3::LrWpanNetDevice/Mac/MacRx";
+      d->GetMac()->TraceConnect("MacRx", ctx.str(), MakeCallback(&OnMacRxWithContext));
+    }
 
     // After listening some EBs, pick a vacant slot from local bitmap with retries
     const double base = 2.0 + 0.20 * i;
@@ -451,26 +655,35 @@ int main(int argc, char** argv)
       if (*done) return;
       (*tries)++;
 
-      // 只看本地可見的協調器所使用的 SDIndex，從剩餘的中挑選
+      // 先確保已聽到至少 g_minEbBeforePick 次 EB，才允許挑槽
+      uint32_t rxNodeId = NodeList::GetNode(i)->GetId();
+      auto ebIt = g_ebCountByNode.find(rxNodeId);
+      uint32_t heard = (ebIt == g_ebCountByNode.end()) ? 0u : ebIt->second;
+      if (heard < g_minEbBeforePick)
+      {
+        if (*tries < maxTries)
+        {
+          Simulator::Schedule(Seconds(retryInterval), *self);
+        }
+        else
+        {
+          NS_LOG_UNCOND("Node " << d->GetNode()->GetId() << " has not heard any EB; give up selecting");
+          g_chosen[d->GetNode()->GetId()] = 0xffff;
+        }
+        return;
+      }
+
+      // 只看本地「實際收到 DBAN 宣告」之已用 SDIndex，從剩餘的中挑選
       const uint16_t slotsCount = static_cast<uint16_t>(1u << (BO - SO));
       std::vector<bool> locallyUsed(slotsCount, false);
-      Ptr<MobilityModel> rx = NodeList::GetNode(i)->GetObject<MobilityModel>();
-      if (rx)
+      auto itset = g_localUsedByNode.find(rxNodeId);
+      if (itset != g_localUsedByNode.end())
       {
-        for (uint32_t cid = 1; cid < NUM_COORD; ++cid)
+        for (uint16_t used : itset->second)
         {
-          auto it = g_chosen.find(cid);
-          if (it == g_chosen.end()) continue;
-          uint16_t usedIdx = it->second;
-          if (usedIdx == 0xffff || usedIdx >= slotsCount) continue;
-          Ptr<Node> cn = NodeList::GetNode(cid);
-          if (!cn) continue;
-          Ptr<MobilityModel> tx = cn->GetObject<MobilityModel>();
-          if (!tx) continue;
-          double prDbm = g_pl ? g_pl->CalcRxPower(g_assumedTxDbm, tx, rx) : -1e9;
-          if (prDbm >= g_rxSensDbm)
+          if (used < slotsCount)
           {
-            locallyUsed[usedIdx] = true;
+            locallyUsed[used] = true;
           }
         }
       }
@@ -536,6 +749,8 @@ int main(int argc, char** argv)
 
       // Start as coordinator then notify in CAP
       lrWpanHelper.CoordBoostrap(d, pd, sdIdx, start);
+      // 加入成功後：鎖定 parent，不再切換
+      g_parentLocked.insert(d->GetNode()->GetId());
       Simulator::Schedule(Seconds(0.08), [d, sdIdx]() {
         d->SendDsmeBeaconAllocNotify();
         LogPickedSlot(d->GetNode()->GetId(), sdIdx);
@@ -563,7 +778,7 @@ int main(int argc, char** argv)
   anim.UpdateNodeColor(nodes.Get(0), 0, 0, 0); // 改為黑色
   anim.UpdateNodeSize(nodes.Get(0)->GetId(), 14.0, 14.0);
 
-  for (uint32_t i = 1; i < NUM_COORD; ++i)
+  for (uint32_t i = 1; i < g_numCoord; ++i)
   {
     std::ostringstream lab;
     std::string sdLab = "?";
@@ -573,10 +788,14 @@ int main(int argc, char** argv)
     anim.UpdateNodeDescription(nodes.Get(i), lab.str());
     anim.UpdateNodeSize(nodes.Get(i)->GetId(), 12.0, 12.0);
   }
-  // Coordinators 一律藍色
-  for (uint32_t i = 1; i < NUM_COORD; ++i)
+  // 骨幹協調器黑色，其餘協調器藍色
+  for (uint32_t i = 1; i < g_numCoord; ++i)
   {
-    anim.UpdateNodeColor(nodes.Get(i), 0, 0, 255);
+    if (i <= NUM_BACKBONE) {
+      anim.UpdateNodeColor(nodes.Get(i), 0, 0, 0);
+    } else {
+      anim.UpdateNodeColor(nodes.Get(i), 0, 0, 255);
+    }
   }
 
   // 週期性提前刷新觀察者顏色（從 3 秒開始，每 0.5 秒，直到結束前 0.5 秒）
