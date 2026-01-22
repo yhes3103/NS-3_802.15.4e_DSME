@@ -351,12 +351,23 @@ static void PrintSummary(uint32_t numNodes)
       if (visible > 1) { totalCollisionCount += (visible - 1); }
     }
   }
-  if (nonPanSlots > 0 && numNodes > 0)
+  // 分母改為「成功選到非 PAN 時槽的節點數 × 非 PAN slot 數」
+  uint32_t selectedNonPanNodes = 0;
+  for (uint32_t i = 0; i < numNodes; ++i)
   {
-    double denom = static_cast<double>(numNodes) * static_cast<double>(nonPanSlots);
+    auto itc = g_chosen.find(i);
+    if (itc != g_chosen.end())
+    {
+      uint16_t sd = itc->second;
+      if (sd != 0xffff && sd != 0) { selectedNonPanNodes++; }
+    }
+  }
+  if (nonPanSlots > 0 && selectedNonPanNodes > 0)
+  {
+    double denom = static_cast<double>(selectedNonPanNodes) * static_cast<double>(nonPanSlots);
     double prob = static_cast<double>(totalCollisionCount) / denom;
     NS_LOG_UNCOND("Collision summary (geometric): total=" << totalCollisionCount
-                   << ", denom=nodes*slots=" << numNodes << "*" << nonPanSlots
+                   << ", denom=selectedNodes*slots=" << selectedNonPanNodes << "*" << nonPanSlots
                    << ", probability=" << prob);
   }
 }
