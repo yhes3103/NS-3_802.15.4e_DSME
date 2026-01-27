@@ -2477,12 +2477,19 @@ void LrWpanMac::PdDataIndication(uint32_t psduLength, Ptr<Packet> p, uint8_t lqi
                         if (m_macDSMEenabled && m_coord && !m_panCoor && m_sendBcn) {
                             // NS_LOG_DEBUG("Simulator::Now() = " << Simulator::Now().As(Time::S));
                             // NS_LOG_DEBUG("m_startOfBcnSlotOfSyncParent = " << m_startOfBcnSlotOfSyncParent.As(Time::S));
-                            Time scheduleBcnTime = Seconds(((double)m_incomingSuperframeDuration * m_choosedSDIndexToSendBcn) 
-                                                        / symbolRate) // Calculate the total superframe time in BI
-                                                        - (Simulator::Now() - m_startOfBcnSlotOfSyncParent); // Minus the times when the Parent coordinator send it beacon.
-                            // Guard against numerical drift or stale parent timestamp causing negative delay
+                            Time targetOffset = Seconds(((double)m_incomingSuperframeDuration * m_choosedSDIndexToSendBcn)
+                                                        / symbolRate);
+                            Time timeSinceParent = Simulator::Now() - m_startOfBcnSlotOfSyncParent;
+                            Time scheduleBcnTime = targetOffset - timeSinceParent;
+                            // If we have already passed the target offset in the current beacon interval,
+                            // wrap to the next beacon interval to preserve alignment.
                             if (!scheduleBcnTime.IsPositive()) {
-                                scheduleBcnTime = NanoSeconds(1);
+                                Time beaconIntervalTime = Seconds((double)m_incomingBeaconInterval / symbolRate);
+                                // Add whole beacon intervals until the delay becomes positive
+                                // (typically once is enough, but guard for edge cases).
+                                while (!scheduleBcnTime.IsPositive()) {
+                                    scheduleBcnTime += beaconIntervalTime;
+                                }
                             }
                             NS_LOG_DEBUG("Simulator::Now() - m_startOfBcnSlotOfSyncParent = " << (Simulator::Now() - m_startOfBcnSlotOfSyncParent).As(Time::S)); // debug
                             // NS_LOG_DEBUG("m_incomingSuperframeDuration = " << m_incomingSuperframeDuration);
