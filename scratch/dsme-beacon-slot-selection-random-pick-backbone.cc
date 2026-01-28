@@ -258,14 +258,6 @@ static void PrintSummary(uint32_t numNodes)
       groups[kv.second].push_back(kv.first);
   }
 
-  uint32_t collisionNodes = 0;
-  for (const auto& kv : groups)
-  {
-    if (kv.first == 0) continue; // PAN-C reserved
-    if (kv.second.size() > 1)
-      collisionNodes += static_cast<uint32_t>(kv.second.size() - 1);
-  }
-
   NS_LOG_UNCOND("==== Beacon Slot Selection Summary ====");
   NS_LOG_UNCOND("Node\tPicked_SDIndex");
   for (uint32_t i = 0; i < numNodes; ++i)
@@ -291,84 +283,95 @@ static void PrintSummary(uint32_t numNodes)
 
   NS_LOG_UNCOND("Unassigned nodes: " << unassigned);
 
-  // 幾何近似的「觀察者可見碰撞」檢查：
-  // 改為 RSSI 近似：對每個觀察者、每個 SDIndex 群組，
-  // 計算以 LogDistance 模型預估之接收功率 Pr(dBm)；若可見 (Pr>=g_rxSensDbm) 的發送者數量 >=2，
-  // 則視為該觀察者在該 SDIndex 可能遭遇 beacon 碰撞。
-  uint32_t obsCollisions = 0;
-  for (uint32_t obsId : g_observers)
-  {
-    Ptr<Node> on = NodeList::GetNode(obsId);
-    // RSSI-based: position fetched inside model; no direct use here
-    bool hasCollision = false;
-    for (const auto& kv : groups)
-    {
-      if (kv.first == 0 || kv.second.size() < 2) continue;
-      uint32_t visible = 0;
-      Ptr<MobilityModel> rx = on->GetObject<MobilityModel>();
-      for (uint32_t coordId : kv.second)
-      {
-        Ptr<Node> cn = NodeList::GetNode(coordId);
-        Ptr<MobilityModel> tx = cn->GetObject<MobilityModel>();
-        double prDbm = g_pl ? g_pl->CalcRxPower(g_assumedTxDbm, tx, rx)
-                            : -1e9; // if not initialized, treat as not visible
-        if (prDbm >= g_rxSensDbm) visible++;
-        if (visible >= 2) { hasCollision = true; break; }
-      }
-      if (hasCollision) break;
-    }
-    if (hasCollision) obsCollisions++;
-    // 觀察者顏色：發生碰撞則金色，否則黑色（骨幹亦會高亮）
-    if (g_anim)
-    {
-      if (hasCollision) { g_anim->UpdateNodeColor(on, 255, 215, 0); }
-      else { g_anim->UpdateNodeColor(on, 0, 0, 0); }
-    }
-  }
-  NS_LOG_UNCOND("Observers potentially experiencing beacon collision: " << obsCollisions << "/" << g_observers.size());
+  // 新的 Summary 統計（以 RSSI 可見性為準）：
+  // 方法一：每個 receiver 是否「至少一次」遇到碰撞（任一 SDIndex，有可見者 k>=2）。
+  // 方法二(a)：receiver-slot 二元碰撞率 = 有碰撞的格子數 / (receiver 數 × 非 PAN slot 數)
+  // 方法二(b)：receiver-slot 碰撞嚴重度（k-1）平均 = Σ(k-1) / (receiver 數 × 非 PAN slot 數)
 
-  // 幾何可見的碰撞機率：總碰撞次數 / (節點數 * slot數)
-  // 其中：對每個觀察者、每個 SDIndex，碰撞次數 = max(0, 可見發送者數-1)
-  uint64_t totalCollisionCount = 0;
   const uint16_t slotsCount = static_cast<uint16_t>(1u << (BO - SO));
   const uint16_t nonPanSlots = (slotsCount > 0) ? (slotsCount - 1) : 0; // 排除 SDIndex 0 (PAN-C)
+
+  uint32_t everCollisionObservers = 0;       // 方法一：曾遇到碰撞的 receiver 數
+  uint64_t collidedObserverSlots = 0;        // 方法二(a)：有碰撞的 receiver-slot 格子數
+  uint64_t sumExcess = 0;                    // 方法二(b)：Σ(k-1)
+
   for (uint32_t obsId : g_observers)
   {
     Ptr<Node> on = NodeList::GetNode(obsId);
     Ptr<MobilityModel> rx = on->GetObject<MobilityModel>();
-    for (const auto& kv : groups)
+    bool ever = false;
+
+    // 逐個非 PAN SDIndex 檢查此觀察者可見的發送者數量 k
+    for (uint16_t sd = 1; sd < slotsCount; ++sd)
     {
-      uint16_t sd = kv.first;
-      if (sd == 0) continue;
       uint32_t visible = 0;
-      for (uint32_t coordId : kv.second)
+      auto itg = groups.find(sd);
+      if (itg != groups.end())
       {
-        Ptr<Node> cn = NodeList::GetNode(coordId);
-        Ptr<MobilityModel> tx = cn->GetObject<MobilityModel>();
-        double prDbm = g_pl ? g_pl->CalcRxPower(g_assumedTxDbm, tx, rx) : -1e9;
-        if (prDbm >= g_rxSensDbm) visible++;
+        for (uint32_t coordId : itg->second)
+        {
+          Ptr<Node> cn = NodeList::GetNode(coordId);
+          Ptr<MobilityModel> tx = cn->GetObject<MobilityModel>();
+          double prDbm = g_pl ? g_pl->CalcRxPower(g_assumedTxDbm, tx, rx) : -1e9;
+          if (prDbm >= g_rxSensDbm) { visible++; }
+        }
       }
-      if (visible > 1) { totalCollisionCount += (visible - 1); }
+
+      if (visible >= 2)
+      {
+        collidedObserverSlots++;  // 方法二(a)
+        ever = true;              // 方法一
+      }
+      if (visible > 1)
+      {
+        sumExcess += static_cast<uint64_t>(visible - 1); // 方法二(b)
+      }
     }
-  }
-  // 分母改為「成功選到非 PAN 時槽的節點數 × 非 PAN slot 數」
-  uint32_t selectedNonPanNodes = 0;
-  for (uint32_t i = 0; i < numNodes; ++i)
-  {
-    auto itc = g_chosen.find(i);
-    if (itc != g_chosen.end())
+
+    // 方法一：此 receiver 是否曾遇碰撞
+    if (ever)
     {
-      uint16_t sd = itc->second;
-      if (sd != 0xffff && sd != 0) { selectedNonPanNodes++; }
+      everCollisionObservers++;
+      if (g_anim)
+      {
+        // 視覺：曾遇碰撞者塗金色
+        g_anim->UpdateNodeColor(on, 255, 215, 0);
+      }
     }
   }
-  if (nonPanSlots > 0 && selectedNonPanNodes > 0)
+
+  const uint32_t receiversN = static_cast<uint32_t>(g_observers.size());
+  const uint64_t totalObserverSlots = static_cast<uint64_t>(receiversN) * static_cast<uint64_t>(nonPanSlots);
+
+  double method1Rate = (receiversN > 0) ? (static_cast<double>(everCollisionObservers) / receiversN) : 0.0;
+  double method2aRate = (totalObserverSlots > 0) ? (static_cast<double>(collidedObserverSlots) / static_cast<double>(totalObserverSlots)) : 0.0;
+  double method2bSeverity = (totalObserverSlots > 0) ? (static_cast<double>(sumExcess) / static_cast<double>(totalObserverSlots)) : 0.0;
+
+  NS_LOG_UNCOND("[Method-1] Ever-collided receivers: " << everCollisionObservers << "/" << receiversN
+                 << " (rate=" << method1Rate << ")");
+  NS_LOG_UNCOND("[Method-2a] Collision probability (receiver-slot): " << method2aRate
+                 << "  (collided=" << collidedObserverSlots
+                 << ", total=" << totalObserverSlots << ")");
+  NS_LOG_UNCOND("[Method-2b] Collision severity avg (k-1 per receiver-slot): " << method2bSeverity
+                 << "  (sumExcess=" << sumExcess
+                 << ", total=" << totalObserverSlots << ")");
+
+  // 總結階段：將未成功加入（未選到非 0 時槽）的協調器覆蓋為紅色，以便一眼辨識。
+  if (g_anim)
   {
-    double denom = static_cast<double>(selectedNonPanNodes) * static_cast<double>(nonPanSlots);
-    double prob = static_cast<double>(totalCollisionCount) / denom;
-    NS_LOG_UNCOND("Collision summary (geometric): total=" << totalCollisionCount
-                   << ", denom=selectedNodes*slots=" << selectedNonPanNodes << "*" << nonPanSlots
-                   << ", probability=" << prob);
+    for (uint32_t i = 1; i < numNodes; ++i)
+    {
+      auto itc = g_chosen.find(i);
+      if (itc != g_chosen.end())
+      {
+        uint16_t sd = itc->second;
+        if (sd == 0xffff)
+        {
+          Ptr<Node> cn = NodeList::GetNode(i);
+          g_anim->UpdateNodeColor(cn, 255, 0, 0); // 紅色：未加入
+        }
+      }
+    }
   }
 }
 
