@@ -1,0 +1,1 @@
+# numNodes avg_method1_rate avg_method2a_prob avg_method2b_severity repeats=80 step=3
