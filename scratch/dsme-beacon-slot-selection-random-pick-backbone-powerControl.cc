@@ -374,6 +374,44 @@ static void PrintSummary(uint32_t numNodes)
     if (it == g_chosen.end() || it->second == 0xffff) ++unassigned;
   }
   NS_LOG_UNCOND("Unassigned nodes: " << unassigned);
+  // Also report join-failure rate over joiner population (exclude 1 PAN-C + NUM_BACKBONE fixed backbone coordinators)
+  const uint32_t baseline = 1u + static_cast<uint32_t>(NUM_BACKBONE); // 9 by default
+  uint32_t joinerPopulation = (numNodes > baseline) ? (numNodes - baseline) : 0u;
+  double unassignedRate = (joinerPopulation > 0) ? (static_cast<double>(unassigned) / static_cast<double>(joinerPopulation)) : 0.0;
+  NS_LOG_UNCOND("Not-joined count / joiners (numNodes-" << baseline << "): "
+                << unassigned << "/" << joinerPopulation << "  (rate=" << unassignedRate << ")");
+
+  // Average TX power among successfully joined joiners (in mW)
+  uint32_t joinedJoiners = 0;
+  double sumMw = 0.0;
+  if (joinerPopulation > 0)
+  {
+    for (uint32_t nid = baseline; nid < numNodes; ++nid)
+    {
+      auto it = g_chosen.find(nid);
+      if (it != g_chosen.end() && it->second != 0xffff)
+      {
+        double dbm = g_defaultJoinerTxDbm;
+        auto itp = g_txDbmByNode.find(nid);
+        if (itp != g_txDbmByNode.end()) { dbm = itp->second; }
+        double mw = std::pow(10.0, dbm / 10.0);
+        sumMw += mw;
+        joinedJoiners++;
+      }
+    }
+  }
+  double avgMw = (joinedJoiners > 0) ? (sumMw / static_cast<double>(joinedJoiners)) : 0.0;
+  if (joinedJoiners > 0)
+  {
+    double avgDbm = 10.0 * std::log10(avgMw);
+    NS_LOG_UNCOND("Avg TX power of joined joiners: " << avgMw << " mW (" << avgDbm << " dBm)"
+                   << "  (joinedJoiners=" << joinedJoiners << ")");
+  }
+  else
+  {
+    NS_LOG_UNCOND("Avg TX power of joined joiners: 0 mW (n/a dBm)"
+                   << "  (joinedJoiners=" << joinedJoiners << ")");
+  }
 
   // Collision stats (visibility): by default, baseline-like using assumedTxDbm; can switch to actual TX
   const uint16_t slotsCount = static_cast<uint16_t>(1u << (BO - SO));
@@ -394,7 +432,24 @@ static void PrintSummary(uint32_t numNodes)
     return g_defaultJoinerTxDbm;
   };
 
+  // Build joined-observer list: include PAN-C (0) and any node that successfully picked an SDIndex
+  std::vector<uint32_t> joinedObservers;
+  joinedObservers.reserve(g_observers.size());
   for (uint32_t obsId : g_observers)
+  {
+    if (obsId == 0)
+    {
+      joinedObservers.push_back(obsId);
+      continue;
+    }
+    auto itc = g_chosen.find(obsId);
+    if (itc != g_chosen.end() && itc->second != 0xffff)
+    {
+      joinedObservers.push_back(obsId);
+    }
+  }
+
+  for (uint32_t obsId : joinedObservers)
   {
     Ptr<Node> on = NodeList::GetNode(obsId);
     Ptr<MobilityModel> rx = on->GetObject<MobilityModel>();
@@ -419,7 +474,7 @@ static void PrintSummary(uint32_t numNodes)
     if (ever) { everCollisionObservers++; }
   }
 
-  const uint32_t receiversN = static_cast<uint32_t>(g_observers.size());
+  const uint32_t receiversN = static_cast<uint32_t>(joinedObservers.size());
   const uint64_t totalObserverSlots = static_cast<uint64_t>(receiversN) * static_cast<uint64_t>(nonPanSlots);
   double method1Rate = (receiversN > 0) ? (static_cast<double>(everCollisionObservers) / receiversN) : 0.0;
   double method2aRate = (totalObserverSlots > 0) ? (static_cast<double>(collidedObserverSlots) / static_cast<double>(totalObserverSlots)) : 0.0;
