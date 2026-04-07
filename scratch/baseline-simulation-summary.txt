@@ -1,0 +1,263 @@
+# Baseline 模擬程式總結與介紹
+
+## 檔案資訊
+
+- **檔名**：`dsme-beacon-slot-selection-baseline.cc`
+- **位置**：`scratch/`
+- **用途**：IEEE 802.15.4e DSME beacon slot selection 的 **Baseline 對照組**（無 power control，所有節點固定 0 dBm 發送）
+
+---
+
+## 一、模擬場景概述
+
+模擬一個 DSME（Deterministic and Synchronous Multi-channel Extension）網路的 beacon slot 分配過程。網路中有一個 PAN Coordinator（PAN-C）和若干個 joiner 節點，所有節點隨機部署在一個正方形區域內（無 backbone 結構）。每個 joiner 透過監聽 Enhanced Beacon（EB）和 DSME Beacon Allocation Notification（DBAN），學習附近已被佔用的 beacon slot，再從剩餘空閒的 slot 中隨機選擇一個，升級為 coordinator 並開始發送自己的 beacon。
+
+本檔案為 **Baseline**，所有節點的發送功率固定為 0 dBm（1 mW），不做任何 power control。用於與 power control 版本做對照比較。
+
+---
+
+## 二、模擬參數一覽
+
+### 2.1 DSME MAC 層參數
+
+| 參數 | 符號 | 值 | 說明 |
+|------|------|----|------|
+| Beacon Order | BO | 6 | 決定 beacon interval |
+| Superframe Order | SO | 3 | 決定 superframe duration |
+| Multi-superframe Order | MO | 5 | 決定 multi-superframe duration |
+| Beacon Slots 總數 | M = 2^(BO−SO) | 8 | Slot 0~7，所有 slot（含 slot 0）皆可被 joiner 選用 |
+| CAP Reduction | — | false | 不啟用 CAP 縮減 |
+| Channel Diversity Mode | — | 1 | 啟用 |
+| 支援 Channel 數 | — | 6 | |
+| PAN ID | — | 0x0007 | |
+
+### 2.2 PHY 層與無線通道參數
+
+| 參數 | 值 | 說明 |
+|------|----|------|
+| 載波頻率 | 2.405 GHz | IEEE 802.15.4 Channel 11（2.4 GHz band 第一個 channel） |
+| 調變方式 | O-QPSK | 2.4 GHz band 標準調變，symbol rate = 62.5 ksym/s |
+| Path Loss Model | Log-distance | `LogDistancePropagationLossModel` |
+| Path Loss Exponent (n) | 2.7 | |
+| Reference Distance (d₀) | 1.0 m | |
+| Reference Loss (L₀) | 40.05 dB | 對應 2.4 GHz 在 1m 的 free-space path loss |
+| RX Sensitivity | −95.0 dBm | 接收功率低於此值視為不可見 |
+| TX Power | 0 dBm (1 mW) | **所有節點固定**，不做調整 |
+
+**Path Loss 公式**：
+
+```
+PL(d) = L₀ + 10 × n × log₁₀(d / d₀)
+      = 40.05 + 10 × 2.7 × log₁₀(d)    [dB]
+```
+
+**最大通訊距離**（在 TX = 0 dBm, RX sensitivity = −95 dBm 時）：
+
+```
+0 − (40.05 + 27 × log₁₀(d_max)) = −95
+log₁₀(d_max) = (95 − 40.05) / 27 = 2.035
+d_max ≈ 108.5 m
+```
+
+### 2.3 拓樸參數
+
+| 參數 | 值 | 說明 |
+|------|----|------|
+| 部署區域 | 300 m × 300 m | x ∈ [−150, 150], y ∈ [−150, 150] |
+| PAN-C 位置 | (0, 0, 0) | 正方形正中心 |
+| Joiner 位置 | 均勻隨機 | 在部署區域內 uniform random |
+| 節點總數 N | 1 + joiners | PAN-C + joiner 數量（預設 joiners=15 → N=16） |
+| Backbone 結構 | 無 | 純隨機拓樸 |
+| Mobility Model | ConstantPositionMobilityModel | 靜態，不移動 |
+
+### 2.4 加入（Join）機制參數
+
+| 參數 | 預設值 | 說明 |
+|------|--------|------|
+| joinBaseOffset | 2.0 s | 節點 i 開始嘗試 join 的基準時間 |
+| joinBaseSlope | 0.20 s | 節點 i 的 join 起始時間 = 2.0 + 0.20 × i |
+| joinRetryInterval | 0.25 s | 每次 retry 的間隔 |
+| joinTimeout | 6.0 s | 超過此時間未成功則放棄 |
+| minEbBeforePick | 1 | 至少收到 1 個 EB 才嘗試選 slot |
+| 最少監聽時間 | 1 個 multi-superframe | ≈ 0.49152 s（確保掃過所有 beacon slot 一輪） |
+
+### 2.5 模擬控制參數
+
+| 參數 | 預設值 | 說明 |
+|------|--------|------|
+| simTime | 15.0 s | 總模擬時間 |
+| seed | 4 | RNG seed（`RngSeedManager::SetSeed`） |
+| verbose | true | 開啟 NS-3 log（LrWpanMac, LrWpanPhy） |
+| promisc | true | 啟用 promiscuous PCAP 輸出 |
+
+---
+
+## 三、程式運作流程
+
+### 3.1 初始化階段
+
+1. **建立節點**：建立 N 個節點（1 PAN-C + joiners 個 joiner）
+2. **部署位置**：PAN-C 置於原點 (0,0,0)，其餘 joiner 在 300m×300m 區域內隨機部署
+3. **安裝 LR-WPAN**：透過 `LrWpanHelper` 為所有節點安裝 IEEE 802.15.4 裝置
+4. **設定 TX power**：所有節點統一設為 0 dBm
+5. **啟動 PAN-C**：PAN-C 以 `MlmeStartRequest` 啟動，佔用 SDIndex=0
+
+### 3.2 Joiner 加入流程
+
+每個 joiner 節點 i 在時刻 `t = 2.0 + 0.20 × i` 秒開始嘗試加入，流程如下：
+
+```
+開始監聽
+   │
+   ▼
+┌──────────────────────────────┐
+│ 是否已聽滿 1 個 multi-superframe？│
+└──────────┬───────────────────┘
+           │ 否 → 等待剩餘時間，retry
+           │ 是
+           ▼
+┌──────────────────────────────┐
+│ 是否聽到至少 1 個 EB？           │
+└──────────┬───────────────────┘
+           │ 否 → 重置監聽窗口，retry
+           │ 是
+           ▼
+┌──────────────────────────────┐
+│ 從 local 觀察建立 used slot set  │
+│ （來源：EB + DBAN）              │
+└──────────┬───────────────────┘
+           │
+           ▼
+┌──────────────────────────────┐
+│ 有空閒 slot 嗎？（slot 0~7）     │
+└──────────┬───────────────────┘
+           │ 否 → retry（直到 timeout）
+           │ 是
+           ▼
+┌──────────────────────────────┐
+│ 從空閒 slot 中隨機選擇一個       │
+│ 啟動 beacon 發送               │
+│ 發送 DBAN 通知鄰居             │
+└──────────────────────────────┘
+```
+
+### 3.3 Slot 資訊學習方式
+
+每個 joiner 透過兩種方式學習附近已被佔用的 slot：
+
+- **收到 Enhanced Beacon (EB)**：解析發送者的 short address → 查出該發送者選用的 SDIndex → 加入 local used set
+- **收到 DBAN (Beacon Allocation Notification)**：直接讀出 DBAN 中宣告的 SDIndex → 加入 local used set
+
+兩者共同維護每個節點的 `g_localUsedByNode[rxNodeId]` 集合。
+
+### 3.4 Slot 0 的處理
+
+- PAN-C 在初始化時固定佔用 slot 0
+- Joiner 在選擇 slot 時，候選範圍為 **slot 0 ~ slot 7**（所有 slot 皆可選）
+- 如果 joiner 能聽到 PAN-C 的 beacon，slot 0 會被標記為已佔用，不會被選
+- 如果 joiner 聽不到 PAN-C（距離太遠），slot 0 會被視為空閒，可以被重用
+
+---
+
+## 四、碰撞偵測與輸出指標
+
+模擬結束時，程式計算並輸出以下四個指標（對應論文定義）：
+
+### 4.1 碰撞判定方法
+
+對每個成功升級的 coordinator r ∈ R 和每個 beacon slot s ∈ S = {1,...,M−1}：
+
+1. 找出所有選擇 slot s 的 transmitter
+2. 用 path loss model 計算每個 transmitter 到 receiver r 的接收功率
+3. 若接收功率 ≥ RX sensitivity（−95 dBm），則該 transmitter 對 r 在 slot s 是「可見的」
+4. 令 k_{r,s} = 該 slot 可見的 transmitter 數量
+5. k_{r,s} ≥ 2 即為碰撞
+
+### 4.2 四項指標
+
+| 指標 | 符號 | 公式 | 值域 | 說明 |
+|------|------|------|------|------|
+| 碰撞機率 | p_coll | Σ_r Σ_s 1(k_{r,s}≥2) / (\|R\|×\|S\|) | [0, 1] | 主要比較指標 |
+| 碰撞嚴重度 | s_coll | Σ_r Σ_s max(0, k_{r,s}−1) / (\|R\|×\|S\|) | [0, ∞) | 平均多餘干擾者數 |
+| 升級成功率 | η (eta) | \|R\| / N | [0, 1] | R 包含 PAN-C |
+| 平均發送功率 | P_tx_avg | 固定 0 dBm (1 mW) | — | Baseline 固定值 |
+
+其中：
+- **R**：成功升級的 coordinator 集合（含 PAN-C）
+- **S**：Beacon slot 集合 = {1, ..., M−1}（排除 slot 0，因 PAN-C 必定佔用且不衝突）
+- **N**：全部節點數
+
+### 4.3 輸出範例
+
+```
+==== Beacon Slot Selection Summary (Baseline, 0 dBm fixed) ====
+Node    SDIndex Tx[dBm]
+0       0       0
+1       3       0
+2       5       0
+...
+---- Metrics ----
+[p_coll]    Collision probability:  0.125   (collided_RS=14, total_RS=112)
+[s_coll]    Collision severity:     0.142   (sum_excess=16, total_RS=112)
+[eta]       Join success rate:      1       (|R|=16, N=16)
+[P_tx_avg]  Avg TX power:           0 dBm   (1 mW)  (|T|=16)
+```
+
+---
+
+## 五、執行方式
+
+### 5.1 編譯
+
+```bash
+./ns3 build scratch/dsme-beacon-slot-selection-baseline
+```
+
+### 5.2 執行
+
+```bash
+./ns3 run "scratch/dsme-beacon-slot-selection-baseline --joiners=15 --seed=4 --verbose=false"
+```
+
+### 5.3 命令列參數一覽
+
+| 參數 | 型別 | 預設值 | 說明 |
+|------|------|--------|------|
+| `--joiners` | uint32_t | 15 | Joiner 數量（N = 1 + joiners） |
+| `--seed` | uint32_t | 4 | RNG seed |
+| `--simTime` | double | 15.0 | 模擬時間（秒） |
+| `--verbose` | bool | true | 啟用 NS-3 log |
+| `--promisc` | bool | true | 啟用 promiscuous PCAP |
+| `--rxSensDbm` | double | −95.0 | RX sensitivity（dBm） |
+| `--plExp` | double | 2.7 | Path loss exponent |
+| `--refDist` | double | 1.0 | Reference distance（m） |
+| `--refLossDb` | double | 40.05 | Reference loss @ d₀（dB） |
+| `--minEbBeforePick` | uint32_t | 1 | 選 slot 前最少 EB 接收數 |
+| `--joinBaseOffset` | double | 2.0 | Join 起始時間 offset（s） |
+| `--joinBaseSlope` | double | 0.20 | Join 起始時間 slope（s/node） |
+| `--joinRetryInterval` | double | 0.25 | Retry 間隔（s） |
+| `--joinTimeout` | double | 6.0 | Join timeout（s） |
+
+---
+
+## 六、輸出檔案
+
+| 檔案 | 說明 |
+|------|------|
+| `dsme-beacon-slot-selection-baseline.xml` | NetAnim 動畫檔 |
+| `dsme-beacon-slot-selection-baseline-*.pcap` | 各節點的 PCAP 封包擷取檔 |
+
+---
+
+## 七、程式架構摘要
+
+| 函式 / 區塊 | 行數（約） | 說明 |
+|-------------|-----------|------|
+| `MultiSuperframeSeconds()` | L67-71 | 計算 1 個 multi-superframe 的秒數 |
+| `ApplyFixedTxPower()` | L123-131 | 設定節點 PHY 為 0 dBm |
+| `OnMacRxWithContext()` | L133-168 | EB/DBAN 接收 callback，更新 local used set |
+| `PrintSummary()` | L170-256 | 計算並輸出四項指標 |
+| `main()` — 拓樸建立 | L298-313 | PAN-C 置中 + joiner 隨機部署 |
+| `main()` — PAN-C 啟動 | L349-363 | SDIndex=0, beacon 啟動 |
+| `main()` — Joiner join 邏輯 | L366-461 | 監聽 → 選 slot → 啟動 beacon → 發 DBAN |
+| `main()` — NetAnim & Run | L463-481 | 動畫設定、模擬執行 |

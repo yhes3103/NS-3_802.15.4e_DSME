@@ -1,24 +1,16 @@
 /*
- * DSME beacon slot selection with power control (random-pick with CAP notify)
+ * DSME beacon slot selection — Baseline (random topology, fixed 0 dBm)
  * - 1 PAN-C (00:01) beacons at SDIndex=0
- * - 8 backbone coordinators with fixed SDIndex
- * - Other coordinators listen Enhanced Beacons (EB) and DBANs, pick vacant SDIndex from
+ * - All other nodes are joiners placed randomly; no backbone structure.
+ * - Joiners listen Enhanced Beacons (EB) and DBANs, pick vacant SDIndex from
  *   locally-heard DBANs only, then start beacons and announce.
- * - Power control: after becoming coordinator, set EB TX power just sufficient to reach
- *   the nearest heard coordinator (estimated using path-loss model), targeting a desired
- *   received power threshold at that neighbor, to reduce collision footprint.
+ * - All nodes transmit at fixed 0 dBm (no power control).
  *
- * 關於 EB 自訂 IE（攜帶 TX power）的處理說明：
- *   目前 LR-WPAN DSME MAC 的實作在增強型 Beacon(E-B) 中固定序列化一個
- *   DsmePANDescriptorIE；若要加入額外的 Header IE，需修改核心 MAC 解析邏輯。
- *   為了不動核心實作，本範例以「模擬層」方式達成等效效果：
- *     - 由範例維護每個節點的名目 TX 功率(g_txDbmByNode)，視為會被放入 EB 的自訂 IE；
- *     - 在接收 EB 時，讀出發送者的「宣告 TX 功率」（由 g_txDbmByNode 取得）並記錄；
- *     - 以該宣告 TX 功率搭配路損模型估算本次接收功率，用來推回鏈路增益/距離；
- *     - 依估算的鏈路增益計算本節點成為協調器後之最小足夠 TX，並透過 PHY PIB
- *       (phyTransmitPower) 套用。
- *   這樣可在不改核心的前提下，符合「在 Beacon IE 放入 TX power 供接收方反推距離」
- *   的研究概念與流程。
+ * 輸出指標（對應論文定義）：
+ *   p_coll   — 碰撞機率 (receiver-slot collision probability)
+ *   s_coll   — 碰撞嚴重度 (average excess interferers per receiver-slot)
+ *   eta      — 升級成功率 (join success rate = |R| / N)
+ *   P_tx_avg — 平均發送功率 (fixed 0 dBm / 1 mW for baseline)
  */
 
 #include "ns3/core-module.h"
@@ -40,16 +32,16 @@
 
 using namespace ns3;
 
-NS_LOG_COMPONENT_DEFINE("DsmeBeaconSlotSelectionRandomPickPowerControl");
+NS_LOG_COMPONENT_DEFINE("DsmeBeaconSlotSelectionRandomTopo");
 
 #define BO 6
 #define SO 3
 #define MO 5
 
-// Path-loss (for visibility/collision stats); TX is fixed at 0 dBm
+// Path-loss model parameters (for visibility/collision stats); all TX fixed at 0 dBm
 static Ptr<LogDistancePropagationLossModel> g_pl = nullptr;
 static double g_rxSensDbm = -95.0;   // receiver sensitivity threshold (dBm)
-static double g_plExponent = 3.0;    // path loss exponent
+static double g_plExponent = 2.7;    // path loss exponent
 static double g_refDist = 1.0;       // reference distance (m)
 static double g_refLossDb = 40.05;   // reference loss @ refDist (dB) ~ 2.4GHz FSPL at 1m
 static uint8_t g_channelNum = 11;
@@ -100,9 +92,6 @@ static std::string SelfStem()
   return f;
 }
 
-// 前置宣告
-static void ApplyNodeTxToPhy(uint32_t nodeId, double dbm);
-
 // 更新 NetAnim 節點標籤，顯示該節點目前選到的 SDIndex
 static void UpdateAnimLabel(uint32_t nodeId)
 {
@@ -115,8 +104,6 @@ static void UpdateAnimLabel(uint32_t nodeId)
   lab << "Coord" << nodeId << " SD=" << sdLab;
   g_anim->UpdateNodeDescription(n, lab.str());
 }
-
-// (Removed) Power-control retune: not used in fixed 0 dBm design
 
 static bool ParseNodeIdFromContext(const std::string& ctx, uint32_t& outNodeId)
 {
@@ -133,23 +120,13 @@ static bool ParseNodeIdFromContext(const std::string& ctx, uint32_t& outNodeId)
   outNodeId = val; return true;
 }
 
-// Utility: bound PIB nominal tx power to [-32,31]
-static int8_t BoundNominalTxDbm(double dbm)
-{
-  double x = std::max(-32.0, std::min(31.0, dbm));
-  return static_cast<int8_t>(std::lround(x));
-}
-
-// Apply per-node tx power to PHY PIB (phyTransmitPower)
-static void ApplyNodeTxToPhy(uint32_t nodeId, double dbm)
+// Apply fixed 0 dBm TX power to PHY PIB (phyTransmitPower)
+static void ApplyFixedTxPower(uint32_t nodeId)
 {
   Ptr<Node> n = NodeList::GetNode(nodeId);
   Ptr<LrWpanNetDevice> d = n->GetDevice(0)->GetObject<LrWpanNetDevice>();
   LrWpanPhyPibAttributes pib;
-  // Encode 6-bit two's complement in lower bits, keep 2 MSB zero
-  int8_t nominal = BoundNominalTxDbm(dbm);
-  uint8_t enc = static_cast<uint8_t>(nominal & 0x3f);
-  pib.phyTransmitPower = enc;
+  pib.phyTransmitPower = 0x00; // 0 dBm
   d->GetPhy()->PlmeSetAttributeRequest(LrWpanPibAttributeIdentifier::phyTransmitPower, &pib);
 }
 
@@ -192,130 +169,92 @@ static void OnMacRxWithContext(std::string context, Ptr<const Packet> p)
 
 static void PrintSummary(uint32_t numNodes)
 {
+  // Group nodes by their chosen SDIndex
   std::map<uint16_t, std::vector<uint32_t>> groups;
   for (const auto& kv : g_chosen)
   {
     if (kv.second != 0xffff) groups[kv.second].push_back(kv.first);
   }
 
-  NS_LOG_UNCOND("==== Beacon Slot Selection Summary (0 dBm fixed) ====");
-  NS_LOG_UNCOND("Node\tPicked_SDIndex\tTx[dBm]");
+  NS_LOG_UNCOND("==== Beacon Slot Selection Summary (Baseline, 0 dBm fixed) ====");
+  NS_LOG_UNCOND("Node\tSDIndex\tTx[dBm]");
   for (uint32_t i = 0; i < numNodes; ++i)
   {
     auto it = g_chosen.find(i);
-    double tx = 0.0;
-    if (it != g_chosen.end()) NS_LOG_UNCOND(i << "\t" << it->second << "\t" << tx);
-    else NS_LOG_UNCOND(i << "\t(n/a)\t" << tx);
+    if (it != g_chosen.end() && it->second != 0xffff)
+      NS_LOG_UNCOND(i << "\t" << it->second << "\t0");
+    else
+      NS_LOG_UNCOND(i << "\t(n/a)\t0");
   }
 
-  // Unassigned nodes (excluding PAN-C 0)
-  uint32_t unassigned = 0;
+  // --- R: set of successfully upgraded coordinators (including PAN-C) ---
+  std::vector<uint32_t> R;
+  R.push_back(0); // PAN-C always succeeds
   for (uint32_t i = 1; i < numNodes; ++i)
   {
     auto it = g_chosen.find(i);
-    if (it == g_chosen.end() || it->second == 0xffff) ++unassigned;
-  }
-  NS_LOG_UNCOND("Unassigned nodes: " << unassigned);
-  // Also report join-failure rate over joiner population (exclude 1 PAN-C)
-  const uint32_t baseline = 1u;
-  uint32_t joinerPopulation = (numNodes > baseline) ? (numNodes - baseline) : 0u;
-  double unassignedRate = (joinerPopulation > 0) ? (static_cast<double>(unassigned) / static_cast<double>(joinerPopulation)) : 0.0;
-  NS_LOG_UNCOND("Not-joined count / joiners (numNodes-" << baseline << "): "
-                << unassigned << "/" << joinerPopulation << "  (rate=" << unassignedRate << ")");
-
-  // Average TX power among successfully joined joiners (in mW)
-  uint32_t joinedJoiners = 0;
-  double sumMw = 0.0;
-  if (joinerPopulation > 0)
-  {
-    for (uint32_t nid = baseline; nid < numNodes; ++nid)
-    {
-      auto it = g_chosen.find(nid);
-      if (it != g_chosen.end() && it->second != 0xffff)
-      {
-        double mw = 1.0; // 0 dBm
-        sumMw += mw;
-        joinedJoiners++;
-      }
-    }
-  }
-  double avgMw = (joinedJoiners > 0) ? 1.0 : 0.0;
-  double avgDbm = (joinedJoiners > 0) ? 0.0 : 0.0;
-  if (joinedJoiners > 0)
-  {
-    NS_LOG_UNCOND("Avg TX power of joined joiners: " << avgMw << " mW (" << avgDbm << " dBm)"
-                   << "  (joinedJoiners=" << joinedJoiners << ")");
-  }
-  else
-  {
-    NS_LOG_UNCOND("Avg TX power of joined joiners: 0 mW (n/a dBm)"
-                   << "  (joinedJoiners=" << joinedJoiners << ")");
+    if (it != g_chosen.end() && it->second != 0xffff)
+      R.push_back(i);
   }
 
-  // Collision stats (visibility) computed using fixed 0 dBm
+  // --- T: set of beacon transmitters (same as R in baseline) ---
+  const auto& T = R;
+
+  // === Metric C: eta = joined joiners / total joiners (excluding PAN-C) ===
+  uint32_t joinedJoiners = (R.size() > 1) ? static_cast<uint32_t>(R.size() - 1) : 0; // exclude PAN-C
+  uint32_t totalJoiners = (numNodes > 1) ? (numNodes - 1) : 0;
+  double eta = (totalJoiners > 0) ? static_cast<double>(joinedJoiners) / static_cast<double>(totalJoiners) : 0.0;
+
+  // === Metric D: P_tx_avg (baseline: all transmitters at 0 dBm = 1 mW) ===
+  // 先算 mW 平均再轉回 dBm
+  double avgMw = 1.0;   // all nodes at 0 dBm = 1 mW
+  double avgDbm = 0.0;  // 10*log10(1) = 0
+
+  // === Metric A: p_coll & Metric B: s_coll ===
   const uint16_t slotsCount = static_cast<uint16_t>(1u << (BO - SO));
-  const uint16_t nonPanSlots = (slotsCount > 0) ? (slotsCount - 1) : 0;
+  const uint16_t nonPanSlots = (slotsCount > 0) ? (slotsCount - 1) : 0; // S = {1,...,M-1}
 
-  uint32_t everCollisionObservers = 0;       // Method-1: receivers that ever see collision
-  uint64_t collidedObserverSlots = 0;        // Method-2a: number of receiver-slot collisions
-  uint64_t sumExcess = 0;                    // Method-2b: sum of (k-1)
-  const auto txDbmOf = [&](uint32_t) { return 0.0; };
+  uint64_t collidedSlots = 0;   // count of (r,s) pairs where k_{r,s} >= 2
+  uint64_t sumExcess = 0;       // sum of max(0, k_{r,s} - 1)
 
-  // Build joined-observer list: include PAN-C (0) and any node that successfully picked an SDIndex
-  std::vector<uint32_t> joinedObservers;
-  joinedObservers.reserve(g_observers.size());
-  for (uint32_t obsId : g_observers)
-  {
-    if (obsId == 0)
-    {
-      joinedObservers.push_back(obsId);
-      continue;
-    }
-    auto itc = g_chosen.find(obsId);
-    if (itc != g_chosen.end() && itc->second != 0xffff)
-    {
-      joinedObservers.push_back(obsId);
-    }
-  }
-
-  for (uint32_t obsId : joinedObservers)
+  for (uint32_t obsId : R)
   {
     Ptr<Node> on = NodeList::GetNode(obsId);
-    Ptr<MobilityModel> rx = on->GetObject<MobilityModel>();
-    bool ever = false;
+    Ptr<MobilityModel> rxMob = on->GetObject<MobilityModel>();
+
     for (uint16_t sd = 1; sd < slotsCount; ++sd)
     {
-      uint32_t visible = 0;
+      uint32_t k = 0; // number of visible transmitters in this slot at this receiver
       auto itg = groups.find(sd);
       if (itg != groups.end())
       {
         for (uint32_t coordId : itg->second)
         {
           Ptr<Node> cn = NodeList::GetNode(coordId);
-          Ptr<MobilityModel> tx = cn->GetObject<MobilityModel>();
-          double prDbm = g_pl ? g_pl->CalcRxPower(txDbmOf(coordId), tx, rx) : -1e9;
-          if (prDbm >= g_rxSensDbm) { visible++; }
+          Ptr<MobilityModel> txMob = cn->GetObject<MobilityModel>();
+          double prDbm = g_pl ? g_pl->CalcRxPower(0.0, txMob, rxMob) : -1e9;
+          if (prDbm >= g_rxSensDbm) { k++; }
         }
       }
-      if (visible >= 2) { collidedObserverSlots++; ever = true; }
-      if (visible > 1) { sumExcess += static_cast<uint64_t>(visible - 1); }
+      if (k >= 2) { collidedSlots++; }
+      if (k > 1)  { sumExcess += static_cast<uint64_t>(k - 1); }
     }
-    if (ever) { everCollisionObservers++; }
   }
 
-  const uint32_t receiversN = static_cast<uint32_t>(joinedObservers.size());
-  const uint64_t totalObserverSlots = static_cast<uint64_t>(receiversN) * static_cast<uint64_t>(nonPanSlots);
-  double method1Rate = (receiversN > 0) ? (static_cast<double>(everCollisionObservers) / receiversN) : 0.0;
-  double method2aRate = (totalObserverSlots > 0) ? (static_cast<double>(collidedObserverSlots) / static_cast<double>(totalObserverSlots)) : 0.0;
-  double method2bSeverity = (totalObserverSlots > 0) ? (static_cast<double>(sumExcess) / static_cast<double>(totalObserverSlots)) : 0.0;
-  NS_LOG_UNCOND("[Method-1] Ever-collided receivers: " << everCollisionObservers << "/" << receiversN
-                 << " (rate=" << method1Rate << ")");
-  NS_LOG_UNCOND("[Method-2a] Collision probability (receiver-slot): " << method2aRate
-                 << "  (collided=" << collidedObserverSlots
-                 << ", total=" << totalObserverSlots << ")");
-  NS_LOG_UNCOND("[Method-2b] Collision severity avg (k-1 per receiver-slot): " << method2bSeverity
-                 << "  (sumExcess=" << sumExcess
-                 << ", total=" << totalObserverSlots << ")");
+  const uint64_t totalRS = static_cast<uint64_t>(R.size()) * static_cast<uint64_t>(nonPanSlots);
+  double p_coll  = (totalRS > 0) ? (static_cast<double>(collidedSlots) / static_cast<double>(totalRS)) : 0.0;
+  double s_coll  = (totalRS > 0) ? (static_cast<double>(sumExcess)     / static_cast<double>(totalRS)) : 0.0;
+
+  // === Output all 4 metrics ===
+  NS_LOG_UNCOND("---- Metrics ----");
+  NS_LOG_UNCOND("[p_coll]    Collision probability:  " << p_coll
+                 << "  (collided_RS=" << collidedSlots << ", total_RS=" << totalRS << ")");
+  NS_LOG_UNCOND("[s_coll]    Collision severity:     " << s_coll
+                 << "  (sum_excess=" << sumExcess << ", total_RS=" << totalRS << ")");
+  NS_LOG_UNCOND("[eta]       Join success rate:      " << eta
+                 << "  (joined_joiners=" << joinedJoiners << ", total_joiners=" << totalJoiners << ")");
+  NS_LOG_UNCOND("[P_tx_avg]  Avg TX power:           " << avgDbm << " dBm  (" << avgMw << " mW)"
+                 << "  (|T|=" << T.size() << ")");
 }
 
 int main(int argc, char** argv)
@@ -421,7 +360,7 @@ int main(int argc, char** argv)
 
   lrWpanHelper.AssociateToBeaconPan(devs, Mac16Address("00:01"), panStart);
   // Fixed TX power at 0 dBm for all nodes
-  for (uint32_t i = 0; i < g_numCoord; ++i) { ApplyNodeTxToPhy(i, 0.0); }
+  for (uint32_t i = 0; i < g_numCoord; ++i) { ApplyFixedTxPower(i); }
   // Record PAN-C SDIndex=0
   g_chosen[0] = 0;
 
@@ -489,7 +428,7 @@ int main(int argc, char** argv)
       }
 
       std::vector<uint16_t> candidates;
-      for (uint16_t s = 1; s < slotsCount; ++s) if (!locallyUsed[s]) candidates.push_back(s);
+      for (uint16_t s = 0; s < slotsCount; ++s) if (!locallyUsed[s]) candidates.push_back(s);
       if (candidates.empty())
       {
         if (*tries < maxTries) { Simulator::Schedule(Seconds(retryInterval), *self); }
