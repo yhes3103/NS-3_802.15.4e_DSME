@@ -18,7 +18,7 @@
 <nu p="s" t="0" id="4" w="1" h="1" />
 <nu p="s" t="0" id="5" w="1" h="1" />
 <ncs ncId="0" n="RemainingEnergy" t="DOUBLE" />
-<nu p="d" t="0" id="0" descr="PAN-C SD=0" />
+<nu p="d" t="0" id="0" descr="PAN-C SD=0 Tx=0" />
 <nu p="c" t="0" id="0" r="0" g="0" b="0" />
 <nu p="s" t="0" id="0" w="14" h="14" />
 <nu p="d" t="0" id="1" descr="Coord1 SD=?" />
@@ -94,10 +94,10 @@
 <wpr uId="3" tId="1" fbRx="1.96627222" lbRx="0" />
 <wpr uId="3" tId="4" fbRx="1.966272224" lbRx="0" />
 <wpr uId="3" tId="2" fbRx="1.966272226" lbRx="0" />
-<nu p="d" t="2.25" id="1" descr="Coord1 SD=4" />
-<nu p="d" t="2.45" id="2" descr="Coord2 SD=7" />
-<nu p="d" t="2.65" id="3" descr="Coord3 SD=6" />
-<nu p="d" t="2.85" id="4" descr="Coord4 SD=3" />
+<nu p="d" t="2.25" id="1" descr="Coord1 SD=4 Tx=-3" />
+<nu p="d" t="2.45" id="2" descr="Coord2 SD=7 Tx=-3" />
+<nu p="d" t="2.65" id="3" descr="Coord3 SD=6 Tx=-12" />
+<nu p="d" t="2.85" id="4" descr="Coord4 SD=4 Tx=-3" />
 <pr uId="4" fId="0" fbTx="2.949312" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 3, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:01
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 1, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
@@ -147,45 +147,13 @@
 <wpr uId="8" tId="5" fbRx="2.955967965" lbRx="0" />
 <wpr uId="8" tId="0" fbRx="2.955967966" lbRx="0" />
 <wpr uId="8" tId="4" fbRx="2.955967992" lbRx="0" />
-<wpr uId="8" tId="1" fbRx="2.955968126" lbRx="0" />
-<wpr uId="8" tId="2" fbRx="2.955968169" lbRx="0" />
-<nu p="d" t="3.05" id="5" descr="Coord5 SD=3" />
-<pr uId="9" fId="4" fbTx="3.317952" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 70, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:05
-) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
-| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
-| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3317760000, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000000001000
-
-| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 2, Channel Offset = 3, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000001000
-
-) ns3::HeaderIETermination (| Length Field | = 0
-| Element ID Field | = 7e
-| Type Field| = 0
-) ns3::PayloadIETermination (| Length Field | = 0
-| Group ID Field | = f
-| Type Field| =1
-) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
-<wpr uId="9" tId="3" fbRx="3.317952127" lbRx="0" />
-<wpr uId="9" tId="0" fbRx="3.317952224" lbRx="0" />
-<wpr uId="9" tId="5" fbRx="3.317952226" lbRx="0" />
-<wpr uId="9" tId="1" fbRx="3.317952373" lbRx="0" />
-<wpr uId="9" tId="2" fbRx="3.317952429" lbRx="0" />
-<pr uId="10" fId="5" fbTx="3.32185599" meta-info="ns3::LrWpanMacHeader (  Frame Type = 3, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 1, Sequence Number Suppresion = 0, IE List Present = 0, Frame Vers = 1, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 82, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:06
-) ns3::CommandPayloadHeader (| MAC Command Frame ID | = 1a
-
-) ns3::LrWpanMacTrailer ( FCS = 0)" />
-<wpr uId="10" tId="0" fbRx="3.321856018" lbRx="0" />
-<wpr uId="10" tId="3" fbRx="3.32185609" lbRx="0" />
-<wpr uId="10" tId="1" fbRx="3.321856185" lbRx="0" />
-<wpr uId="10" tId="2" fbRx="3.321856201" lbRx="0" />
-<wpr uId="10" tId="4" fbRx="3.321856216" lbRx="0" />
-<pr uId="11" fId="1" fbTx="3.440832" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 53, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:02
+<nu p="d" t="3.05" id="5" descr="Coord5 SD=5 Tx=-27" />
+<pr uId="9" fId="1" fbTx="3.440832" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 53, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:02
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 3440640000, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000000011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000000010000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 2, Channel Offset = 4, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000010000
 
@@ -196,17 +164,32 @@
 | Group ID Field | = f
 | Type Field| =1
 ) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
-<wpr uId="11" tId="2" fbRx="3.440832118" lbRx="0" />
-<wpr uId="11" tId="5" fbRx="3.440832195" lbRx="0" />
-<wpr uId="11" tId="0" fbRx="3.44083222" lbRx="0" />
-<wpr uId="11" tId="3" fbRx="3.440832261" lbRx="0" />
-<wpr uId="11" tId="4" fbRx="3.440832373" lbRx="0" />
-<pr uId="12" fId="3" fbTx="3.686592" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 33, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:04
+<pr uId="10" fId="4" fbTx="3.440832" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 70, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:05
+) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
+| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
+| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3440640000, Time Synchronization Beacon Offset Timestamp = 51
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000000010000
+
+| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 2, Channel Offset = 4, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000010000
+
+) ns3::HeaderIETermination (| Length Field | = 0
+| Element ID Field | = 7e
+| Type Field| = 0
+) ns3::PayloadIETermination (| Length Field | = 0
+| Group ID Field | = f
+| Type Field| =1
+) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
+<wpr uId="9" tId="2" fbRx="3.440832118" lbRx="0" />
+<wpr uId="10" tId="3" fbRx="3.440832127" lbRx="0" />
+<wpr uId="9" tId="5" fbRx="3.440832195" lbRx="0" />
+<wpr uId="9" tId="0" fbRx="3.44083222" lbRx="0" />
+<pr uId="11" fId="3" fbTx="3.686592" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 33, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:04
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 3686400000, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000001011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000001010000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 2, Channel Offset = 6, Channel Offset Length = 16, Channel Offset Bitmap =  0000000001000000
 
@@ -217,17 +200,20 @@
 | Group ID Field | = f
 | Type Field| =1
 ) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
-<wpr uId="12" tId="5" fbRx="3.6865921" lbRx="0" />
-<wpr uId="12" tId="0" fbRx="3.686592101" lbRx="0" />
-<wpr uId="12" tId="4" fbRx="3.686592127" lbRx="0" />
-<wpr uId="12" tId="1" fbRx="3.686592261" lbRx="0" />
-<wpr uId="12" tId="2" fbRx="3.686592304" lbRx="0" />
+<wpr uId="11" tId="5" fbRx="3.6865921" lbRx="0" />
+<wpr uId="11" tId="0" fbRx="3.686592101" lbRx="0" />
+<wpr uId="11" tId="4" fbRx="3.686592127" lbRx="0" />
+<pr uId="12" fId="5" fbTx="3.690495864" meta-info="ns3::LrWpanMacHeader (  Frame Type = 3, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 1, Sequence Number Suppresion = 0, IE List Present = 0, Frame Vers = 1, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 82, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:06
+) ns3::CommandPayloadHeader (| MAC Command Frame ID | = 1a
+
+) ns3::LrWpanMacTrailer ( FCS = 0)" />
+<wpr uId="12" tId="0" fbRx="3.690495892" lbRx="0" />
 <pr uId="13" fId="2" fbTx="3.809472" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 94, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:03
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 3809280000, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000010010000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 2, Channel Offset = 7, Channel Offset Length = 16, Channel Offset Bitmap =  0000000010000000
 
@@ -242,13 +228,12 @@
 <wpr uId="13" tId="5" fbRx="3.809472211" lbRx="0" />
 <wpr uId="13" tId="0" fbRx="3.809472226" lbRx="0" />
 <wpr uId="13" tId="3" fbRx="3.809472304" lbRx="0" />
-<wpr uId="13" tId="4" fbRx="3.809472429" lbRx="0" />
 <pr uId="14" fId="0" fbTx="3.932352" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 4, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:01
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 1, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 3932160000, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011010000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 4, Channel Offset = 0, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000001
 
@@ -264,48 +249,12 @@
 <wpr uId="14" tId="1" fbRx="3.93235222" lbRx="0" />
 <wpr uId="14" tId="4" fbRx="3.932352224" lbRx="0" />
 <wpr uId="14" tId="2" fbRx="3.932352226" lbRx="0" />
-<pr uId="15" fId="5" fbTx="4.300992" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 78, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:06
-) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
-| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
-| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 5832704, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
-
-| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 3, Channel Offset = 3, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000001000
-
-) ns3::HeaderIETermination (| Length Field | = 0
-| Element ID Field | = 7e
-| Type Field| = 0
-) ns3::PayloadIETermination (| Length Field | = 0
-| Group ID Field | = f
-| Type Field| =1
-) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
-<pr uId="16" fId="4" fbTx="4.300992" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 71, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:05
-) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
-| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
-| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 5832704, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
-
-| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 3, Channel Offset = 3, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000001000
-
-) ns3::HeaderIETermination (| Length Field | = 0
-| Element ID Field | = 7e
-| Type Field| = 0
-) ns3::PayloadIETermination (| Length Field | = 0
-| Group ID Field | = f
-| Type Field| =1
-) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
-<wpr uId="15" tId="0" fbRx="4.300992028" lbRx="0" />
-<wpr uId="15" tId="3" fbRx="4.3009921" lbRx="0" />
-<wpr uId="15" tId="1" fbRx="4.300992195" lbRx="0" />
-<wpr uId="15" tId="2" fbRx="4.300992211" lbRx="0" />
-<pr uId="17" fId="1" fbTx="4.423872" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 54, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:02
+<pr uId="15" fId="1" fbTx="4.423872" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 54, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:02
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 128712704, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011010000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 3, Channel Offset = 4, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000010000
 
@@ -316,17 +265,49 @@
 | Group ID Field | = f
 | Type Field| =1
 ) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
-<wpr uId="17" tId="2" fbRx="4.423872118" lbRx="0" />
-<wpr uId="17" tId="5" fbRx="4.423872195" lbRx="0" />
-<wpr uId="17" tId="0" fbRx="4.42387222" lbRx="0" />
-<wpr uId="17" tId="3" fbRx="4.423872261" lbRx="0" />
-<wpr uId="17" tId="4" fbRx="4.423872373" lbRx="0" />
+<pr uId="16" fId="4" fbTx="4.423872" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 71, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:05
+) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
+| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
+| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 128712704, Time Synchronization Beacon Offset Timestamp = 51
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011010000
+
+| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 3, Channel Offset = 4, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000010000
+
+) ns3::HeaderIETermination (| Length Field | = 0
+| Element ID Field | = 7e
+| Type Field| = 0
+) ns3::PayloadIETermination (| Length Field | = 0
+| Group ID Field | = f
+| Type Field| =1
+) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
+<wpr uId="15" tId="2" fbRx="4.423872118" lbRx="0" />
+<wpr uId="16" tId="3" fbRx="4.423872127" lbRx="0" />
+<wpr uId="15" tId="5" fbRx="4.423872195" lbRx="0" />
+<wpr uId="15" tId="0" fbRx="4.42387222" lbRx="0" />
+<pr uId="17" fId="5" fbTx="4.546752" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 78, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:06
+) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
+| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
+| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 251592704, Time Synchronization Beacon Offset Timestamp = 51
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
+
+| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 3, Channel Offset = 5, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000100000
+
+) ns3::HeaderIETermination (| Length Field | = 0
+| Element ID Field | = 7e
+| Type Field| = 0
+) ns3::PayloadIETermination (| Length Field | = 0
+| Group ID Field | = f
+| Type Field| =1
+) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
+<wpr uId="17" tId="0" fbRx="4.546752028" lbRx="0" />
 <pr uId="18" fId="3" fbTx="4.669632" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 34, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:04
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 374472704, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011010000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 3, Channel Offset = 6, Channel Offset Length = 16, Channel Offset Bitmap =  0000000001000000
 
@@ -340,14 +321,12 @@
 <wpr uId="18" tId="5" fbRx="4.6696321" lbRx="0" />
 <wpr uId="18" tId="0" fbRx="4.669632101" lbRx="0" />
 <wpr uId="18" tId="4" fbRx="4.669632127" lbRx="0" />
-<wpr uId="18" tId="1" fbRx="4.669632261" lbRx="0" />
-<wpr uId="18" tId="2" fbRx="4.669632304" lbRx="0" />
 <pr uId="19" fId="2" fbTx="4.792512" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 95, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:03
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 497352704, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011010000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 3, Channel Offset = 7, Channel Offset Length = 16, Channel Offset Bitmap =  0000000010000000
 
@@ -362,13 +341,12 @@
 <wpr uId="19" tId="5" fbRx="4.792512211" lbRx="0" />
 <wpr uId="19" tId="0" fbRx="4.792512226" lbRx="0" />
 <wpr uId="19" tId="3" fbRx="4.792512304" lbRx="0" />
-<wpr uId="19" tId="4" fbRx="4.792512429" lbRx="0" />
 <pr uId="20" fId="0" fbTx="4.915392" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 5, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:01
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 1, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 620232704, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 5, Channel Offset = 0, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000001
 
@@ -384,48 +362,12 @@
 <wpr uId="20" tId="1" fbRx="4.91539222" lbRx="0" />
 <wpr uId="20" tId="4" fbRx="4.915392224" lbRx="0" />
 <wpr uId="20" tId="2" fbRx="4.915392226" lbRx="0" />
-<pr uId="21" fId="5" fbTx="5.284032" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 79, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:06
-) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
-| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
-| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 988872704, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
-
-| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 4, Channel Offset = 3, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000001000
-
-) ns3::HeaderIETermination (| Length Field | = 0
-| Element ID Field | = 7e
-| Type Field| = 0
-) ns3::PayloadIETermination (| Length Field | = 0
-| Group ID Field | = f
-| Type Field| =1
-) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
-<pr uId="22" fId="4" fbTx="5.284032" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 72, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:05
-) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
-| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
-| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 988872704, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
-
-| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 4, Channel Offset = 3, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000001000
-
-) ns3::HeaderIETermination (| Length Field | = 0
-| Element ID Field | = 7e
-| Type Field| = 0
-) ns3::PayloadIETermination (| Length Field | = 0
-| Group ID Field | = f
-| Type Field| =1
-) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
-<wpr uId="21" tId="0" fbRx="5.284032028" lbRx="0" />
-<wpr uId="21" tId="3" fbRx="5.2840321" lbRx="0" />
-<wpr uId="21" tId="1" fbRx="5.284032195" lbRx="0" />
-<wpr uId="21" tId="2" fbRx="5.284032211" lbRx="0" />
-<pr uId="23" fId="1" fbTx="5.406912" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 55, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:02
+<pr uId="21" fId="1" fbTx="5.406912" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 55, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:02
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 1111752704, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 4, Channel Offset = 4, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000010000
 
@@ -436,17 +378,49 @@
 | Group ID Field | = f
 | Type Field| =1
 ) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
-<wpr uId="23" tId="2" fbRx="5.406912118" lbRx="0" />
-<wpr uId="23" tId="5" fbRx="5.406912195" lbRx="0" />
-<wpr uId="23" tId="0" fbRx="5.40691222" lbRx="0" />
-<wpr uId="23" tId="3" fbRx="5.406912261" lbRx="0" />
-<wpr uId="23" tId="4" fbRx="5.406912373" lbRx="0" />
+<pr uId="22" fId="4" fbTx="5.406912" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 72, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:05
+) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
+| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
+| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1111752704, Time Synchronization Beacon Offset Timestamp = 51
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
+
+| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 4, Channel Offset = 4, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000010000
+
+) ns3::HeaderIETermination (| Length Field | = 0
+| Element ID Field | = 7e
+| Type Field| = 0
+) ns3::PayloadIETermination (| Length Field | = 0
+| Group ID Field | = f
+| Type Field| =1
+) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
+<wpr uId="21" tId="2" fbRx="5.406912118" lbRx="0" />
+<wpr uId="22" tId="3" fbRx="5.406912127" lbRx="0" />
+<wpr uId="21" tId="5" fbRx="5.406912195" lbRx="0" />
+<wpr uId="21" tId="0" fbRx="5.40691222" lbRx="0" />
+<pr uId="23" fId="5" fbTx="5.529792" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 79, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:06
+) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
+| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
+| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1234632704, Time Synchronization Beacon Offset Timestamp = 51
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
+
+| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 4, Channel Offset = 5, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000100000
+
+) ns3::HeaderIETermination (| Length Field | = 0
+| Element ID Field | = 7e
+| Type Field| = 0
+) ns3::PayloadIETermination (| Length Field | = 0
+| Group ID Field | = f
+| Type Field| =1
+) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
+<wpr uId="23" tId="0" fbRx="5.529792028" lbRx="0" />
 <pr uId="24" fId="3" fbTx="5.652672" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 35, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:04
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 1357512704, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 4, Channel Offset = 6, Channel Offset Length = 16, Channel Offset Bitmap =  0000000001000000
 
@@ -460,14 +434,12 @@
 <wpr uId="24" tId="5" fbRx="5.6526721" lbRx="0" />
 <wpr uId="24" tId="0" fbRx="5.652672101" lbRx="0" />
 <wpr uId="24" tId="4" fbRx="5.652672127" lbRx="0" />
-<wpr uId="24" tId="1" fbRx="5.652672261" lbRx="0" />
-<wpr uId="24" tId="2" fbRx="5.652672304" lbRx="0" />
 <pr uId="25" fId="2" fbTx="5.775552" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 96, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:03
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 1480392704, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 4, Channel Offset = 7, Channel Offset Length = 16, Channel Offset Bitmap =  0000000010000000
 
@@ -482,13 +454,12 @@
 <wpr uId="25" tId="5" fbRx="5.775552211" lbRx="0" />
 <wpr uId="25" tId="0" fbRx="5.775552226" lbRx="0" />
 <wpr uId="25" tId="3" fbRx="5.775552304" lbRx="0" />
-<wpr uId="25" tId="4" fbRx="5.775552429" lbRx="0" />
 <pr uId="26" fId="0" fbTx="5.898432" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 6, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:01
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 1, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 1603272704, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 6, Channel Offset = 0, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000001
 
@@ -504,48 +475,12 @@
 <wpr uId="26" tId="1" fbRx="5.89843222" lbRx="0" />
 <wpr uId="26" tId="4" fbRx="5.898432224" lbRx="0" />
 <wpr uId="26" tId="2" fbRx="5.898432226" lbRx="0" />
-<pr uId="27" fId="5" fbTx="6.267072" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 80, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:06
-) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
-| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
-| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1971912704, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
-
-| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 5, Channel Offset = 3, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000001000
-
-) ns3::HeaderIETermination (| Length Field | = 0
-| Element ID Field | = 7e
-| Type Field| = 0
-) ns3::PayloadIETermination (| Length Field | = 0
-| Group ID Field | = f
-| Type Field| =1
-) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
-<pr uId="28" fId="4" fbTx="6.267072" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 73, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:05
-) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
-| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
-| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1971912704, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
-
-| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 5, Channel Offset = 3, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000001000
-
-) ns3::HeaderIETermination (| Length Field | = 0
-| Element ID Field | = 7e
-| Type Field| = 0
-) ns3::PayloadIETermination (| Length Field | = 0
-| Group ID Field | = f
-| Type Field| =1
-) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
-<wpr uId="27" tId="0" fbRx="6.267072028" lbRx="0" />
-<wpr uId="27" tId="3" fbRx="6.2670721" lbRx="0" />
-<wpr uId="27" tId="1" fbRx="6.267072195" lbRx="0" />
-<wpr uId="27" tId="2" fbRx="6.267072211" lbRx="0" />
-<pr uId="29" fId="1" fbTx="6.389952" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 56, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:02
+<pr uId="27" fId="1" fbTx="6.389952" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 56, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:02
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 2094792704, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 5, Channel Offset = 4, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000010000
 
@@ -556,17 +491,49 @@
 | Group ID Field | = f
 | Type Field| =1
 ) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
-<wpr uId="29" tId="2" fbRx="6.389952118" lbRx="0" />
-<wpr uId="29" tId="5" fbRx="6.389952195" lbRx="0" />
-<wpr uId="29" tId="0" fbRx="6.38995222" lbRx="0" />
-<wpr uId="29" tId="3" fbRx="6.389952261" lbRx="0" />
-<wpr uId="29" tId="4" fbRx="6.389952373" lbRx="0" />
+<pr uId="28" fId="4" fbTx="6.389952" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 73, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:05
+) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
+| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
+| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2094792704, Time Synchronization Beacon Offset Timestamp = 51
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
+
+| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 5, Channel Offset = 4, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000010000
+
+) ns3::HeaderIETermination (| Length Field | = 0
+| Element ID Field | = 7e
+| Type Field| = 0
+) ns3::PayloadIETermination (| Length Field | = 0
+| Group ID Field | = f
+| Type Field| =1
+) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
+<wpr uId="27" tId="2" fbRx="6.389952118" lbRx="0" />
+<wpr uId="28" tId="3" fbRx="6.389952127" lbRx="0" />
+<wpr uId="27" tId="5" fbRx="6.389952195" lbRx="0" />
+<wpr uId="27" tId="0" fbRx="6.38995222" lbRx="0" />
+<pr uId="29" fId="5" fbTx="6.512832" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 80, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:06
+) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
+| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
+| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2217672704, Time Synchronization Beacon Offset Timestamp = 51
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
+
+| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 5, Channel Offset = 5, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000100000
+
+) ns3::HeaderIETermination (| Length Field | = 0
+| Element ID Field | = 7e
+| Type Field| = 0
+) ns3::PayloadIETermination (| Length Field | = 0
+| Group ID Field | = f
+| Type Field| =1
+) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
+<wpr uId="29" tId="0" fbRx="6.512832028" lbRx="0" />
 <pr uId="30" fId="3" fbTx="6.635712" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 36, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:04
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 2340552704, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 5, Channel Offset = 6, Channel Offset Length = 16, Channel Offset Bitmap =  0000000001000000
 
@@ -580,14 +547,12 @@
 <wpr uId="30" tId="5" fbRx="6.6357121" lbRx="0" />
 <wpr uId="30" tId="0" fbRx="6.635712101" lbRx="0" />
 <wpr uId="30" tId="4" fbRx="6.635712127" lbRx="0" />
-<wpr uId="30" tId="1" fbRx="6.635712261" lbRx="0" />
-<wpr uId="30" tId="2" fbRx="6.635712304" lbRx="0" />
 <pr uId="31" fId="2" fbTx="6.758592" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 97, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:03
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 2463432704, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 5, Channel Offset = 7, Channel Offset Length = 16, Channel Offset Bitmap =  0000000010000000
 
@@ -602,13 +567,12 @@
 <wpr uId="31" tId="5" fbRx="6.758592211" lbRx="0" />
 <wpr uId="31" tId="0" fbRx="6.758592226" lbRx="0" />
 <wpr uId="31" tId="3" fbRx="6.758592304" lbRx="0" />
-<wpr uId="31" tId="4" fbRx="6.758592429" lbRx="0" />
 <pr uId="32" fId="0" fbTx="6.881472" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 7, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:01
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 1, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 2586312704, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 7, Channel Offset = 0, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000001
 
@@ -624,48 +588,12 @@
 <wpr uId="32" tId="1" fbRx="6.88147222" lbRx="0" />
 <wpr uId="32" tId="4" fbRx="6.881472224" lbRx="0" />
 <wpr uId="32" tId="2" fbRx="6.881472226" lbRx="0" />
-<pr uId="33" fId="5" fbTx="7.250112" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 81, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:06
-) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
-| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
-| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2954952704, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
-
-| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 6, Channel Offset = 3, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000001000
-
-) ns3::HeaderIETermination (| Length Field | = 0
-| Element ID Field | = 7e
-| Type Field| = 0
-) ns3::PayloadIETermination (| Length Field | = 0
-| Group ID Field | = f
-| Type Field| =1
-) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
-<pr uId="34" fId="4" fbTx="7.250112" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 74, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:05
-) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
-| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
-| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2954952704, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
-
-| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 6, Channel Offset = 3, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000001000
-
-) ns3::HeaderIETermination (| Length Field | = 0
-| Element ID Field | = 7e
-| Type Field| = 0
-) ns3::PayloadIETermination (| Length Field | = 0
-| Group ID Field | = f
-| Type Field| =1
-) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
-<wpr uId="33" tId="0" fbRx="7.250112028" lbRx="0" />
-<wpr uId="33" tId="3" fbRx="7.2501121" lbRx="0" />
-<wpr uId="33" tId="1" fbRx="7.250112195" lbRx="0" />
-<wpr uId="33" tId="2" fbRx="7.250112211" lbRx="0" />
-<pr uId="35" fId="1" fbTx="7.372992" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 57, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:02
+<pr uId="33" fId="1" fbTx="7.372992" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 57, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:02
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 3077832704, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 6, Channel Offset = 4, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000010000
 
@@ -676,17 +604,49 @@
 | Group ID Field | = f
 | Type Field| =1
 ) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
-<wpr uId="35" tId="2" fbRx="7.372992118" lbRx="0" />
-<wpr uId="35" tId="5" fbRx="7.372992195" lbRx="0" />
-<wpr uId="35" tId="0" fbRx="7.37299222" lbRx="0" />
-<wpr uId="35" tId="3" fbRx="7.372992261" lbRx="0" />
-<wpr uId="35" tId="4" fbRx="7.372992373" lbRx="0" />
+<pr uId="34" fId="4" fbTx="7.372992" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 74, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:05
+) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
+| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
+| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3077832704, Time Synchronization Beacon Offset Timestamp = 51
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
+
+| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 6, Channel Offset = 4, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000010000
+
+) ns3::HeaderIETermination (| Length Field | = 0
+| Element ID Field | = 7e
+| Type Field| = 0
+) ns3::PayloadIETermination (| Length Field | = 0
+| Group ID Field | = f
+| Type Field| =1
+) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
+<wpr uId="33" tId="2" fbRx="7.372992118" lbRx="0" />
+<wpr uId="34" tId="3" fbRx="7.372992127" lbRx="0" />
+<wpr uId="33" tId="5" fbRx="7.372992195" lbRx="0" />
+<wpr uId="33" tId="0" fbRx="7.37299222" lbRx="0" />
+<pr uId="35" fId="5" fbTx="7.495872" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 81, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:06
+) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
+| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
+| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3200712704, Time Synchronization Beacon Offset Timestamp = 51
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
+
+| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 6, Channel Offset = 5, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000100000
+
+) ns3::HeaderIETermination (| Length Field | = 0
+| Element ID Field | = 7e
+| Type Field| = 0
+) ns3::PayloadIETermination (| Length Field | = 0
+| Group ID Field | = f
+| Type Field| =1
+) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
+<wpr uId="35" tId="0" fbRx="7.495872028" lbRx="0" />
 <pr uId="36" fId="3" fbTx="7.618752" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 37, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:04
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 3323592704, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 6, Channel Offset = 6, Channel Offset Length = 16, Channel Offset Bitmap =  0000000001000000
 
@@ -700,14 +660,12 @@
 <wpr uId="36" tId="5" fbRx="7.6187521" lbRx="0" />
 <wpr uId="36" tId="0" fbRx="7.618752101" lbRx="0" />
 <wpr uId="36" tId="4" fbRx="7.618752127" lbRx="0" />
-<wpr uId="36" tId="1" fbRx="7.618752261" lbRx="0" />
-<wpr uId="36" tId="2" fbRx="7.618752304" lbRx="0" />
 <pr uId="37" fId="2" fbTx="7.741632" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 98, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:03
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 3446472704, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 6, Channel Offset = 7, Channel Offset Length = 16, Channel Offset Bitmap =  0000000010000000
 
@@ -722,13 +680,12 @@
 <wpr uId="37" tId="5" fbRx="7.741632211" lbRx="0" />
 <wpr uId="37" tId="0" fbRx="7.741632226" lbRx="0" />
 <wpr uId="37" tId="3" fbRx="7.741632304" lbRx="0" />
-<wpr uId="37" tId="4" fbRx="7.741632429" lbRx="0" />
 <pr uId="38" fId="0" fbTx="7.864512" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 8, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:01
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 1, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 3569352704, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, Channel Offset = 0, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000001
 
@@ -744,48 +701,12 @@
 <wpr uId="38" tId="1" fbRx="7.86451222" lbRx="0" />
 <wpr uId="38" tId="4" fbRx="7.864512224" lbRx="0" />
 <wpr uId="38" tId="2" fbRx="7.864512226" lbRx="0" />
-<pr uId="39" fId="5" fbTx="8.233152" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 82, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:06
-) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
-| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
-| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3937992704, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
-
-| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 7, Channel Offset = 3, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000001000
-
-) ns3::HeaderIETermination (| Length Field | = 0
-| Element ID Field | = 7e
-| Type Field| = 0
-) ns3::PayloadIETermination (| Length Field | = 0
-| Group ID Field | = f
-| Type Field| =1
-) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
-<pr uId="40" fId="4" fbTx="8.233152" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 75, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:05
-) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
-| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
-| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3937992704, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
-
-| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 7, Channel Offset = 3, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000001000
-
-) ns3::HeaderIETermination (| Length Field | = 0
-| Element ID Field | = 7e
-| Type Field| = 0
-) ns3::PayloadIETermination (| Length Field | = 0
-| Group ID Field | = f
-| Type Field| =1
-) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
-<wpr uId="39" tId="0" fbRx="8.233152028" lbRx="0" />
-<wpr uId="39" tId="3" fbRx="8.2331521" lbRx="0" />
-<wpr uId="39" tId="1" fbRx="8.233152195" lbRx="0" />
-<wpr uId="39" tId="2" fbRx="8.233152211" lbRx="0" />
-<pr uId="41" fId="1" fbTx="8.356032" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 58, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:02
+<pr uId="39" fId="1" fbTx="8.356032" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 58, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:02
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 4060872704, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 7, Channel Offset = 4, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000010000
 
@@ -796,17 +717,49 @@
 | Group ID Field | = f
 | Type Field| =1
 ) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
-<wpr uId="41" tId="2" fbRx="8.356032118" lbRx="0" />
-<wpr uId="41" tId="5" fbRx="8.356032195" lbRx="0" />
-<wpr uId="41" tId="0" fbRx="8.35603222" lbRx="0" />
-<wpr uId="41" tId="3" fbRx="8.356032261" lbRx="0" />
-<wpr uId="41" tId="4" fbRx="8.356032373" lbRx="0" />
+<pr uId="40" fId="4" fbTx="8.356032" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 75, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:05
+) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
+| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
+| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 4060872704, Time Synchronization Beacon Offset Timestamp = 51
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
+
+| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 7, Channel Offset = 4, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000010000
+
+) ns3::HeaderIETermination (| Length Field | = 0
+| Element ID Field | = 7e
+| Type Field| = 0
+) ns3::PayloadIETermination (| Length Field | = 0
+| Group ID Field | = f
+| Type Field| =1
+) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
+<wpr uId="39" tId="2" fbRx="8.356032118" lbRx="0" />
+<wpr uId="40" tId="3" fbRx="8.356032127" lbRx="0" />
+<wpr uId="39" tId="5" fbRx="8.356032195" lbRx="0" />
+<wpr uId="39" tId="0" fbRx="8.35603222" lbRx="0" />
+<pr uId="41" fId="5" fbTx="8.478912" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 82, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:06
+) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
+| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
+| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 4183752704, Time Synchronization Beacon Offset Timestamp = 51
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
+
+| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 7, Channel Offset = 5, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000100000
+
+) ns3::HeaderIETermination (| Length Field | = 0
+| Element ID Field | = 7e
+| Type Field| = 0
+) ns3::PayloadIETermination (| Length Field | = 0
+| Group ID Field | = f
+| Type Field| =1
+) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
+<wpr uId="41" tId="0" fbRx="8.478912028" lbRx="0" />
 <pr uId="42" fId="3" fbTx="8.601792" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 38, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:04
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 11665408, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 7, Channel Offset = 6, Channel Offset Length = 16, Channel Offset Bitmap =  0000000001000000
 
@@ -820,14 +773,12 @@
 <wpr uId="42" tId="5" fbRx="8.6017921" lbRx="0" />
 <wpr uId="42" tId="0" fbRx="8.601792101" lbRx="0" />
 <wpr uId="42" tId="4" fbRx="8.601792127" lbRx="0" />
-<wpr uId="42" tId="1" fbRx="8.601792261" lbRx="0" />
-<wpr uId="42" tId="2" fbRx="8.601792304" lbRx="0" />
 <pr uId="43" fId="2" fbTx="8.724672" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 99, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:03
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 134545408, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 7, Channel Offset = 7, Channel Offset Length = 16, Channel Offset Bitmap =  0000000010000000
 
@@ -842,13 +793,12 @@
 <wpr uId="43" tId="5" fbRx="8.724672211" lbRx="0" />
 <wpr uId="43" tId="0" fbRx="8.724672226" lbRx="0" />
 <wpr uId="43" tId="3" fbRx="8.724672304" lbRx="0" />
-<wpr uId="43" tId="4" fbRx="8.724672429" lbRx="0" />
 <pr uId="44" fId="0" fbTx="8.847552" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 9, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:01
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 1, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 257425408, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 9, Channel Offset = 0, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000001
 
@@ -864,48 +814,12 @@
 <wpr uId="44" tId="1" fbRx="8.84755222" lbRx="0" />
 <wpr uId="44" tId="4" fbRx="8.847552224" lbRx="0" />
 <wpr uId="44" tId="2" fbRx="8.847552226" lbRx="0" />
-<pr uId="45" fId="5" fbTx="9.216192" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 83, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:06
-) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
-| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
-| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 626065408, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
-
-| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, Channel Offset = 3, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000001000
-
-) ns3::HeaderIETermination (| Length Field | = 0
-| Element ID Field | = 7e
-| Type Field| = 0
-) ns3::PayloadIETermination (| Length Field | = 0
-| Group ID Field | = f
-| Type Field| =1
-) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
-<pr uId="46" fId="4" fbTx="9.216192" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 76, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:05
-) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
-| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
-| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 626065408, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
-
-| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, Channel Offset = 3, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000001000
-
-) ns3::HeaderIETermination (| Length Field | = 0
-| Element ID Field | = 7e
-| Type Field| = 0
-) ns3::PayloadIETermination (| Length Field | = 0
-| Group ID Field | = f
-| Type Field| =1
-) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
-<wpr uId="45" tId="0" fbRx="9.216192028" lbRx="0" />
-<wpr uId="45" tId="3" fbRx="9.2161921" lbRx="0" />
-<wpr uId="45" tId="1" fbRx="9.216192195" lbRx="0" />
-<wpr uId="45" tId="2" fbRx="9.216192211" lbRx="0" />
-<pr uId="47" fId="1" fbTx="9.339072" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 59, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:02
+<pr uId="45" fId="1" fbTx="9.339072" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 59, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:02
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 748945408, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, Channel Offset = 4, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000010000
 
@@ -916,17 +830,49 @@
 | Group ID Field | = f
 | Type Field| =1
 ) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
-<wpr uId="47" tId="2" fbRx="9.339072118" lbRx="0" />
-<wpr uId="47" tId="5" fbRx="9.339072195" lbRx="0" />
-<wpr uId="47" tId="0" fbRx="9.33907222" lbRx="0" />
-<wpr uId="47" tId="3" fbRx="9.339072261" lbRx="0" />
-<wpr uId="47" tId="4" fbRx="9.339072373" lbRx="0" />
+<pr uId="46" fId="4" fbTx="9.339072" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 76, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:05
+) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
+| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
+| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 748945408, Time Synchronization Beacon Offset Timestamp = 51
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
+
+| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, Channel Offset = 4, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000010000
+
+) ns3::HeaderIETermination (| Length Field | = 0
+| Element ID Field | = 7e
+| Type Field| = 0
+) ns3::PayloadIETermination (| Length Field | = 0
+| Group ID Field | = f
+| Type Field| =1
+) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
+<wpr uId="45" tId="2" fbRx="9.339072118" lbRx="0" />
+<wpr uId="46" tId="3" fbRx="9.339072127" lbRx="0" />
+<wpr uId="45" tId="5" fbRx="9.339072195" lbRx="0" />
+<wpr uId="45" tId="0" fbRx="9.33907222" lbRx="0" />
+<pr uId="47" fId="5" fbTx="9.461952" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 83, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:06
+) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
+| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
+| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 871825408, Time Synchronization Beacon Offset Timestamp = 51
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
+
+| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, Channel Offset = 5, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000100000
+
+) ns3::HeaderIETermination (| Length Field | = 0
+| Element ID Field | = 7e
+| Type Field| = 0
+) ns3::PayloadIETermination (| Length Field | = 0
+| Group ID Field | = f
+| Type Field| =1
+) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
+<wpr uId="47" tId="0" fbRx="9.461952028" lbRx="0" />
 <pr uId="48" fId="3" fbTx="9.584832" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 39, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:04
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 994705408, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, Channel Offset = 6, Channel Offset Length = 16, Channel Offset Bitmap =  0000000001000000
 
@@ -940,14 +886,12 @@
 <wpr uId="48" tId="5" fbRx="9.5848321" lbRx="0" />
 <wpr uId="48" tId="0" fbRx="9.584832101" lbRx="0" />
 <wpr uId="48" tId="4" fbRx="9.584832127" lbRx="0" />
-<wpr uId="48" tId="1" fbRx="9.584832261" lbRx="0" />
-<wpr uId="48" tId="2" fbRx="9.584832304" lbRx="0" />
 <pr uId="49" fId="2" fbTx="9.707712" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 100, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:03
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 1117585408, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, Channel Offset = 7, Channel Offset Length = 16, Channel Offset Bitmap =  0000000010000000
 
@@ -962,13 +906,12 @@
 <wpr uId="49" tId="5" fbRx="9.707712211" lbRx="0" />
 <wpr uId="49" tId="0" fbRx="9.707712226" lbRx="0" />
 <wpr uId="49" tId="3" fbRx="9.707712304" lbRx="0" />
-<wpr uId="49" tId="4" fbRx="9.707712429" lbRx="0" />
 <pr uId="50" fId="0" fbTx="9.830592" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 10, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:01
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 1, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 1240465408, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 10, Channel Offset = 0, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000001
 
@@ -984,48 +927,12 @@
 <wpr uId="50" tId="1" fbRx="9.83059222" lbRx="0" />
 <wpr uId="50" tId="4" fbRx="9.830592224" lbRx="0" />
 <wpr uId="50" tId="2" fbRx="9.830592226" lbRx="0" />
-<pr uId="51" fId="5" fbTx="10.199232" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 84, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:06
-) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
-| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
-| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1609105408, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
-
-| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 9, Channel Offset = 3, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000001000
-
-) ns3::HeaderIETermination (| Length Field | = 0
-| Element ID Field | = 7e
-| Type Field| = 0
-) ns3::PayloadIETermination (| Length Field | = 0
-| Group ID Field | = f
-| Type Field| =1
-) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
-<pr uId="52" fId="4" fbTx="10.199232" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 77, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:05
-) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
-| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
-| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1609105408, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
-
-| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 9, Channel Offset = 3, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000001000
-
-) ns3::HeaderIETermination (| Length Field | = 0
-| Element ID Field | = 7e
-| Type Field| = 0
-) ns3::PayloadIETermination (| Length Field | = 0
-| Group ID Field | = f
-| Type Field| =1
-) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
-<wpr uId="51" tId="0" fbRx="10.19923203" lbRx="0" />
-<wpr uId="51" tId="3" fbRx="10.1992321" lbRx="0" />
-<wpr uId="51" tId="1" fbRx="10.1992322" lbRx="0" />
-<wpr uId="51" tId="2" fbRx="10.19923221" lbRx="0" />
-<pr uId="53" fId="1" fbTx="10.322112" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 60, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:02
+<pr uId="51" fId="1" fbTx="10.322112" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 60, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:02
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 1731985408, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 9, Channel Offset = 4, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000010000
 
@@ -1036,17 +943,49 @@
 | Group ID Field | = f
 | Type Field| =1
 ) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
-<wpr uId="53" tId="2" fbRx="10.32211212" lbRx="0" />
-<wpr uId="53" tId="5" fbRx="10.3221122" lbRx="0" />
-<wpr uId="53" tId="0" fbRx="10.32211222" lbRx="0" />
-<wpr uId="53" tId="3" fbRx="10.32211226" lbRx="0" />
-<wpr uId="53" tId="4" fbRx="10.32211237" lbRx="0" />
+<pr uId="52" fId="4" fbTx="10.322112" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 77, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:05
+) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
+| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
+| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1731985408, Time Synchronization Beacon Offset Timestamp = 51
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
+
+| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 9, Channel Offset = 4, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000010000
+
+) ns3::HeaderIETermination (| Length Field | = 0
+| Element ID Field | = 7e
+| Type Field| = 0
+) ns3::PayloadIETermination (| Length Field | = 0
+| Group ID Field | = f
+| Type Field| =1
+) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
+<wpr uId="51" tId="2" fbRx="10.32211212" lbRx="0" />
+<wpr uId="52" tId="3" fbRx="10.32211213" lbRx="0" />
+<wpr uId="51" tId="5" fbRx="10.3221122" lbRx="0" />
+<wpr uId="51" tId="0" fbRx="10.32211222" lbRx="0" />
+<pr uId="53" fId="5" fbTx="10.444992" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 84, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:06
+) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
+| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
+| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1854865408, Time Synchronization Beacon Offset Timestamp = 51
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
+
+| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 9, Channel Offset = 5, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000100000
+
+) ns3::HeaderIETermination (| Length Field | = 0
+| Element ID Field | = 7e
+| Type Field| = 0
+) ns3::PayloadIETermination (| Length Field | = 0
+| Group ID Field | = f
+| Type Field| =1
+) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
+<wpr uId="53" tId="0" fbRx="10.44499203" lbRx="0" />
 <pr uId="54" fId="3" fbTx="10.567872" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 40, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:04
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 1977745408, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 9, Channel Offset = 6, Channel Offset Length = 16, Channel Offset Bitmap =  0000000001000000
 
@@ -1060,14 +999,12 @@
 <wpr uId="54" tId="5" fbRx="10.5678721" lbRx="0" />
 <wpr uId="54" tId="0" fbRx="10.5678721" lbRx="0" />
 <wpr uId="54" tId="4" fbRx="10.56787213" lbRx="0" />
-<wpr uId="54" tId="1" fbRx="10.56787226" lbRx="0" />
-<wpr uId="54" tId="2" fbRx="10.5678723" lbRx="0" />
 <pr uId="55" fId="2" fbTx="10.690752" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 101, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:03
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 2100625408, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 9, Channel Offset = 7, Channel Offset Length = 16, Channel Offset Bitmap =  0000000010000000
 
@@ -1082,13 +1019,12 @@
 <wpr uId="55" tId="5" fbRx="10.69075221" lbRx="0" />
 <wpr uId="55" tId="0" fbRx="10.69075223" lbRx="0" />
 <wpr uId="55" tId="3" fbRx="10.6907523" lbRx="0" />
-<wpr uId="55" tId="4" fbRx="10.69075243" lbRx="0" />
 <pr uId="56" fId="0" fbTx="10.813632" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 11, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:01
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 1, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 2223505408, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 11, Channel Offset = 0, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000001
 
@@ -1104,48 +1040,12 @@
 <wpr uId="56" tId="1" fbRx="10.81363222" lbRx="0" />
 <wpr uId="56" tId="4" fbRx="10.81363222" lbRx="0" />
 <wpr uId="56" tId="2" fbRx="10.81363223" lbRx="0" />
-<pr uId="57" fId="5" fbTx="11.182272" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 85, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:06
-) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
-| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
-| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2592145408, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
-
-| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 10, Channel Offset = 3, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000001000
-
-) ns3::HeaderIETermination (| Length Field | = 0
-| Element ID Field | = 7e
-| Type Field| = 0
-) ns3::PayloadIETermination (| Length Field | = 0
-| Group ID Field | = f
-| Type Field| =1
-) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
-<pr uId="58" fId="4" fbTx="11.182272" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 78, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:05
-) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
-| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
-| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2592145408, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
-
-| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 10, Channel Offset = 3, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000001000
-
-) ns3::HeaderIETermination (| Length Field | = 0
-| Element ID Field | = 7e
-| Type Field| = 0
-) ns3::PayloadIETermination (| Length Field | = 0
-| Group ID Field | = f
-| Type Field| =1
-) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
-<wpr uId="57" tId="0" fbRx="11.18227203" lbRx="0" />
-<wpr uId="57" tId="3" fbRx="11.1822721" lbRx="0" />
-<wpr uId="57" tId="1" fbRx="11.18227219" lbRx="0" />
-<wpr uId="57" tId="2" fbRx="11.18227221" lbRx="0" />
-<pr uId="59" fId="1" fbTx="11.305152" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 61, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:02
+<pr uId="57" fId="1" fbTx="11.305152" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 61, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:02
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 2715025408, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 10, Channel Offset = 4, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000010000
 
@@ -1156,17 +1056,49 @@
 | Group ID Field | = f
 | Type Field| =1
 ) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
-<wpr uId="59" tId="2" fbRx="11.30515212" lbRx="0" />
-<wpr uId="59" tId="5" fbRx="11.30515219" lbRx="0" />
-<wpr uId="59" tId="0" fbRx="11.30515222" lbRx="0" />
-<wpr uId="59" tId="3" fbRx="11.30515226" lbRx="0" />
-<wpr uId="59" tId="4" fbRx="11.30515237" lbRx="0" />
+<pr uId="58" fId="4" fbTx="11.305152" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 78, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:05
+) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
+| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
+| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2715025408, Time Synchronization Beacon Offset Timestamp = 51
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
+
+| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 10, Channel Offset = 4, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000010000
+
+) ns3::HeaderIETermination (| Length Field | = 0
+| Element ID Field | = 7e
+| Type Field| = 0
+) ns3::PayloadIETermination (| Length Field | = 0
+| Group ID Field | = f
+| Type Field| =1
+) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
+<wpr uId="57" tId="2" fbRx="11.30515212" lbRx="0" />
+<wpr uId="58" tId="3" fbRx="11.30515213" lbRx="0" />
+<wpr uId="57" tId="5" fbRx="11.30515219" lbRx="0" />
+<wpr uId="57" tId="0" fbRx="11.30515222" lbRx="0" />
+<pr uId="59" fId="5" fbTx="11.428032" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 85, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:06
+) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
+| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
+| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 2837905408, Time Synchronization Beacon Offset Timestamp = 51
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
+
+| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 10, Channel Offset = 5, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000100000
+
+) ns3::HeaderIETermination (| Length Field | = 0
+| Element ID Field | = 7e
+| Type Field| = 0
+) ns3::PayloadIETermination (| Length Field | = 0
+| Group ID Field | = f
+| Type Field| =1
+) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
+<wpr uId="59" tId="0" fbRx="11.42803203" lbRx="0" />
 <pr uId="60" fId="3" fbTx="11.550912" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 41, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:04
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 2960785408, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 10, Channel Offset = 6, Channel Offset Length = 16, Channel Offset Bitmap =  0000000001000000
 
@@ -1180,14 +1112,12 @@
 <wpr uId="60" tId="5" fbRx="11.5509121" lbRx="0" />
 <wpr uId="60" tId="0" fbRx="11.5509121" lbRx="0" />
 <wpr uId="60" tId="4" fbRx="11.55091213" lbRx="0" />
-<wpr uId="60" tId="1" fbRx="11.55091226" lbRx="0" />
-<wpr uId="60" tId="2" fbRx="11.5509123" lbRx="0" />
 <pr uId="61" fId="2" fbTx="11.673792" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 102, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:03
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 3083665408, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 10, Channel Offset = 7, Channel Offset Length = 16, Channel Offset Bitmap =  0000000010000000
 
@@ -1202,13 +1132,12 @@
 <wpr uId="61" tId="5" fbRx="11.67379221" lbRx="0" />
 <wpr uId="61" tId="0" fbRx="11.67379223" lbRx="0" />
 <wpr uId="61" tId="3" fbRx="11.6737923" lbRx="0" />
-<wpr uId="61" tId="4" fbRx="11.67379243" lbRx="0" />
 <pr uId="62" fId="0" fbTx="11.796672" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 12, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:01
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 1, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 3206545408, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 12, Channel Offset = 0, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000001
 
@@ -1224,48 +1153,12 @@
 <wpr uId="62" tId="1" fbRx="11.79667222" lbRx="0" />
 <wpr uId="62" tId="4" fbRx="11.79667222" lbRx="0" />
 <wpr uId="62" tId="2" fbRx="11.79667223" lbRx="0" />
-<pr uId="63" fId="5" fbTx="12.165312" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 86, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:06
-) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
-| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
-| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3575185408, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
-
-| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 11, Channel Offset = 3, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000001000
-
-) ns3::HeaderIETermination (| Length Field | = 0
-| Element ID Field | = 7e
-| Type Field| = 0
-) ns3::PayloadIETermination (| Length Field | = 0
-| Group ID Field | = f
-| Type Field| =1
-) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
-<pr uId="64" fId="4" fbTx="12.165312" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 79, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:05
-) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
-| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
-| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3575185408, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
-
-| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 11, Channel Offset = 3, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000001000
-
-) ns3::HeaderIETermination (| Length Field | = 0
-| Element ID Field | = 7e
-| Type Field| = 0
-) ns3::PayloadIETermination (| Length Field | = 0
-| Group ID Field | = f
-| Type Field| =1
-) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
-<wpr uId="63" tId="0" fbRx="12.16531203" lbRx="0" />
-<wpr uId="63" tId="3" fbRx="12.1653121" lbRx="0" />
-<wpr uId="63" tId="1" fbRx="12.1653122" lbRx="0" />
-<wpr uId="63" tId="2" fbRx="12.16531221" lbRx="0" />
-<pr uId="65" fId="1" fbTx="12.288192" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 62, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:02
+<pr uId="63" fId="1" fbTx="12.288192" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 62, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:02
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 3698065408, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 11, Channel Offset = 4, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000010000
 
@@ -1276,17 +1169,49 @@
 | Group ID Field | = f
 | Type Field| =1
 ) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
-<wpr uId="65" tId="2" fbRx="12.28819212" lbRx="0" />
-<wpr uId="65" tId="5" fbRx="12.2881922" lbRx="0" />
-<wpr uId="65" tId="0" fbRx="12.28819222" lbRx="0" />
-<wpr uId="65" tId="3" fbRx="12.28819226" lbRx="0" />
-<wpr uId="65" tId="4" fbRx="12.28819237" lbRx="0" />
+<pr uId="64" fId="4" fbTx="12.288192" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 79, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:05
+) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
+| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
+| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3698065408, Time Synchronization Beacon Offset Timestamp = 51
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
+
+| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 11, Channel Offset = 4, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000010000
+
+) ns3::HeaderIETermination (| Length Field | = 0
+| Element ID Field | = 7e
+| Type Field| = 0
+) ns3::PayloadIETermination (| Length Field | = 0
+| Group ID Field | = f
+| Type Field| =1
+) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
+<wpr uId="63" tId="2" fbRx="12.28819212" lbRx="0" />
+<wpr uId="64" tId="3" fbRx="12.28819213" lbRx="0" />
+<wpr uId="63" tId="5" fbRx="12.2881922" lbRx="0" />
+<wpr uId="63" tId="0" fbRx="12.28819222" lbRx="0" />
+<pr uId="65" fId="5" fbTx="12.411072" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 86, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:06
+) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
+| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
+| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 3820945408, Time Synchronization Beacon Offset Timestamp = 51
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
+
+| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 11, Channel Offset = 5, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000100000
+
+) ns3::HeaderIETermination (| Length Field | = 0
+| Element ID Field | = 7e
+| Type Field| = 0
+) ns3::PayloadIETermination (| Length Field | = 0
+| Group ID Field | = f
+| Type Field| =1
+) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
+<wpr uId="65" tId="0" fbRx="12.41107203" lbRx="0" />
 <pr uId="66" fId="3" fbTx="12.533952" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 42, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:04
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 3943825408, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 11, Channel Offset = 6, Channel Offset Length = 16, Channel Offset Bitmap =  0000000001000000
 
@@ -1300,14 +1225,12 @@
 <wpr uId="66" tId="5" fbRx="12.5339521" lbRx="0" />
 <wpr uId="66" tId="0" fbRx="12.5339521" lbRx="0" />
 <wpr uId="66" tId="4" fbRx="12.53395213" lbRx="0" />
-<wpr uId="66" tId="1" fbRx="12.53395226" lbRx="0" />
-<wpr uId="66" tId="2" fbRx="12.5339523" lbRx="0" />
 <pr uId="67" fId="2" fbTx="12.656832" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 103, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:03
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 4066705408, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 11, Channel Offset = 7, Channel Offset Length = 16, Channel Offset Bitmap =  0000000010000000
 
@@ -1322,13 +1245,12 @@
 <wpr uId="67" tId="5" fbRx="12.65683221" lbRx="0" />
 <wpr uId="67" tId="0" fbRx="12.65683223" lbRx="0" />
 <wpr uId="67" tId="3" fbRx="12.6568323" lbRx="0" />
-<wpr uId="67" tId="4" fbRx="12.65683243" lbRx="0" />
 <pr uId="68" fId="0" fbTx="12.779712" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 13, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:01
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 1, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 4189585408, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 13, Channel Offset = 0, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000001
 
@@ -1344,48 +1266,12 @@
 <wpr uId="68" tId="1" fbRx="12.77971222" lbRx="0" />
 <wpr uId="68" tId="4" fbRx="12.77971222" lbRx="0" />
 <wpr uId="68" tId="2" fbRx="12.77971223" lbRx="0" />
-<pr uId="69" fId="5" fbTx="13.148352" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 87, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:06
-) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
-| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
-| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 263258112, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
-
-| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 12, Channel Offset = 3, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000001000
-
-) ns3::HeaderIETermination (| Length Field | = 0
-| Element ID Field | = 7e
-| Type Field| = 0
-) ns3::PayloadIETermination (| Length Field | = 0
-| Group ID Field | = f
-| Type Field| =1
-) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
-<pr uId="70" fId="4" fbTx="13.148352" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 80, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:05
-) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
-| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
-| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 263258112, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
-
-| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 12, Channel Offset = 3, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000001000
-
-) ns3::HeaderIETermination (| Length Field | = 0
-| Element ID Field | = 7e
-| Type Field| = 0
-) ns3::PayloadIETermination (| Length Field | = 0
-| Group ID Field | = f
-| Type Field| =1
-) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
-<wpr uId="69" tId="0" fbRx="13.14835203" lbRx="0" />
-<wpr uId="69" tId="3" fbRx="13.1483521" lbRx="0" />
-<wpr uId="69" tId="1" fbRx="13.14835219" lbRx="0" />
-<wpr uId="69" tId="2" fbRx="13.14835221" lbRx="0" />
-<pr uId="71" fId="1" fbTx="13.271232" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 63, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:02
+<pr uId="69" fId="1" fbTx="13.271232" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 63, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:02
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 386138112, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 12, Channel Offset = 4, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000010000
 
@@ -1396,17 +1282,49 @@
 | Group ID Field | = f
 | Type Field| =1
 ) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
-<wpr uId="71" tId="2" fbRx="13.27123212" lbRx="0" />
-<wpr uId="71" tId="5" fbRx="13.27123219" lbRx="0" />
-<wpr uId="71" tId="0" fbRx="13.27123222" lbRx="0" />
-<wpr uId="71" tId="3" fbRx="13.27123226" lbRx="0" />
-<wpr uId="71" tId="4" fbRx="13.27123237" lbRx="0" />
+<pr uId="70" fId="4" fbTx="13.271232" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 80, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:05
+) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
+| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
+| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 386138112, Time Synchronization Beacon Offset Timestamp = 51
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
+
+| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 12, Channel Offset = 4, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000010000
+
+) ns3::HeaderIETermination (| Length Field | = 0
+| Element ID Field | = 7e
+| Type Field| = 0
+) ns3::PayloadIETermination (| Length Field | = 0
+| Group ID Field | = f
+| Type Field| =1
+) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
+<wpr uId="69" tId="2" fbRx="13.27123212" lbRx="0" />
+<wpr uId="70" tId="3" fbRx="13.27123213" lbRx="0" />
+<wpr uId="69" tId="5" fbRx="13.27123219" lbRx="0" />
+<wpr uId="69" tId="0" fbRx="13.27123222" lbRx="0" />
+<pr uId="71" fId="5" fbTx="13.394112" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 87, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:06
+) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
+| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
+| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 509018112, Time Synchronization Beacon Offset Timestamp = 51
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
+
+| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 12, Channel Offset = 5, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000100000
+
+) ns3::HeaderIETermination (| Length Field | = 0
+| Element ID Field | = 7e
+| Type Field| = 0
+) ns3::PayloadIETermination (| Length Field | = 0
+| Group ID Field | = f
+| Type Field| =1
+) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
+<wpr uId="71" tId="0" fbRx="13.39411203" lbRx="0" />
 <pr uId="72" fId="3" fbTx="13.516992" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 43, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:04
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 631898112, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 12, Channel Offset = 6, Channel Offset Length = 16, Channel Offset Bitmap =  0000000001000000
 
@@ -1420,14 +1338,12 @@
 <wpr uId="72" tId="5" fbRx="13.5169921" lbRx="0" />
 <wpr uId="72" tId="0" fbRx="13.5169921" lbRx="0" />
 <wpr uId="72" tId="4" fbRx="13.51699213" lbRx="0" />
-<wpr uId="72" tId="1" fbRx="13.51699226" lbRx="0" />
-<wpr uId="72" tId="2" fbRx="13.5169923" lbRx="0" />
 <pr uId="73" fId="2" fbTx="13.639872" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 104, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:03
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 754778112, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 12, Channel Offset = 7, Channel Offset Length = 16, Channel Offset Bitmap =  0000000010000000
 
@@ -1442,13 +1358,12 @@
 <wpr uId="73" tId="5" fbRx="13.63987221" lbRx="0" />
 <wpr uId="73" tId="0" fbRx="13.63987223" lbRx="0" />
 <wpr uId="73" tId="3" fbRx="13.6398723" lbRx="0" />
-<wpr uId="73" tId="4" fbRx="13.63987243" lbRx="0" />
 <pr uId="74" fId="0" fbTx="13.762752" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 14, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:01
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 1, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 877658112, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 14, Channel Offset = 0, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000001
 
@@ -1464,48 +1379,12 @@
 <wpr uId="74" tId="1" fbRx="13.76275222" lbRx="0" />
 <wpr uId="74" tId="4" fbRx="13.76275222" lbRx="0" />
 <wpr uId="74" tId="2" fbRx="13.76275223" lbRx="0" />
-<pr uId="75" fId="5" fbTx="14.131392" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 88, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:06
-) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
-| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
-| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1246298112, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
-
-| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 13, Channel Offset = 3, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000001000
-
-) ns3::HeaderIETermination (| Length Field | = 0
-| Element ID Field | = 7e
-| Type Field| = 0
-) ns3::PayloadIETermination (| Length Field | = 0
-| Group ID Field | = f
-| Type Field| =1
-) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
-<pr uId="76" fId="4" fbTx="14.131392" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 81, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:05
-) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
-| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
-| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
-| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1246298112, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
-
-| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 13, Channel Offset = 3, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000001000
-
-) ns3::HeaderIETermination (| Length Field | = 0
-| Element ID Field | = 7e
-| Type Field| = 0
-) ns3::PayloadIETermination (| Length Field | = 0
-| Group ID Field | = f
-| Type Field| =1
-) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
-<wpr uId="75" tId="0" fbRx="14.13139203" lbRx="0" />
-<wpr uId="75" tId="3" fbRx="14.1313921" lbRx="0" />
-<wpr uId="75" tId="1" fbRx="14.1313922" lbRx="0" />
-<wpr uId="75" tId="2" fbRx="14.13139221" lbRx="0" />
-<pr uId="77" fId="1" fbTx="14.254272" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 64, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:02
+<pr uId="75" fId="1" fbTx="14.254272" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 64, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:02
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 1369178112, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 13, Channel Offset = 4, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000010000
 
@@ -1516,17 +1395,49 @@
 | Group ID Field | = f
 | Type Field| =1
 ) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
-<wpr uId="77" tId="2" fbRx="14.25427212" lbRx="0" />
-<wpr uId="77" tId="5" fbRx="14.2542722" lbRx="0" />
-<wpr uId="77" tId="0" fbRx="14.25427222" lbRx="0" />
-<wpr uId="77" tId="3" fbRx="14.25427226" lbRx="0" />
-<wpr uId="77" tId="4" fbRx="14.25427237" lbRx="0" />
+<pr uId="76" fId="4" fbTx="14.254272" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 81, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:05
+) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
+| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
+| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1369178112, Time Synchronization Beacon Offset Timestamp = 51
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
+
+| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 13, Channel Offset = 4, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000010000
+
+) ns3::HeaderIETermination (| Length Field | = 0
+| Element ID Field | = 7e
+| Type Field| = 0
+) ns3::PayloadIETermination (| Length Field | = 0
+| Group ID Field | = f
+| Type Field| =1
+) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
+<wpr uId="75" tId="2" fbRx="14.25427212" lbRx="0" />
+<wpr uId="76" tId="3" fbRx="14.25427213" lbRx="0" />
+<wpr uId="75" tId="5" fbRx="14.2542722" lbRx="0" />
+<wpr uId="75" tId="0" fbRx="14.25427222" lbRx="0" />
+<pr uId="77" fId="5" fbTx="14.377152" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 88, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:06
+) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
+| Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
+| DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
+| Time Sync Field | =  Time Synchronization Beacon Timestamp = 1492058112, Time Synchronization Beacon Offset Timestamp = 51
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
+
+| Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 13, Channel Offset = 5, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000100000
+
+) ns3::HeaderIETermination (| Length Field | = 0
+| Element ID Field | = 7e
+| Type Field| = 0
+) ns3::PayloadIETermination (| Length Field | = 0
+| Group ID Field | = f
+| Type Field| =1
+) ns3::BeaconPayloadHeader (| Superframe Spec Field | =  Beacon Order = f, Frame Order = f, Final CAP slot = 0, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 0| GTS Spec Field | = " />
+<wpr uId="77" tId="0" fbRx="14.37715203" lbRx="0" />
 <pr uId="78" fId="3" fbTx="14.500032" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 44, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:04
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 1614938112, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 13, Channel Offset = 6, Channel Offset Length = 16, Channel Offset Bitmap =  0000000001000000
 
@@ -1540,14 +1451,12 @@
 <wpr uId="78" tId="5" fbRx="14.5000321" lbRx="0" />
 <wpr uId="78" tId="0" fbRx="14.5000321" lbRx="0" />
 <wpr uId="78" tId="4" fbRx="14.50003213" lbRx="0" />
-<wpr uId="78" tId="1" fbRx="14.50003226" lbRx="0" />
-<wpr uId="78" tId="2" fbRx="14.5000323" lbRx="0" />
 <pr uId="79" fId="2" fbTx="14.622912" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 105, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:03
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 0, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 1737818112, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 13, Channel Offset = 7, Channel Offset Length = 16, Channel Offset Bitmap =  0000000010000000
 
@@ -1562,13 +1471,12 @@
 <wpr uId="79" tId="5" fbRx="14.62291221" lbRx="0" />
 <wpr uId="79" tId="0" fbRx="14.62291223" lbRx="0" />
 <wpr uId="79" tId="3" fbRx="14.6229123" lbRx="0" />
-<wpr uId="79" tId="4" fbRx="14.62291243" lbRx="0" />
 <pr uId="80" fId="0" fbTx="14.745792" meta-info="ns3::LrWpanMacHeader (  Frame Type = 0, Sec Enable = 0, Frame Pending = 0, Ack Request = 0, PAN ID Compress = 0, Sequence Number Suppresion = 0, IE List Present = 1, Frame Vers = 2, Dst Addrs Mode = 2, Src Addr Mode = 2, Sequence Num = 15, Dst Addr Pan ID = 7, m_addrShortDstAddr = ff:ff, Src Addr Pan ID = 7, m_addrShortSrcAddr = 00:01
 ) ns3::DsmePANDescriptorIE (| Superframe Spec Field | =  Beacon Order = 6, Frame Order = 3, Final CAP slot = 8, Battery Life Ext = 0, PAN Coordinator = 1, Association Permit = 1
 | Pending Address Field | =  Num. Short Addr = 0, Num. Ext   Addr = 0
 | DSEM Superframe Field | =  DSME Multi Beacon Order = 5, DSME Channel Diversity mode = 1, DSME GACK = 0, DSME CAP Reduction = 0, DSME Deferred Beacon = 0
 | Time Sync Field | =  Time Synchronization Beacon Timestamp = 1860698112, Time Synchronization Beacon Offset Timestamp = 51
-| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011011000
+| Beacon Bitmap Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 8, SD bitmap = 0000000011110000
 
 | Channel Hopping Field | = Beacon Bitmap SD Index = 0, SD Bitmap Length = 15, Channel Offset = 0, Channel Offset Length = 16, Channel Offset Bitmap =  0000000000000001
 

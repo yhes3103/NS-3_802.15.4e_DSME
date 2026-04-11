@@ -16,9 +16,10 @@
 | 檔案 | 說明 | 狀態 |
 |------|------|------|
 | `dsme-beacon-slot-selection-baseline.cc` | **Baseline**：純隨機拓樸，無 backbone，固定 0 dBm，用於對照組 | 完成 |
-| `dsme-beacon-slot-selection-random-pick-backbone-powerControl.cc` | **Power Control（RSSI-based）**：有 backbone，以宣告 TX power + path loss 估距 | 完成但待替換 |
+| `dsme-beacon-slot-selection-PC.cc` | **Power Control（GPS-based, scheme B）**：純隨機拓樸，同 baseline 結構，加上 GPS table + 因果閘門（模擬 IE 夾帶 GPS） | 完成，待 sweep 驗證 |
+| ~~`dsme-beacon-slot-selection-random-pick-backbone-powerControl.cc`~~ | 舊的 RSSI-based 版本（backbone），**計畫刪除** | 淘汰 |
 
-> **重要**：論文提出的是 **GPS-based** power control，目前實作是 RSSI-based 的 proxy 版本（不改 NS-3 核心）。最終版需改為 GPS 座標夾帶於 beacon IE。
+> **GPS-based 實作方式**：目前採「方案 B」— 不改 NS-3 核心，在模擬層維護 `g_gpsTable`，但強制「只有當 rx 收過 tx 的 EB 才能查 tx 的 GPS」（`g_heardFromTxByRx` 因果閘門），避免模擬器上帝視角。這與「真正改 IE 序列化（方案 A）」在指標層面等價。方案 A 未來作為 realism validation 章節補做。
 
 ## 研究指標定義
 
@@ -78,39 +79,66 @@
 
 ```
 BO=6, SO=3, MO=5
-N (節點數)    : 15 ~ 50
-M (beacon slots): 8（16 待定）
-Path loss n   : 3.0（程式中），論文擬定 2.7（待統一）
-Max Tx        : 0 dBm
-Topology      : 純隨機，PAN-C 置中
+N (節點數)    : 5 ~ 50（sweep 時建議每 N 多 seed 取平均）
+M (beacon slots): 8（slot 0 保留給 PAN-C，可選 S = {1..7}）
+Path loss n   : 2.7（baseline 與 PC 版已統一）
+Reference     : d_ref = 1 m, L_ref = 40.05 dB（2.4 GHz FSPL @ 1 m）
+RX sens       : -95 dBm
+Max Tx        : 0 dBm（PC 的 clamp 上限；PAN-C 固定 0 dBm）
+Min Tx        : -32 dBm（PC 的 clamp 下限，PHY PIB 6-bit 兩補數）
+PC margin     : 3 dB（預設，可 `--pcMarginDb=X` 調整）
+Topology      : 純隨機，PAN-C 置中（±150 m 方形）
 ```
 
 ## 目前進度與待辦
 
 ### 已完成
 - [x] Baseline 模擬（random topo, 0 dBm fixed）
-- [x] RSSI-based power control 模擬（含 backbone）
-- [x] 四項指標實作（p_coll, s̄_coll, η, P̄_tx）
-- [x] Sweep 腳本（`sweep-random-topo.sh`, `collision-sweep-pc.sh`）
+- [x] **GPS-based power control 模擬（方案 B）** — `dsme-beacon-slot-selection-PC.cc`
+- [x] Path loss exponent 統一為 2.7（baseline 與 PC）
+- [x] 四項指標實作（p_coll, s̄_coll, η, P̄_tx），PC 版 p_coll/s̄_coll 使用各節點實際 TX
+- [x] PAN-C 固定 0 dBm 的設計（bootstrap 種子不做 PC）
+- [x] PC 版 N=16 sanity check：p_coll 由 baseline 的 ~0.08 降到 0.018，P̄_tx = −2.43 dBm
 
 ### 進行中 / 待完成
-- [ ] **GPS-based power control 實作**：將 RSSI-based 替換為真正的 GPS 座標 IE 方式
-  - 方案A：修改 NS-3 核心 LR-WPAN MAC（加入 Custom Header IE）
-  - 方案B：模擬層 workaround（維護 global GPS table，接收 EB 時查表取座標）
-- [ ] 移除 GPS 版本的 backbone 結構（純隨機拓樸）
-- [ ] 統一 path loss exponent 為 2.7
+- [ ] **跨 N sweep**（N=5..50，每 N 多 seed），畫 baseline vs PC 的四指標對照圖
+- [ ] 小 N trade-off 現象的解釋與論文討論（見下方「已知現象」）
+- [ ] 刪除舊的 `dsme-beacon-slot-selection-random-pick-backbone-powerControl.cc`
+- [ ] **方案 A**（改 NS-3 核心 Custom IE）作為 realism validation — 次要優先
 - [ ] 推導 Baseline / Power Control 碰撞機率解析式（Chapter 3 & 4）
 - [ ] 驗證模擬結果 vs 解析式是否吻合
-- [ ] 完整 N=15~50、M=8 的 sweep 比較圖
+
+## 已知現象與設計取捨
+
+### PC 在小 N 可能略差於 baseline（trade-off，非 bug）
+N ≤ slot 數時，baseline 因為 0 dBm 覆蓋 150 m 全域 → 所有 joiner 聽得到彼此 → 完美協調，p_coll ≈ 0。
+PC 縮小發射範圍的同時也**縮掉協調資訊**：後起 joiner 可能聽不到前輩的低功率 beacon → 誤選已占用的 slot → 在某個共同 receiver 處被計為碰撞。
+**論文應誠實呈現 crossover**：小 N 持平或略差，大 N（N > slot 數，baseline 進入崩潰區）PC 大勝。
+
+### 方案 B 的因果閘門設計
+`g_gpsTable` 是物理真值（mobility install 時登記），但**只能透過 `ComputePcTxDbm` 經 `g_heardFromTxByRx` 閘門存取**。這確保：節點 r 要先收到 t 的 EB，才「知道」t 的 GPS — 在論文層面等價於 GPS 嵌在 beacon IE 中傳遞。
+
+### Short address 失效的坑
+LR-WPAN joiner 完成 association 後 MAC 層 short address 會被 coordinator 重新指派，初期建立的 `g_shortToNodeId` 快取會過時。PC 版靠 `LookupNodeIdByShort()` 在 cache miss 時 rescan live device 重建。Baseline 雖然也有同樣問題但靠 DBAN 通知路徑（不需 short addr 查表）繞過去，所以 baseline 看起來沒壞。**若之後新增任何依賴 beacon sender 身分的邏輯，記得用 `LookupNodeIdByShort()` 而非直接 `g_shortToNodeId.find()`**。
 
 ## 關鍵程式架構
 
-### 碰撞偵測邏輯位置
-- `dsme-beacon-slot-selection-baseline.cc:259~316` — Method-1（曾碰撞接收者數）、Method-2a/2b（receiver-slot 碰撞次數/嚴重度）
+### Baseline 碰撞偵測邏輯
+- `dsme-beacon-slot-selection-baseline.cc:214~246` — p_coll / s̄_coll（per receiver-slot 可見 tx 計數）
 
-### Power Control 核心邏輯
-- `dsme-beacon-slot-selection-random-pick-backbone-powerControl.cc:287` — 接收 EB 時讀取對方宣告 TX，估算距離
-- `dsme-beacon-slot-selection-random-pick-backbone-powerControl.cc:182` — 計算歐氏距離（現為座標直接計算，非 IE 夾帶）
+### PC 核心邏輯（`dsme-beacon-slot-selection-PC.cc`）
+- `ComputePcTxDbm()` — 從 `g_heardFromTxByRx[me]` 找最近鄰居，套 log-distance 反推最小 TX power
+- `OnMacRxWithContext()` BEACON 分支 — 經 `LookupNodeIdByShort` 解析 sender，更新因果閘門
+- Joiner lambda `*done = true` 之後 — 先 `ComputePcTxDbm → ApplyNodeTxDbm`，再 `CoordBoostrap`，確保第一顆 beacon 就用 PC power
+- `PrintSummary` — p_coll/s̄_coll 使用 `g_txDbmByNode[coordId]` 計算可見性；P̄_tx 對 T 集合做 mW 平均再轉 dBm
+
+### PC 版新增 CLI 旋鈕
+```
+--pcMarginDb=3.0       # fade margin (dB)
+--txMinDbm=-32.0       # PC 下限
+--txMaxDbm=0.0         # PC 上限
+--panCoordTxDbm=0.0    # PAN-C 固定功率（不做 PC）
+```
 
 ## NS-3 核心修改說明
 
@@ -123,6 +151,6 @@ LR-WPAN DSME MAC 位於 `src/lr-wpan/`。目前 EB 固定序列化 `DsmePANDescr
 | 章節 | 內容 | 實作狀態 |
 |------|------|----------|
 | Ch3 | Baseline 碰撞機率解析式 | 待推導驗證 |
-| Ch4 | GPS-based power control 設計 | 待實作（目前為 RSSI proxy） |
+| Ch4 | GPS-based power control 設計 | 模擬層方案 B 完成；方案 A（真正改 IE 序列化）列為未來章節 |
 | Ch4 | Power control 碰撞機率解析式 | 待推導 |
-| Ch5 | NS3 模擬比較（Baseline vs PC） | 部分完成，待 GPS 版本完成後重跑 |
+| Ch5 | NS3 模擬比較（Baseline vs PC） | 單點 sanity 完成；跨 N sweep + 多 seed 平均待做 |
