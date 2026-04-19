@@ -103,9 +103,9 @@ Topology      : 純隨機，PAN-C 置中（±150 m 方形）
 ### 進行中 / 待完成
 - [ ] **跨 N sweep**（N=5..50，每 N 多 seed），畫 baseline vs PC 的四指標對照圖
 - [ ] 小 N trade-off 現象的解釋與論文討論（見下方「已知現象」）
+- [ ] **Fixed low power 對照組**：複製 PC 版改成「所有 joiner 固定 −10 dBm、−15 dBm」兩組，回答 null hypothesis「是不是只要功率變低就會改善？」。沒有這個對照，reviewer 會說 PC 演算法沒有貢獻、只是剛好功率變低。
 - [ ] 刪除舊的 `dsme-beacon-slot-selection-random-pick-backbone-powerControl.cc`
 - [ ] **方案 A**（改 NS-3 核心 Custom IE）作為 realism validation — 次要優先
-- [ ] 推導 Baseline / Power Control 碰撞機率解析式（Chapter 3 & 4）
 - [ ] 驗證模擬結果 vs 解析式是否吻合
 
 ## 已知現象與設計取捨
@@ -154,3 +154,28 @@ LR-WPAN DSME MAC 位於 `src/lr-wpan/`。目前 EB 固定序列化 `DsmePANDescr
 | Ch4 | GPS-based power control 設計 | 模擬層方案 B 完成；方案 A（真正改 IE 序列化）列為未來章節 |
 | Ch4 | Power control 碰撞機率解析式 | 待推導 |
 | Ch5 | NS3 模擬比較（Baseline vs PC） | 單點 sanity 完成；跨 N sweep + 多 seed 平均待做 |
+
+## 事件紀錄
+
+### 2026-04-12：本地 git 倉庫毀損（已修復，零資料損失）
+- **症狀**：`.git/objects/` 內 5 個 loose object（ac180a85、15c07fd3、1f1e8ade、b7241921、b9439a58）全部為 0 bytes，時間戳一致為 4/12 18:55。`git status`、`git log` 無法執行，所有 git 操作卡住。
+- **原因**：4/12 18:55 執行 `git commit` 寫入過程中系統異常中斷（斷電/強制關機），filesystem 只同步了 metadata（檔名）、來不及同步 data（內容），導致 5 個 object file 空殼化。這次 commit 包含方案 B 完成後（4/11 `851a5c75` push）繼續開發的 fixed-low-power 對照組。
+- **修復流程（2026-04-19）**：
+  1. `cp -r .git .git.broken-backup-20260419`（保險備份）
+  2. 把 `refs/heads/dsme_new` 從壞掉的 `ac180a85` 改指向遠端最新 `851a5c75`
+  3. 刪除 5 個空 loose object
+  4. `git read-tree HEAD` 重整 index
+- **資料保全**：working directory 完全沒受影響（那些檔案是編輯器更早就存檔的）。遠端 GitHub 也完全沒受影響。唯一「真的丟失」的是那次 commit 的 metadata（commit message、tree 結構），但**修改的檔案內容仍完整**。
+- **教訓**：
+  - Commit 完盡快 push，遠端是最可靠的備份
+  - 進階防護：`git config --global core.fsync committed-objects,loose-object`（犧牲少量效能換安全）
+  - `.git.broken-backup-20260419/` 已加入 `.gitignore`，不 commit 上 repo
+
+### 2026-04-19：方案 A 研究啟動準備
+- 當天確認方案 B（scheme B，模擬層 GPS 表 + 因果閘門）已完整 push 至 GitHub（`851a5c75`）。
+- 4/11 → 4/12 期間完成但未 push 的工作：
+  - `scratch/dsme-beacon-slot-selection-fixed-low-power.cc`（固定低功率對照組，CLAUDE.md TODO 之一）
+  - 對應 sweep 腳本更新與 `-5 / -10 / -15 dBm` 三組輸出檔
+  - CLAUDE.md 本身的大幅擴寫（指標定義、trade-off 說明、架構段落）
+- 這些成果於 2026-04-19 修復 git 後補 commit + push。
+- 準備進入方案 A（改 NS-3 核心 `src/lr-wpan/` 的 IE 序列化，把 GPS 真的塞進 Enhanced Beacon 的 Custom IE），將開新 branch `dsme_scheme_a` 進行。

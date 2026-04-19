@@ -38,7 +38,7 @@ TX_MIN=${TX_MIN:--32.0}
 TX_MAX=${TX_MAX:-0.0}
 PANC_TX=${PANC_TX:-0.0}
 
-echo "# joiners   avg_p_coll   avg_s_coll   avg_eta   avg_P_tx_avg_dBm   repeats=$REPEATS step=$STEP pcMargin=$PC_MARGIN txMin=$TX_MIN txMax=$TX_MAX panCoordTx=$PANC_TX" > "$OUT"
+echo "# joiners  p_coll_mean p_coll_std  s_coll_mean s_coll_std  eta_mean eta_std  Ptx_mean_dBm Ptx_std_dBm   repeats=$REPEATS step=$STEP pcMargin=$PC_MARGIN txMin=$TX_MIN txMax=$TX_MAX panCoordTx=$PANC_TX" > "$OUT"
 
 for J in $(seq "$START" "$STEP" "$END"); do
   echo "[sweep] joiners=$J repeats=$REPEATS" >&2
@@ -81,14 +81,28 @@ for J in $(seq "$START" "$STEP" "$END"); do
     if [[ -n "$V" ]]; then vals_ptx+="$V\n"; cnt_ptx=$((cnt_ptx+1)); fi
   done
 
-  # Averages
-  avg() { local vals="$1" cnt="$2"; if [[ $cnt -gt 0 ]]; then printf "%b" "$vals" | awk 'BEGIN{s=0;n=0} NF{s+=$1;n++} END{if(n>0) printf("%.10f",s/n)}'; else echo "NA"; fi; }
-  AVG_PCOLL=$(avg "$vals_pcoll" "$cnt_pcoll")
-  AVG_SCOLL=$(avg "$vals_scoll" "$cnt_scoll")
-  AVG_ETA=$(avg "$vals_eta" "$cnt_eta")
-  AVG_PTX=$(avg "$vals_ptx" "$cnt_ptx")
+  # Mean + sample std (n-1 denominator). Each metric -> "mean std" pair.
+  stat() {
+    local vals="$1" cnt="$2"
+    if [[ $cnt -gt 0 ]]; then
+      printf "%b" "$vals" | awk 'BEGIN{s=0;s2=0;n=0} NF{s+=$1;s2+=$1*$1;n++} END{
+        if(n>0){
+          m=s/n;
+          v=(n>1)?(s2 - n*m*m)/(n-1):0;
+          if(v<0) v=0;
+          printf("%.10f %.10f", m, sqrt(v));
+        }
+      }'
+    else
+      printf "NA NA"
+    fi
+  }
+  STAT_PCOLL=$(stat "$vals_pcoll" "$cnt_pcoll")
+  STAT_SCOLL=$(stat "$vals_scoll" "$cnt_scoll")
+  STAT_ETA=$(stat "$vals_eta" "$cnt_eta")
+  STAT_PTX=$(stat "$vals_ptx" "$cnt_ptx")
 
-  printf "%d %s %s %s %s\n" "$J" "$AVG_PCOLL" "$AVG_SCOLL" "$AVG_ETA" "$AVG_PTX" >> "$OUT"
+  printf "%d %s %s %s %s\n" "$J" "$STAT_PCOLL" "$STAT_SCOLL" "$STAT_ETA" "$STAT_PTX" >> "$OUT"
 done
 
 echo "[sweep] done. Results in $OUT" >&2
