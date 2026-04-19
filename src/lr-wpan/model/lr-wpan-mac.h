@@ -1517,6 +1517,18 @@ class LrWpanMac : public Object
     void Set6lowpanDataNoACK(bool NoACK);
 
     /**
+     * Set this node's own GPS coordinate (for scheme-A GPS IE in EB).
+     * Call this from the scratch layer once (typically when mobility is installed).
+     * The stored value is serialized into every outgoing Enhanced Beacon as a
+     * HEADERIE_GPS_COORD header IE.
+     */
+    void SetSelfGpsCoord(double latDeg, double lonDeg);
+    void SetSelfGpsCoordE6(int32_t latE6, int32_t lonE6);
+    int32_t GetSelfLatE6() const { return m_selfLatE6; }
+    int32_t GetSelfLonE6() const { return m_selfLonE6; }
+    bool HasSelfGpsCoord() const { return m_selfGpsSet; }
+
+    /**
      * Get the type ID.
      *
      * \return the object TypeId
@@ -2586,6 +2598,23 @@ class LrWpanMac : public Object
     uint32_t m_multiSuperframeDuration;
 
     DsmePANDescriptorIE m_dsmePanDescriptorIE;
+
+    /**
+     * Scheme A: self GPS coord (int32_E6 = degrees * 1e6).
+     * Injected by scratch layer via SetSelfGpsCoord(); serialized into every EB
+     * as HEADERIE_GPS_COORD.  m_selfGpsSet stays false until set; EBs will emit
+     * (0, 0) until then (harmless, receivers just won't treat bootstrap as GPS).
+     */
+    int32_t m_selfLatE6 = 0;
+    int32_t m_selfLonE6 = 0;
+    bool    m_selfGpsSet = false;
+
+    /**
+     * Scheme A trace: fired when this MAC extracts a GPS IE from a received EB.
+     * Signature: (sender short address, sender lat_E6, sender lon_E6).
+     * Scratch layer connects to populate per-node neighbor GPS table.
+     */
+    TracedCallback<Mac16Address, int32_t, int32_t> m_gpsFromBeaconTrace;
 
     uint8_t m_incomingMultisuperframeOrder;
 

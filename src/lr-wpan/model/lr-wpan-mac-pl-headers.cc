@@ -1501,6 +1501,62 @@ void DsmePANDescriptorIE::Print(std::ostream &os) const {
 }
 
 /***********************************************************
+ *                   GpsCoordIE (scheme A)
+ ***********************************************************/
+
+GpsCoordIE::GpsCoordIE() {
+    // descriptor payload length = 8 bytes (two int32), elementID set below
+    m_descriptor.SetLength(8);
+    m_descriptor.SetHeaderElementID(HEADERIE_GPS_COORD);
+}
+
+GpsCoordIE::~GpsCoordIE() {}
+
+NS_OBJECT_ENSURE_REGISTERED(GpsCoordIE);
+
+void GpsCoordIE::SetCoordE6(int32_t latE6, int32_t lonE6) {
+    m_latE6 = latE6;
+    m_lonE6 = lonE6;
+}
+
+int32_t GpsCoordIE::GetLatE6() const { return m_latE6; }
+int32_t GpsCoordIE::GetLonE6() const { return m_lonE6; }
+double  GpsCoordIE::GetLatDeg() const { return static_cast<double>(m_latE6) / 1e6; }
+double  GpsCoordIE::GetLonDeg() const { return static_cast<double>(m_lonE6) / 1e6; }
+
+TypeId GpsCoordIE::GetTypeId() {
+    static TypeId tid = TypeId("ns3::GpsCoordIE")
+                            .SetParent<Header>()
+                            .SetGroupName("LrWpan")
+                            .AddConstructor<GpsCoordIE>();
+    return tid;
+}
+
+TypeId GpsCoordIE::GetInstanceTypeId() const { return GetTypeId(); }
+
+uint32_t GpsCoordIE::GetSerializedSize() const {
+    return m_descriptor.GetSerializedSize() + 4 + 4;  // 2B descriptor + 4B lat + 4B lon
+}
+
+void GpsCoordIE::Serialize(Buffer::Iterator start) const {
+    Buffer::Iterator i = m_descriptor.Serialize(start);
+    i.WriteU32(static_cast<uint32_t>(m_latE6));   // little-endian (NS-3 default)
+    i.WriteU32(static_cast<uint32_t>(m_lonE6));
+}
+
+uint32_t GpsCoordIE::Deserialize(Buffer::Iterator start) {
+    Buffer::Iterator i = m_descriptor.Deserialize(start);
+    m_latE6 = static_cast<int32_t>(i.ReadU32());
+    m_lonE6 = static_cast<int32_t>(i.ReadU32());
+    return i.GetDistanceFrom(start);
+}
+
+void GpsCoordIE::Print(std::ostream &os) const {
+    os << "| GPS Coord IE | lat=" << GetLatDeg() << ", lon=" << GetLonDeg()
+       << " (E6: " << m_latE6 << ", " << m_lonE6 << ")";
+}
+
+/***********************************************************
  *                   Header IE Termination
  ***********************************************************/
 

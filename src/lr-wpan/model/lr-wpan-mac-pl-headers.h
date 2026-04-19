@@ -143,7 +143,8 @@ enum HeaderElementIDs {
     HEADERIE_LIST_TERMINATION_2    = 0x7f,       //!< List Termination 2
     HEADERIE_ENHANCED_GACK         = 0x21,       //!< Reserved bit , extended for E-GACK
     HEADERIE_DSME_GTS_GACK         = 0x22,       //!< Reserved bit , extended for DSME-GTS GACK
-    HEADERIE_RESERVED              = 0x23        //!< Reserved
+    HEADERIE_RESERVED              = 0x23,       //!< Reserved
+    HEADERIE_GPS_COORD             = 0x2a        //!< Non-standard: GPS coord (lat/lon int32_E6) for adaptive beacon power control (thesis scheme A)
 };
 
 /** 
@@ -251,7 +252,44 @@ private:
     GroupACK m_gack;
 };
 
-class AckControl 
+/**
+ * \ingroup lr-wpan
+ * Non-standard Header IE carrying sender's GPS coordinate (lat/lon as int32_E6,
+ * i.e. degrees * 1e6).  Used by thesis "Adaptive Beacon Power Control" (scheme A)
+ * so that receivers can compute distance to the sender from EB contents alone.
+ *
+ * On-wire layout (10 bytes total):
+ *   [2B HeaderIEDescriptor: len=8, elementID=HEADERIE_GPS_COORD, type=0]
+ *   [4B int32 lat_E6 little-endian]
+ *   [4B int32 lon_E6 little-endian]
+ */
+class GpsCoordIE : public Header {
+public:
+    GpsCoordIE();
+    ~GpsCoordIE();
+
+    void SetCoordE6(int32_t latE6, int32_t lonE6);
+    int32_t GetLatE6() const;
+    int32_t GetLonE6() const;
+
+    double GetLatDeg() const;   //!< convenience: latE6 / 1e6
+    double GetLonDeg() const;
+
+    static TypeId GetTypeId();
+    TypeId GetInstanceTypeId() const override;
+
+    uint32_t GetSerializedSize() const override;
+    void Serialize(Buffer::Iterator start) const override;
+    uint32_t Deserialize(Buffer::Iterator start) override;
+    void Print(std::ostream &os) const override;
+
+private:
+    HeaderIEDescriptor m_descriptor;
+    int32_t m_latE6 = 0;
+    int32_t m_lonE6 = 0;
+};
+
+class AckControl
 {
     public:
         AckControl();

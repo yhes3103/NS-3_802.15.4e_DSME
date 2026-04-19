@@ -91,6 +91,11 @@ LrWpanMac::GetTypeId()
                             "This is a non-promiscuous trace,",
                             MakeTraceSourceAccessor(&LrWpanMac::m_macRxTrace),
                             "ns3::Packet::TracedCallback")
+            .AddTraceSource("GpsFromBeacon",
+                            "Scheme A: a GpsCoordIE was extracted from an incoming EB. "
+                            "Args: (sender Mac16Address, latE6, lonE6).",
+                            MakeTraceSourceAccessor(&LrWpanMac::m_gpsFromBeaconTrace),
+                            "ns3::LrWpanMac::GpsFromBeaconTracedCallback")
             .AddTraceSource("MacRxDrop",
                             "Trace source indicating a packet was received, "
                             "but dropped before being forwarded up the stack",
@@ -684,9 +689,17 @@ void LrWpanMac::SendOneEnhancedBeacon() {
         
         // DSME-TODO
         m_dsmePanDescriptorIE.SetHeaderIEDescriptor(m_dsmePanDescriptorIE.GetSerializedSize() - 2
-                                                    , HEADERIE_DSME_PAN_DESCRIPTOR); // debug     
+                                                    , HEADERIE_DSME_PAN_DESCRIPTOR); // debug
 
         beaconPacket->AddHeader(m_dsmePanDescriptorIE);
+
+        // Scheme A: attach GPS Coord IE (non-standard). AddHeader() prepends,
+        // so calling this AFTER DsmePANDescriptorIE places GpsCoordIE BEFORE it
+        // on the wire (right after MAC header). Receiver (scheme-A aware) must
+        // RemoveHeader(GpsCoordIE) before RemoveHeader(DsmePANDescriptorIE).
+        GpsCoordIE gpsIe;
+        gpsIe.SetCoordE6(m_selfLatE6, m_selfLonE6);
+        beaconPacket->AddHeader(gpsIe);
     }
 
     beaconPacket->AddHeader(macHdr); 
@@ -2289,6 +2302,13 @@ void LrWpanMac::PdDataIndication(uint32_t psduLength, Ptr<Packet> p, uint8_t lqi
                 // Extract the Header and Payload IE List here
                 if (m_macDSMEenabled && receivedMacHdr.GetFrameVer() == LrWpanMacHeader::IEEE_802_15_4
                     && receivedMacHdr.IsIEListPresent()) {
+                    // Scheme A: strip GpsCoordIE first (it precedes DsmePANDescriptorIE on wire).
+                    // This is safe only because every scheme-A sender (including PAN-C) emits one.
+                    GpsCoordIE rxGpsIe;
+                    p->RemoveHeader(rxGpsIe);
+                    m_gpsFromBeaconTrace(receivedMacHdr.GetShortSrcAddr(),
+                                         rxGpsIe.GetLatE6(), rxGpsIe.GetLonE6());
+
                     // DSME-TODO
                     // 要怎麼知道第一個 HeaderIE 一定是 Dsme Pan descriptor?
                     p->RemoveHeader(receivedDsmePANDescriptorIEHeaderIE);
@@ -3941,6 +3961,19 @@ void LrWpanMac::ResetDsmeGtsGroupAckBuffer()
 void LrWpanMac::Set6lowpanDataNoACK(bool NoACK)
 {
     m_NoACK = NoACK;
+}
+
+void LrWpanMac::SetSelfGpsCoord(double latDeg, double lonDeg)
+{
+    SetSelfGpsCoordE6(static_cast<int32_t>(latDeg * 1e6),
+                      static_cast<int32_t>(lonDeg * 1e6));
+}
+
+void LrWpanMac::SetSelfGpsCoordE6(int32_t latE6, int32_t lonE6)
+{
+    m_selfLatE6 = latE6;
+    m_selfLonE6 = lonE6;
+    m_selfGpsSet = true;
 }
 
 // ---- Added: DSME Beacon allocation helpers (distributed slot selection) ----
