@@ -1,25 +1,25 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Sweep joiner counts for dsme-beacon-slot-selection-PC and average metrics.
+# Sweep joiner counts for dsme-beacon-slot-selection-PC-schemeB and average metrics.
 #   使用方式：
-#     bash scratch/sweep-dsme-beacon-slot-selection-PC.sh [START] [END] [OUTFILE] [REPEATS] [STEP]
-#   預設：START=10 END=50 OUTFILE=dsme-beacon-slot-selection-PC.txt REPEATS=100 STEP=5
+#     bash scratch/sweep-dsme-beacon-slot-selection-PC-schemeB.sh [START] [END] [OUTFILE] [REPEATS] [STEP]
+#   預設：START=10 END=50 OUTFILE=dsme-beacon-slot-selection-PC-schemeB.txt REPEATS=100 STEP=5
 # 可用環境變數覆寫：
-#   SEED(4) SIMTIME(15) APP(scratch/dsme-beacon-slot-selection-PC)
+#   SEED(4) SIMTIME(15) APP(scratch/dsme-beacon-slot-selection-PC-schemeB)
 #   RXSENS(-95) PLEXP(2.7) REFDIST(1.0) REFLOSS(40.05)
 #   MINEB(1) BASE_OFFSET(2.0) BASE_SLOPE(0.20) RETRY(0.25) TIMEOUT(6.0)
 #   PC_MARGIN(3.0) TX_MIN(-32.0) TX_MAX(0.0) PANC_TX(0.0)
 
 START=${1:-10}
 END=${2:-50}
-OUT=${3:-dsme-beacon-slot-selection-PC.txt}
+OUT=${3:-dsme-beacon-slot-selection-PC-schemeB.txt}
 REPEATS=${4:-100}
 STEP=${5:-5}
 
 SEED=${SEED:-4}
 SIMTIME=${SIMTIME:-15}
-APP=${APP:-scratch/dsme-beacon-slot-selection-PC}
+APP=${APP:-scratch/dsme-beacon-slot-selection-PC-schemeB}
 
 RXSENS=${RXSENS:--95}
 PLEXP=${PLEXP:-2.7}

@@ -15,13 +15,13 @@
 
 | 檔案 | 說明 | 狀態 |
 |------|------|------|
-| `dsme-beacon-slot-selection-baseline.cc` | **Baseline**：純隨機拓樸，無 backbone，固定 0 dBm，用於對照組 | 完成 |
-| `dsme-beacon-slot-selection-PC.cc` | **Power Control（GPS-based, scheme B）**：純隨機拓樸，同 baseline 結構，加上 GPS table + 因果閘門（模擬 IE 夾帶 GPS） | 完成，待 sweep 驗證 |
-| `dsme-beacon-slot-selection-PC-schemeA.cc` | **Power Control（GPS-based, scheme A）**：從 PC.cc 改造，真的透過核心新增的 `GpsCoordIE` 從 EB wire 取得鄰居 GPS | 完成，同 seed 與 scheme B bit-identical |
-| `dsme-beacon-slot-selection-fixed-low-power.cc` | **Fixed low power 對照組**：所有 joiner 固定 −5 / −10 / −15 dBm，用於回答「只要功率變低就會改善？」 | 完成 |
+| `dsme-beacon-slot-selection-fixed-0dBm.cc` | **Baseline**：純隨機拓樸，無 backbone，固定 0 dBm，用於對照組 | 完成 |
+| `dsme-beacon-slot-selection-PC-schemeB.cc` | **Power Control（GPS-based, scheme B）**：純隨機拓樸，同 baseline 結構，加上 GPS table + 因果閘門（模擬 IE 夾帶 GPS） | 完成，待 sweep 驗證 |
+| `dsme-beacon-slot-selection-PC-schemeA.cc` | **Power Control（GPS-based, scheme A）**：從 scheme B 改造，真的透過核心新增的 `GpsCoordIE` 從 EB wire 取得鄰居 GPS | 完成，同 seed 與 scheme B bit-identical |
+| `dsme-beacon-slot-selection-fixed-5dBm.cc` | **Fixed low power 對照組**：所有 joiner 固定 −5 dBm，用於回答「只要功率變低就會改善？」 | 完成 |
 | ~~`dsme-beacon-slot-selection-random-pick-backbone-powerControl.cc`~~ | 舊的 RSSI-based 版本（backbone），**計畫刪除** | 淘汰 |
 
-> **GPS-based 實作方式**：scheme B（`PC.cc`）不改 NS-3 核心，模擬層維護 `g_gpsTable` + `g_heardFromTxByRx` 因果閘門；scheme A（`PC-schemeA.cc`）改核心加 `GpsCoordIE` 真的在 EB wire 上傳 10 bytes，再透過 `GpsFromBeacon` trace 讓 scratch 收 IE。同 RNG seed 兩版 bit-identical → 論文層面方案 B 是方案 A 的合法抽象，可互為驗證。
+> **GPS-based 實作方式**：scheme B（`PC-schemeB.cc`）不改 NS-3 核心，模擬層維護 `g_gpsTable` + `g_heardFromTxByRx` 因果閘門；scheme A（`PC-schemeA.cc`）改核心加 `GpsCoordIE` 真的在 EB wire 上傳 10 bytes，再透過 `GpsFromBeacon` trace 讓 scratch 收 IE。同 RNG seed 兩版 bit-identical → 論文層面方案 B 是方案 A 的合法抽象，可互為驗證。
 
 ## 研究指標定義
 
@@ -96,9 +96,9 @@ Topology      : 純隨機，PAN-C 置中（±150 m 方形）
 
 ### 已完成
 - [x] Baseline 模擬（random topo, 0 dBm fixed）
-- [x] **GPS-based power control 模擬（方案 B）** — `dsme-beacon-slot-selection-PC.cc`
+- [x] **GPS-based power control 模擬（方案 B）** — `dsme-beacon-slot-selection-PC-schemeB.cc`
 - [x] **GPS-based power control 模擬（方案 A，改核心 Custom IE）** — `dsme-beacon-slot-selection-PC-schemeA.cc` + `src/lr-wpan/` 核心改動
-- [x] **Fixed low power 對照組** — `dsme-beacon-slot-selection-fixed-low-power.cc`
+- [x] **Fixed low power 對照組（−5 dBm）** — `dsme-beacon-slot-selection-fixed-5dBm.cc`
 - [x] Path loss exponent 統一為 2.7（baseline 與 PC）
 - [x] 四項指標實作（p_coll, s̄_coll, η, P̄_tx），PC 版 p_coll/s̄_coll 使用各節點實際 TX
 - [x] PAN-C 固定 0 dBm 的設計（bootstrap 種子不做 PC）
@@ -106,7 +106,7 @@ Topology      : 純隨機，PAN-C 置中（±150 m 方形）
 - [x] 方案 A vs 方案 B 等價性驗證：同 seed（seed=1, seed=7）下 scheme A 與 scheme B 的 SDIndex、Tx、p_coll/s̄_coll/η/P̄_tx 完全 bit-identical
 
 ### 進行中 / 待完成
-- [ ] **跨 N sweep**（N=5..50，每 N 多 seed），畫 baseline vs PC（A 或 B 皆可，結果等價）vs fixed-low-power 的四指標對照圖
+- [ ] **跨 N sweep**（N=5..50，每 N 多 seed），畫 baseline vs PC（A 或 B 皆可，結果等價）vs fixed-5dBm 的四指標對照圖
 - [ ] 小 N trade-off 現象的解釋與論文討論（見下方「已知現象」）
 - [ ] 刪除舊的 `dsme-beacon-slot-selection-random-pick-backbone-powerControl.cc`
 - [ ] 驗證模擬結果 vs 解析式是否吻合
@@ -128,9 +128,9 @@ LR-WPAN joiner 完成 association 後 MAC 層 short address 會被 coordinator �
 ## 關鍵程式架構
 
 ### Baseline 碰撞偵測邏輯
-- `dsme-beacon-slot-selection-baseline.cc:214~246` — p_coll / s̄_coll（per receiver-slot 可見 tx 計數）
+- `dsme-beacon-slot-selection-fixed-0dBm.cc:214~246` — p_coll / s̄_coll（per receiver-slot 可見 tx 計數）
 
-### PC 核心邏輯（scheme B：`dsme-beacon-slot-selection-PC.cc`）
+### PC 核心邏輯（scheme B：`dsme-beacon-slot-selection-PC-schemeB.cc`）
 - `ComputePcTxDbm()` — 從 `g_heardFromTxByRx[me]` 找最近鄰居，套 log-distance 反推最小 TX power
 - `OnMacRxWithContext()` BEACON 分支 — 經 `LookupNodeIdByShort` 解析 sender，更新因果閘門
 - Joiner lambda `*done = true` 之後 — 先 `ComputePcTxDbm → ApplyNodeTxDbm`，再 `CoordBoostrap`，確保第一顆 beacon 就用 PC power
@@ -209,7 +209,7 @@ LR-WPAN DSME MAC 位於 `src/lr-wpan/`。scheme A 的修改：
 ### 2026-04-19：方案 A 研究啟動準備
 - 當天確認方案 B（scheme B，模擬層 GPS 表 + 因果閘門）已完整 push 至 GitHub（`851a5c75`）。
 - 4/11 → 4/12 期間完成但未 push 的工作：
-  - `scratch/dsme-beacon-slot-selection-fixed-low-power.cc`（固定低功率對照組，CLAUDE.md TODO 之一）
+  - `scratch/dsme-beacon-slot-selection-fixed-5dBm.cc`（固定低功率對照組 −5 dBm，CLAUDE.md TODO 之一；原名 `fixed-low-power.cc`，2026-04-19 重命名 + 固定至 −5 dBm）
   - 對應 sweep 腳本更新與 `-5 / -10 / -15 dBm` 三組輸出檔
   - CLAUDE.md 本身的大幅擴寫（指標定義、trade-off 說明、架構段落）
 - 這些成果於 2026-04-19 修復 git 後補 commit + push。
@@ -217,14 +217,14 @@ LR-WPAN DSME MAC 位於 `src/lr-wpan/`。scheme A 的修改：
 
 ### 2026-04-19：方案 A 完成 + 等價性驗證
 - 改核心加 `GpsCoordIE`（element ID 0x2a，10-byte on-wire），新 trace source `GpsFromBeacon`（commit `b5526dd`）。
-- 新檔 `scratch/dsme-beacon-slot-selection-PC-schemeA.cc`（commit `204a84a`）：從 PC.cc 改造，god-mode `g_gpsTable` 拆成 `g_selfGps` + `g_neighborGps`（後者只能從 IE 學）。
+- 新檔 `scratch/dsme-beacon-slot-selection-PC-schemeA.cc`（commit `204a84a`）：從 scheme B 改造，god-mode `g_gpsTable` 拆成 `g_selfGps` + `g_neighborGps`（後者只能從 IE 學）。
 - **驗證 1（IE 真的在 wire 上）**：stash 核心改動 → 跑 baseline → EB = 56 bytes；restore 核心改動 → EB = 66 bytes，差 10 bytes 正好等於 `GpsCoordIE::GetSerializedSize()`。
 - **驗證 2（方案等價）**：seed=1 與 seed=7 分別跑 scheme A 和 scheme B，diff 輸出除了 header 字串 + binary 名之外**完全 bit-identical**（SDIndex、Tx dBm、四項 metrics 全部相同）。
 - 推論：reviewer 若質疑方案 B 作弊，可拿 scheme A 的 bit-identical 結果當最強證據；方案 B 自此確立為「方案 A 的合法抽象」，可放心用於大規模 sweep（不用 IE overhead）。
 - 兩個 commit 已 push `origin/dsme_new`，working tree 乾淨。
 
 ### 下次接續的起點
-1. **跨 N sweep 主實驗**（CLAUDE.md TODO 最上面那條）：N=5..50、每 N 多 seed（建議 ≥ 20），baseline vs PC（挑 scheme A 或 B 皆可，B 較快）vs fixed-low-power(-5/-10/-15)，畫四指標對照圖。
+1. **跨 N sweep 主實驗**（CLAUDE.md TODO 最上面那條）：N=5..50、每 N 多 seed（建議 ≥ 20），baseline vs PC（挑 scheme A 或 B 皆可，B 較快）vs fixed-5dBm，畫四指標對照圖。
 2. sweep 跑完之後動手寫論文 Ch5 實驗比較章節。
 3. 加分題：Wireshark Lua dissector 解碼 GPS IE，把 pcap 開起來就看得到 sender 座標。
 4. 刪舊檔 `dsme-beacon-slot-selection-random-pick-backbone-powerControl.cc`（CLAUDE.md 已標計畫刪除）。

@@ -1,25 +1,25 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Sweep joiner counts for dsme-beacon-slot-selection-baseline and average metrics.
+# Sweep joiner counts for dsme-beacon-slot-selection-fixed-5dBm and average metrics.
 #   使用方式：
-#     bash scratch/sweep-random-topo.sh [START] [END] [OUTFILE] [REPEATS] [STEP]
-#   預設：START=5 END=50 OUTFILE=random_topo_sweep.txt REPEATS=20 STEP=5
+#     bash scratch/sweep-dsme-beacon-slot-selection-fixed-5dBm.sh [START] [END] [OUTFILE] [REPEATS] [STEP]
+#   預設：START=10 END=50 OUTFILE=dsme-beacon-slot-selection-fixed-5dBm.txt REPEATS=100 STEP=5
 # 可用環境變數覆寫：
-#   SEED(4) SIMTIME(15) APP(scratch/dsme-beacon-slot-selection-baseline)
+#   SEED(4) SIMTIME(15) APP(scratch/dsme-beacon-slot-selection-fixed-5dBm)
 #   RXSENS(-95) PLEXP(2.7) REFDIST(1.0) REFLOSS(40.05)
 #   MINEB(1) BASE_OFFSET(2.0) BASE_SLOPE(0.20) RETRY(0.25) TIMEOUT(6.0)
-#   FIXED_TX (unset by default; if set, passes --fixedTxDbm=$FIXED_TX to APP)
+#   FIXED_TX(-5.0)
 
 START=${1:-10}
 END=${2:-50}
-OUT=${3:-dsme-beacon-slot-selection-baseline.txt}
+OUT=${3:-dsme-beacon-slot-selection-fixed-5dBm.txt}
 REPEATS=${4:-100}
 STEP=${5:-5}
 
 SEED=${SEED:-4}
 SIMTIME=${SIMTIME:-15}
-APP=${APP:-scratch/dsme-beacon-slot-selection-baseline}
+APP=${APP:-scratch/dsme-beacon-slot-selection-fixed-5dBm}
 
 RXSENS=${RXSENS:--95}
 PLEXP=${PLEXP:-2.7}
@@ -32,13 +32,10 @@ BASE_SLOPE=${BASE_SLOPE:-0.20}
 RETRY=${RETRY:-0.25}
 TIMEOUT=${TIMEOUT:-6.0}
 
-# Optional: fixed TX power for fixed-low-power control group
-EXTRA_ARGS=""
-if [[ -n "${FIXED_TX:-}" ]]; then
-  EXTRA_ARGS="--fixedTxDbm=$FIXED_TX"
-fi
+# Fixed-5dBm specific knob
+FIXED_TX=${FIXED_TX:--5.0}
 
-echo "# joiners  p_coll_mean p_coll_std  s_coll_mean s_coll_std  eta_mean eta_std  Ptx_mean_dBm Ptx_std_dBm   repeats=$REPEATS step=$STEP${FIXED_TX:+ fixedTx=$FIXED_TX}" > "$OUT"
+echo "# joiners  p_coll_mean p_coll_std  s_coll_mean s_coll_std  eta_mean eta_std  Ptx_mean_dBm Ptx_std_dBm   repeats=$REPEATS step=$STEP fixedTx=$FIXED_TX" > "$OUT"
 
 for J in $(seq "$START" "$STEP" "$END"); do
   echo "[sweep] joiners=$J repeats=$REPEATS" >&2
@@ -50,7 +47,7 @@ for J in $(seq "$START" "$STEP" "$END"); do
 
   for r in $(seq 1 "$REPEATS"); do
     RUN_SEED=$(( SEED + J*100 + r ))
-    LOG=$(./ns3 run "$APP --joiners=$J --simTime=$SIMTIME --seed=$RUN_SEED --rxSensDbm=$RXSENS --plExp=$PLEXP --refDist=$REFDIST --refLossDb=$REFLOSS --minEbBeforePick=$MINEB --joinBaseOffset=$BASE_OFFSET --joinBaseSlope=$BASE_SLOPE --joinRetryInterval=$RETRY --joinTimeout=$TIMEOUT $EXTRA_ARGS --verbose=false" 2>&1 || true)
+    LOG=$(./ns3 run "$APP --joiners=$J --simTime=$SIMTIME --seed=$RUN_SEED --rxSensDbm=$RXSENS --plExp=$PLEXP --refDist=$REFDIST --refLossDb=$REFLOSS --minEbBeforePick=$MINEB --joinBaseOffset=$BASE_OFFSET --joinBaseSlope=$BASE_SLOPE --joinRetryInterval=$RETRY --joinTimeout=$TIMEOUT --fixedTxDbm=$FIXED_TX --verbose=false" 2>&1 || true)
 
     # Extract p_coll
     V=$(printf "%s\n" "$LOG" \

@@ -53,3 +53,7 @@ cmake-build-release/
 
 # local git corruption backup (2026-04-12 incident, see CLAUDE.md)
 .git.broken-backup-*/
+
+# simulation outputs dropped at repo root (NetAnim xml, sweep txt)
+/dsme-beacon-slot-selection-*.xml
+/dsme-beacon-slot-selection-*.txt
