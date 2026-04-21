@@ -144,7 +144,7 @@ enum HeaderElementIDs {
     HEADERIE_ENHANCED_GACK         = 0x21,       //!< Reserved bit , extended for E-GACK
     HEADERIE_DSME_GTS_GACK         = 0x22,       //!< Reserved bit , extended for DSME-GTS GACK
     HEADERIE_RESERVED              = 0x23,       //!< Reserved
-    HEADERIE_GPS_COORD             = 0x2a        //!< Non-standard: GPS coord (lat/lon int32_E6) for adaptive beacon power control (thesis scheme A)
+    HEADERIE_GPS_COORD             = 0x18        //!< Non-standard (Unmanaged ID range 0x00-0x19): GPS coord (lat/lon int32_E6) for adaptive beacon power control (thesis scheme A)
 };
 
 /** 

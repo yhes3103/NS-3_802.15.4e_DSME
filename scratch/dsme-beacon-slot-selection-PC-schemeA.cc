@@ -2,7 +2,7 @@
  * DSME beacon slot selection — Power Control, scheme A (real Custom IE in Enhanced Beacon)
  *
  * 與 scheme B（模擬層 g_gpsTable + 因果閘門）的差異：
- *  - GPS 座標透過核心新增的 `GpsCoordIE` (HEADERIE_GPS_COORD = 0x2a) 真正序列化進 EB wire。
+ *  - GPS 座標透過核心新增的 `GpsCoordIE` (HEADERIE_GPS_COORD = 0x18, IEEE Unmanaged ID 區段) 真正序列化進 EB wire。
  *  - 每個節點只知道：a) 自己的 GPS（由本 scratch 透過 LrWpanMac::SetSelfGpsCoord 灌入）；
  *                   b) 鄰居的 GPS ←← 只從收到的 EB 的 GpsCoordIE 解析而得（MAC 的 trace
  *                   source `GpsFromBeacon` 回呼 scratch 更新 g_neighborGps）。

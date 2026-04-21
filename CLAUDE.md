@@ -110,7 +110,7 @@ Topology      : 純隨機，PAN-C 置中（±150 m 方形）
 - [ ] 小 N trade-off 現象的解釋與論文討論（見下方「已知現象」）
 - [ ] 刪除舊的 `dsme-beacon-slot-selection-random-pick-backbone-powerControl.cc`
 - [ ] 驗證模擬結果 vs 解析式是否吻合
-- [ ] （加分題）寫 Wireshark Lua dissector 解碼 `HEADERIE_GPS_COORD`（element ID 0x2a），讓 pcap 可視化 GPS IE 內容
+- [ ] （加分題）寫 Wireshark Lua dissector 解碼 `HEADERIE_GPS_COORD`（element ID 0x18），讓 pcap 可視化 GPS IE 內容
 
 ## 已知現象與設計取捨
 
@@ -156,7 +156,7 @@ LR-WPAN joiner 完成 association 後 MAC 層 short address 會被 coordinator �
 LR-WPAN DSME MAC 位於 `src/lr-wpan/`。scheme A 的修改：
 
 ### `src/lr-wpan/model/lr-wpan-mac-pl-headers.h`
-- 新增 `HEADERIE_GPS_COORD = 0x2a`（非標準 IE element ID，避開 IEEE 已定義範圍）
+- 新增 `HEADERIE_GPS_COORD = 0x18`（IEEE 802.15.4 Unmanaged ID 範圍 0x00–0x19，明確留給實作自訂非標準 IE）
 - 新增 `class GpsCoordIE : public Header` 宣告
 
 ### `src/lr-wpan/model/lr-wpan-mac-pl-headers.cc`
@@ -216,7 +216,7 @@ LR-WPAN DSME MAC 位於 `src/lr-wpan/`。scheme A 的修改：
 - 決定不開新 branch，直接在 `dsme_new` 改方案 A（壞了可 reset 回 `bf329bd`）。
 
 ### 2026-04-19：方案 A 完成 + 等價性驗證
-- 改核心加 `GpsCoordIE`（element ID 0x2a，10-byte on-wire），新 trace source `GpsFromBeacon`（commit `b5526dd`）。
+- 改核心加 `GpsCoordIE`（element ID 0x18，10-byte on-wire），新 trace source `GpsFromBeacon`（commit `b5526dd`，ID 後改為 0x18）。
 - 新檔 `scratch/dsme-beacon-slot-selection-PC-schemeA.cc`（commit `204a84a`）：從 scheme B 改造，god-mode `g_gpsTable` 拆成 `g_selfGps` + `g_neighborGps`（後者只能從 IE 學）。
 - **驗證 1（IE 真的在 wire 上）**：stash 核心改動 → 跑 baseline → EB = 56 bytes；restore 核心改動 → EB = 66 bytes，差 10 bytes 正好等於 `GpsCoordIE::GetSerializedSize()`。
 - **驗證 2（方案等價）**：seed=1 與 seed=7 分別跑 scheme A 和 scheme B，diff 輸出除了 header 字串 + binary 名之外**完全 bit-identical**（SDIndex、Tx dBm、四項 metrics 全部相同）。
