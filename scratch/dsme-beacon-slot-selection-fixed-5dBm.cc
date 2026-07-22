@@ -31,6 +31,7 @@
 #include <functional>
 #include <set>
 #include <limits>
+#include <cstdint>
 
 using namespace ns3;
 
@@ -62,6 +63,12 @@ static double g_joinBaseSlope = 0.20;
 static double g_joinRetryInterval = 0.25;
 static double g_joinTimeout = 6.0;
 static std::map<uint32_t, double> g_listenStartSecByNode;
+
+// ==== 2-hop beacon scheduling (DSME SD-Bitmap relay) ====
+// g_hopScope: 1 = direct 1-hop occupancy; 2 = spec-faithful 2-hop via neighbour bitmap relay.
+static uint32_t g_hopScope = 2;
+// rxNode -> set of neighbour nodeIds whose beacon/DBAN was received directly (1-hop neighbour set).
+static std::map<uint32_t, std::set<uint32_t>> g_heardNeighbors;
 
 // ==== Fixed low power specific state ====
 static double g_fixedTxDbm = -5.0;               // configurable via --fixedTxDbm
@@ -144,6 +151,58 @@ static void ApplyNodeTxDbm(uint32_t nodeId, double dbm)
   g_txDbmByNode[nodeId] = static_cast<double>(nominal);
 }
 
+// LR-WPAN joiners get a new short address after association, so the setup-time cache
+// goes stale. On cache miss, rescan live devices and rebuild — the 2-hop SD-bitmap relay
+// depends on reliable neighbour identification, so we cannot use a stale g_shortToNodeId.
+static uint32_t LookupNodeIdByShort(const std::string& shortStr)
+{
+  auto it = g_shortToNodeId.find(shortStr);
+  if (it != g_shortToNodeId.end()) return it->second;
+  for (uint32_t i = 0; i < NodeList::GetNNodes(); ++i)
+  {
+    Ptr<Node> n = NodeList::GetNode(i);
+    Ptr<NetDevice> nd = n->GetDevice(0);
+    if (!nd) continue;
+    Ptr<LrWpanNetDevice> d = nd->GetObject<LrWpanNetDevice>();
+    if (!d) continue;
+    std::string s = ShortToString(d->GetMac()->GetShortAddress());
+    g_shortToNodeId[s] = n->GetId();
+  }
+  it = g_shortToNodeId.find(shortStr);
+  return (it != g_shortToNodeId.end()) ? it->second : UINT32_MAX;
+}
+
+// Build the SDIndex occupancy view used when a joiner picks its slot.
+//   g_hopScope == 1 : only slots this node heard directly (1-hop).
+//   g_hopScope >= 2 : additionally OR in every 1-hop neighbour's advertised bitmap
+//                     (its own directly-heard slots + its own allocation). This mirrors
+//                     the standard DSME SD-Bitmap relay, which covers the 2-hop
+//                     neighbourhood and prevents hidden-node slot collisions.
+static std::set<uint16_t> BuildUsedView(uint32_t nodeId)
+{
+  std::set<uint16_t> used;
+  auto itSelf = g_localUsedByNode.find(nodeId);
+  if (itSelf != g_localUsedByNode.end())
+    used.insert(itSelf->second.begin(), itSelf->second.end());
+  if (g_hopScope >= 2)
+  {
+    auto itNb = g_heardNeighbors.find(nodeId);
+    if (itNb != g_heardNeighbors.end())
+    {
+      for (uint32_t nb : itNb->second)
+      {
+        auto itNbUsed = g_localUsedByNode.find(nb);
+        if (itNbUsed != g_localUsedByNode.end())
+          used.insert(itNbUsed->second.begin(), itNbUsed->second.end());
+        auto itNbChosen = g_chosen.find(nb);
+        if (itNbChosen != g_chosen.end() && itNbChosen->second != 0xffff)
+          used.insert(itNbChosen->second);
+      }
+    }
+  }
+  return used;
+}
+
 // On EB/DBAN reception, update local observations (same as baseline)
 static void OnMacRxWithContext(std::string context, Ptr<const Packet> p)
 {
@@ -157,10 +216,10 @@ static void OnMacRxWithContext(std::string context, Ptr<const Packet> p)
   if (mh.GetType() == LrWpanMacHeader::LRWPAN_MAC_BEACON)
   {
     g_ebCountByNode[rxNodeId]++;
-    auto itTx = g_shortToNodeId.find(ShortToString(mh.GetShortSrcAddr()));
-    if (itTx != g_shortToNodeId.end())
+    uint32_t txNodeId = LookupNodeIdByShort(ShortToString(mh.GetShortSrcAddr()));
+    if (txNodeId != UINT32_MAX)
     {
-      uint32_t txNodeId = itTx->second;
+      g_heardNeighbors[rxNodeId].insert(txNodeId);   // 1-hop neighbour (for 2-hop relay)
       auto itChosen = g_chosen.find(txNodeId);
       if (itChosen != g_chosen.end())
       {
@@ -177,6 +236,9 @@ static void OnMacRxWithContext(std::string context, Ptr<const Packet> p)
   {
     uint16_t sd = cmd.GetAllocationBcnSDIndex();
     g_localUsedByNode[rxNodeId].insert(sd);
+    uint32_t txNodeId = LookupNodeIdByShort(ShortToString(mh.GetShortSrcAddr()));
+    if (txNodeId != UINT32_MAX)
+      g_heardNeighbors[rxNodeId].insert(txNodeId);   // DBAN sender is a 1-hop neighbour
   }
 }
 
@@ -305,6 +367,7 @@ int main(int argc, char** argv)
   cmd.AddValue("joinBaseSlope", "Join attempt base slope seconds per node index", g_joinBaseSlope);
   cmd.AddValue("joinRetryInterval", "Interval between join retries (s)", g_joinRetryInterval);
   cmd.AddValue("joinTimeout", "Timeout for joining attempts (s)", g_joinTimeout);
+  cmd.AddValue("hopScope", "Beacon occupancy scope: 1=1-hop direct, 2=2-hop SD-bitmap relay (spec)", g_hopScope);
   // Fixed low power knob
   cmd.AddValue("fixedTxDbm", "Fixed TX power for ALL nodes including PAN-C (dBm)", g_fixedTxDbm);
   cmd.Parse(argc, argv);
@@ -443,11 +506,8 @@ int main(int argc, char** argv)
 
       const uint16_t slotsCount = static_cast<uint16_t>(1u << (BO - SO));
       std::vector<bool> locallyUsed(slotsCount, false);
-      auto itset = g_localUsedByNode.find(rxNodeId);
-      if (itset != g_localUsedByNode.end())
-      {
-        for (uint16_t used : itset->second) if (used < slotsCount) locallyUsed[used] = true;
-      }
+      std::set<uint16_t> usedView = BuildUsedView(rxNodeId); // 1-hop or 2-hop per g_hopScope
+      for (uint16_t used : usedView) if (used < slotsCount) locallyUsed[used] = true;
 
       std::vector<uint16_t> candidates;
       for (uint16_t s = 0; s < slotsCount; ++s) if (!locallyUsed[s]) candidates.push_back(s);

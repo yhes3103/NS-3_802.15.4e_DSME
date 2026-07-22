@@ -9,6 +9,7 @@ set -euo pipefail
 #   SEED(4) SIMTIME(15) APP(scratch/dsme-beacon-slot-selection-PC-schemeA)
 #   RXSENS(-95) PLEXP(2.7) REFDIST(1.0) REFLOSS(40.05)
 #   MINEB(1) BASE_OFFSET(2.0) BASE_SLOPE(0.20) RETRY(0.25) TIMEOUT(6.0)
+#   HOPSCOPE(2)  # 1 = 1-hop direct, 2 = 2-hop SD-bitmap relay (spec)
 #   PC_MARGIN(3.0) TX_MIN(-32.0) TX_MAX(0.0) PANC_TX(0.0)
 
 START=${1:-10}
@@ -31,6 +32,7 @@ BASE_OFFSET=${BASE_OFFSET:-2.0}
 BASE_SLOPE=${BASE_SLOPE:-0.20}
 RETRY=${RETRY:-0.25}
 TIMEOUT=${TIMEOUT:-6.0}
+HOPSCOPE=${HOPSCOPE:-2}
 
 # PC-specific knobs
 PC_MARGIN=${PC_MARGIN:-3.0}
@@ -38,7 +40,7 @@ TX_MIN=${TX_MIN:--32.0}
 TX_MAX=${TX_MAX:-0.0}
 PANC_TX=${PANC_TX:-0.0}
 
-echo "# joiners  p_coll_mean p_coll_std  s_coll_mean s_coll_std  eta_mean eta_std  Ptx_mean_dBm Ptx_std_dBm   repeats=$REPEATS step=$STEP pcMargin=$PC_MARGIN txMin=$TX_MIN txMax=$TX_MAX panCoordTx=$PANC_TX" > "$OUT"
+echo "# joiners  p_coll_mean p_coll_std  s_coll_mean s_coll_std  eta_mean eta_std  Ptx_mean_dBm Ptx_std_dBm   repeats=$REPEATS step=$STEP hopScope=$HOPSCOPE pcMargin=$PC_MARGIN txMin=$TX_MIN txMax=$TX_MAX panCoordTx=$PANC_TX" > "$OUT"
 
 for J in $(seq "$START" "$STEP" "$END"); do
   echo "[sweep] joiners=$J repeats=$REPEATS" >&2
@@ -50,7 +52,7 @@ for J in $(seq "$START" "$STEP" "$END"); do
 
   for r in $(seq 1 "$REPEATS"); do
     RUN_SEED=$(( SEED + J*100 + r ))
-    LOG=$(./ns3 run "$APP --joiners=$J --simTime=$SIMTIME --seed=$RUN_SEED --rxSensDbm=$RXSENS --plExp=$PLEXP --refDist=$REFDIST --refLossDb=$REFLOSS --minEbBeforePick=$MINEB --joinBaseOffset=$BASE_OFFSET --joinBaseSlope=$BASE_SLOPE --joinRetryInterval=$RETRY --joinTimeout=$TIMEOUT --pcMarginDb=$PC_MARGIN --txMinDbm=$TX_MIN --txMaxDbm=$TX_MAX --panCoordTxDbm=$PANC_TX --verbose=false" 2>&1 || true)
+    LOG=$(./ns3 run "$APP --joiners=$J --simTime=$SIMTIME --seed=$RUN_SEED --rxSensDbm=$RXSENS --plExp=$PLEXP --refDist=$REFDIST --refLossDb=$REFLOSS --minEbBeforePick=$MINEB --joinBaseOffset=$BASE_OFFSET --joinBaseSlope=$BASE_SLOPE --joinRetryInterval=$RETRY --joinTimeout=$TIMEOUT --hopScope=$HOPSCOPE --pcMarginDb=$PC_MARGIN --txMinDbm=$TX_MIN --txMaxDbm=$TX_MAX --panCoordTxDbm=$PANC_TX --verbose=false" 2>&1 || true)
 
     # Extract p_coll
     V=$(printf "%s\n" "$LOG" \

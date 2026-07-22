@@ -104,9 +104,10 @@ Topology      : 純隨機，PAN-C 置中（±150 m 方形）
 - [x] PAN-C 固定 0 dBm 的設計（bootstrap 種子不做 PC）
 - [x] PC 版 N=16 sanity check：p_coll 由 baseline 的 ~0.08 降到 0.018，P̄_tx = −2.43 dBm
 - [x] 方案 A vs 方案 B 等價性驗證：同 seed（seed=1, seed=7）下 scheme A 與 scheme B 的 SDIndex、Tx、p_coll/s̄_coll/η/P̄_tx 完全 bit-identical
+- [x] **跨 N sweep 主實驗**（N=10..50 step=5，每 N 100 seeds）：baseline / fixed-5dBm / PC schemeA 三組四指標完整數據，schemeB 與 schemeA bit-identical 再次驗證（見 2026-05-05 事件紀錄）
 
 ### 進行中 / 待完成
-- [ ] **跨 N sweep**（N=5..50，每 N 多 seed），畫 baseline vs PC（A 或 B 皆可，結果等價）vs fixed-5dBm 的四指標對照圖
+- [ ] 寫論文 Ch5 實驗比較章節（已有完整數據可直接畫圖、分析）
 - [ ] 小 N trade-off 現象的解釋與論文討論（見下方「已知現象」）
 - [ ] 刪除舊的 `dsme-beacon-slot-selection-random-pick-backbone-powerControl.cc`
 - [ ] 驗證模擬結果 vs 解析式是否吻合
@@ -150,6 +151,12 @@ LR-WPAN joiner 完成 association 後 MAC 層 short address 會被 coordinator �
 --panCoordTxDbm=0.0    # PAN-C 固定功率（不做 PC）
 --seed=<int>           # RngSeedManager 種子（驗證等價性用）
 ```
+
+### 三檔共用 CLI 旋鈕（2026-07-22 新增，baseline/fixed-5/schemeA 皆有）
+```
+--hopScope=2           # beacon 占用感知範圍：1=1-hop 直接聽取，2=2-hop SD-bitmap relay（貼近 spec，預設）
+```
+sweep script 對應環境變數 `HOPSCOPE`（預設 2）。
 
 ## NS-3 核心修改說明（scheme A 已實作，commit `b5526dd`）
 
@@ -223,8 +230,48 @@ LR-WPAN DSME MAC 位於 `src/lr-wpan/`。scheme A 的修改：
 - 推論：reviewer 若質疑方案 B 作弊，可拿 scheme A 的 bit-identical 結果當最強證據；方案 B 自此確立為「方案 A 的合法抽象」，可放心用於大規模 sweep（不用 IE overhead）。
 - 兩個 commit 已 push `origin/dsme_new`，working tree 乾淨。
 
+### 2026-05-05：跨 N sweep 主實驗完成 + Hwang/Nam 2014 MAB 變體調查
+- **三組 sweep**（N=10..50 step=5，每 N 100 seeds）跑完，結果存於 repo root：
+  - `dsme-beacon-slot-selection-fixed-0dBm.txt`（baseline）
+  - `dsme-beacon-slot-selection-fixed-5dBm.txt`（fixed low power 對照）
+  - `dsme-beacon-slot-selection-PC-schemeA.txt`（GPS-based PC，與 schemeB bit-identical 驗證再次成立）
+- **核心發現**（N=50）：
+  - p_coll：baseline 0.333 / fixed-5dBm 0.153 / **PC 0.109**（PC 最低）
+  - η：baseline 0.754 / fixed-5dBm 0.861 / **PC 0.954**（PC 最高、最穩）
+  - PC P̄_tx 從 N=10 的 −1.66 dBm 自適應降到 N=50 的 −4.98 dBm（省能 32%→68%）
+- **fixed-5dBm 的 p_coll 假象**：N=10 時 p_coll 看似只有 0.012，但 η 只有 0.418——一半節點根本沒升級進網，孤立節點不會撞 ≠ 沒問題。論文必須揭穿此 trade-off，避免 reviewer challenge。
+- **PC 最強論點**：N=50 時 PC P̄_tx ≈ −4.98 dBm 跟 fixed −5 dBm 幾乎相同，但 PC p_coll 低 29%、η 高 11%——同等能量花費下，「依拓樸自適應」明確優於「全體無腦降功率」。隔離了「降功率」這個變數、只剩「適應性」效果。
+- **PC 沒有崩盤區**：baseline 大 N 崩、fixed-5 小 N 崩，PC 全段 η ∈ [0.82, 0.97]。robustness 故事乾淨。
+- **新增 scratch/dsme-beacon-slot-selection-PC-schemeA-MAB.cc**（untracked，未 commit）：在 PC schemeA 上把 slot 挑選從 Random 改 MAB（Hwang/Nam 2014 提的 Most Available Bit，pick max_used+1，與機器學習 multi-armed bandit 同名但無關）。
+- **Hwang/Nam 2014 原文調查結論**：他們的「MAB > Random」結論是**經驗觀察、無理論支持**——
+  - 平台：Journal of Applied Mathematics（Hindawi 2014），special issue，審稿品質有疑慮。2023 年 Wiley 收購後 Hindawi 大規模撤稿事件波及該期刊。
+  - 佐證：只有 Figure 4 / Figure 13 兩張長條圖（3×3 grid，9 nodes 固定拓樸 + 10–40 隨機），無 confidence interval、無敏感度分析。
+  - MAB > Random 的文字解釋只有一句邏輯有洞的 "Random 可能不同節點挑到同一 slot"，但他們的 Random 演算法本身會檢查 bitmap 不挑已佔位，跟 MAB 同樣風險。
+  - 他們指標是「join 成功率」（被 allocation notification 在 CSMA 撞掉影響），不是 p_coll；失敗模式跟我們的系統根本不同。
+  - **結論**：Hwang/Nam 的 MAB 優勢是「特定 3×3 grid × join-success metric」的耦合產物，不可推廣到隨機拓樸 + p_coll。MAB 在我們的系統預期不會贏 Random（甚至可能輸），可寫成 Ch5 反例段落。
+- 工作目錄狀態：三組 sweep .txt 已存在；MAB 變體 .cc 尚未 commit、未跑 sweep；`scratch/dsme-beacon-slot-selection-random-pick-backbone-powerControl.cc` 仍未刪。
+
+### 2026-07-22：baseline/fixed-5/schemeA 三檔改成 2-hop beacon scheduling（貼近 spec）
+- **動機**：原本三檔的 slot 挑選只看「直接聽到的鄰居」占用（1-hop），但 IEEE 802.15.4e DSME 標準是靠 SD-Bitmap 逐跳傳播達成 **2-hop** 無衝突排程（解 hidden-node）。等於原本量的 p_coll 其實是 1-hop 直接聽取模型下的 hidden-node 碰撞。
+- **改法（三檔一致）**：
+  - 新增 `g_heardNeighbors[R]`（R 直接聽到 beacon/DBAN 的 1-hop 鄰居集合）。
+  - 新 helper `BuildUsedView(R)`：`g_hopScope==1` 只回 R 直接聽到的 slot；`>=2` 再 OR 進每個鄰居的 advertised bitmap（`g_localUsedByNode[nb]` + 鄰居自己的 slot），即 SD-Bitmap relay 的抽象。嚴格 2-hop、不會無限傳播。
+  - 新 CLI `--hopScope`（**預設 2**；`=1` 復現舊 1-hop，論文可做對照）。
+  - 兩個 fixed 檔補上 `LookupNodeIdByShort()`（依「short address 失效的坑」教訓，2-hop 鄰居辨識不能靠 stale cache）。
+  - 三個 sweep script 加 `HOPSCOPE` 環境變數（預設 2）、傳 `--hopScope`、寫進輸出檔 header。
+- **副作用**：schemeA 改 2-hop 後，`PC-schemeB.cc` / `PC-schemeA-MAB.cc` 仍是 1-hop → schemeA 與 schemeB **不再 bit-identical**（等價性驗證要重做需把 schemeB 也改 2-hop）。
+- **2-hop 主實驗結果**（joiners=10..25 step=1，每點 100 seeds，存 `*-2hop.txt`，repo root、被 gitignore）：
+  - **PC 從 joiners≈14 起全面領先**：η 全段守在 0.78~0.89（唯一不崩），baseline 從 joiners=15 因 2-hop 鄰域過大 slot 耗盡而 η 下滑，fixed-5 因盲降孤立長期低 η（0.43~0.71）。
+  - **p_coll 排序**：fixed-5 最低 < PC < baseline。但 fixed-5 低 p_coll 部分是「少收一半節點」換來的假象（低 η）。**論文務必 p_coll 與 η 成對呈現，勿單獨畫 p_coll。**
+  - **合成指標 collision-free 入網數 = η×joiners×(1−p_coll)**（我方自訂、非標準）：PC 從 joiners=14 起最高且差距擴大（joiners=25 時比 baseline 多 26%、比 fixed-5 多 17%）。這是最有殺傷力的總結圖。
+  - **省能**：PC P̄tx −1.66~−2.85 dBm（省 30~48%），baseline 0 dBm。
+  - ⚠️ 注意 sweep 第一欄是 **joiners**，總節點數 = joiners+1；`eta` 分母也是 joiners。
+- **畫圖**：`scratch/plot-sweep-2hop.py`（吃三個 `-2hop.txt`）→ `plots/fig_summary_2x2_2hop`、四張單圖 `fig_{pcoll,scoll,eta,ptx}_2hop`、`fig_collisionfree_2hop`（png 600dpi + pdf）。
+- **注意**：目前「1-hop」數據若要當對照，須用**現在這份 code** 跑 `--hopScope=1` 重生（舊 `.txt` 是舊 code、混變數不可直接比）。
+
 ### 下次接續的起點
-1. **跨 N sweep 主實驗**（CLAUDE.md TODO 最上面那條）：N=5..50、每 N 多 seed（建議 ≥ 20），baseline vs PC（挑 scheme A 或 B 皆可，B 較快）vs fixed-5dBm，畫四指標對照圖。
-2. sweep 跑完之後動手寫論文 Ch5 實驗比較章節。
-3. 加分題：Wireshark Lua dissector 解碼 GPS IE，把 pcap 開起來就看得到 sender 座標。
-4. 刪舊檔 `dsme-beacon-slot-selection-random-pick-backbone-powerControl.cc`（CLAUDE.md 已標計畫刪除）。
+1. **動手寫論文 Ch5**：主結果改用 2-hop（貼近 spec）。圖用 `plots/fig_*_2hop`，論述見上方 2026-07-22 紀錄。務必把「fixed-5 低 p_coll 是拒收假象」用 η 或 collision-free 圖戳破；crossover（joiners≲14 PC 略輸 baseline）誠實寫出。
+2. （選）同步把 `PC-schemeB.cc` / `PC-schemeA-MAB.cc` 也改 2-hop，恢復 schemeA/B 等價性驗證。
+3. （選）用 `--hopScope=1` 重跑三檔 1-hop，做乾淨的 1-hop vs 2-hop 對照（唯一變數 hopScope）。
+4. 加分題：Wireshark Lua dissector 解碼 GPS IE。
+5. 刪舊檔 `dsme-beacon-slot-selection-random-pick-backbone-powerControl.cc`。
