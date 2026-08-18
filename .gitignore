@@ -57,3 +57,5 @@ cmake-build-release/
 # simulation outputs dropped at repo root (NetAnim xml, sweep txt)
 /dsme-beacon-slot-selection-*.xml
 /dsme-beacon-slot-selection-*.txt
+# 2-hop sweep 結果納入版控（雲端備份，避免本地毀損時丟失）
+!/dsme-beacon-slot-selection-*-2hop.txt

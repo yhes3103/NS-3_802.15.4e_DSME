@@ -48,7 +48,9 @@ for J in $(seq "$START" "$STEP" "$END"); do
   cnt_pcoll=0; cnt_scoll=0; cnt_eta=0; cnt_ptx=0
 
   for r in $(seq 1 "$REPEATS"); do
-    RUN_SEED=$(( SEED + J*100 + r ))
+    # CRN (Common Random Numbers): 每個 N 共用同一組 100 個 seed(SEED+1..SEED+100），
+    # 使相鄰 N 的拓樸 nested（N+1 = N 再加一顆節點），曲線平滑、跨 N 為配對比較。
+    RUN_SEED=$(( SEED + r ))
     LOG=$(./ns3 run "$APP --joiners=$J --simTime=$SIMTIME --seed=$RUN_SEED --rxSensDbm=$RXSENS --plExp=$PLEXP --refDist=$REFDIST --refLossDb=$REFLOSS --minEbBeforePick=$MINEB --joinBaseOffset=$BASE_OFFSET --joinBaseSlope=$BASE_SLOPE --joinRetryInterval=$RETRY --joinTimeout=$TIMEOUT --hopScope=$HOPSCOPE --fixedTxDbm=$FIXED_TX --verbose=false" 2>&1 || true)
 
     # Extract p_coll
